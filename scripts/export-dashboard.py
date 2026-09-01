@@ -130,17 +130,31 @@ def clean_evidence(
     return (text[:limit] or "(empty)"), redactions
 
 
-def clean_url(value: Any, sensitive_values: Iterable[str] = ()) -> tuple[str, int]:
+def clean_url(value: Any, sensitive_values: Iterable[str] = ()) -> tuple[str | None, int]:
     text, redactions = clean_evidence(value, 512, sensitive_values)
     try:
         parsed = urllib.parse.urlsplit(text)
     except ValueError:
-        return text[:220], redactions
-    if parsed.scheme not in {"http", "https", "ftp", "tftp"} or not parsed.netloc:
-        return text[:220], redactions
+        return None, redactions + 1
+    try:
+        port = parsed.port
+    except ValueError:
+        return None, redactions + 1
+    hostname = parsed.hostname
+    if (
+        parsed.scheme.lower() not in {"http", "https", "ftp", "tftp"}
+        or not hostname
+        or not parsed.netloc
+        or parsed.username is not None
+        or parsed.password is not None
+        or any(character.isspace() for character in hostname)
+    ):
+        return None, redactions + 1
     if parsed.query or parsed.fragment:
         redactions += 1
-    return urllib.parse.urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", ""))[:220], redactions
+    host = f"[{hostname}]" if ":" in hostname else hostname
+    netloc = f"{host}:{port}" if port is not None else host
+    return urllib.parse.urlunsplit((parsed.scheme.lower(), netloc, parsed.path, "", ""))[:220], redactions
 
 
 def clean_sha256(value: Any) -> str | None:
@@ -500,7 +514,7 @@ def build_snapshot(
             artifact_counts[key] += 1
             artifact_times[key].append(timestamp)
             technique_counts["tool_transfer"] += 1
-            technique_evidence["tool_transfer"][url] += 1
+            technique_evidence["tool_transfer"][url or "Malformed transfer reference withheld"] += 1
 
     for attempts in auth_evidence.values():
         distinct = list(dict.fromkeys(attempts))
@@ -575,6 +589,7 @@ def build_snapshot(
             detail, _ = clean_evidence(event.get("input"), 180, excluded_ips)
         elif event_id == "cowrie.session.file_download":
             detail, _ = clean_url(event.get("url"), excluded_ips)
+            detail = detail or "Malformed transfer reference withheld"
         address = event["_public_ip"]
         recent.append({
             "time": iso_z(parse_timestamp(event.get("timestamp")) or now), "severity": severity,

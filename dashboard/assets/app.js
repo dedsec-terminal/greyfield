@@ -174,7 +174,7 @@ function renderArtifacts(items) {
     }
     const techniqueCell = node("td"); techniqueCell.append(technique);
     row.append(
-      node("td", "artifact-url", item.url),
+      node("td", "artifact-url", item.url || "Malformed reference withheld"),
       node("td", "hash", item.sha256 || "Unavailable"),
       techniqueCell,
       correlation,

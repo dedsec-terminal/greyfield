@@ -255,9 +255,9 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
             continue
         require_exact_keys(artifact, ARTIFACT_KEYS, f"artifacts[{index}]", errors)
         url = artifact.get("url")
-        if not isinstance(url, str):
-            errors.append(f"artifacts[{index}].url must be a string")
-        else:
+        if url is not None and not isinstance(url, str):
+            errors.append(f"artifacts[{index}].url must be null or a string")
+        elif isinstance(url, str):
             try:
                 parsed_url = urllib.parse.urlsplit(url)
             except ValueError:

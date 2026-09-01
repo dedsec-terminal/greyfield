@@ -1,0 +1,42 @@
+name: checks
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ShellCheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - name: Validate Bash syntax
+        run: bash -n scripts/*.sh
+      - name: Run ShellCheck
+        run: shellcheck scripts/*.sh
+      - name: Run telemetry exporter tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Parse dashboard JavaScript
+        run: node --check dashboard/assets/app.js
+      - name: Check repository whitespace
+        run: git diff --check
+
+  powershell:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse PowerShell scripts
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [void][System.Management.Automation.Language.Parser]::ParseFile(
+            "$PWD/scripts/local-preflight.ps1",
+            [ref]$tokens,
+            [ref]$errors
+          )
+          if ($errors.Count) { $errors | Format-List; exit 1 }

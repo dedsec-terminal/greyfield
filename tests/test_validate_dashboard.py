@@ -1,5 +1,8 @@
 import importlib.util
 import json
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -34,6 +37,17 @@ class DashboardValidationTests(unittest.TestCase):
 
     def test_synthetic_snapshot_passes(self):
         self.assertEqual(validate_dashboard.validate(self.load()), [])
+
+    def test_cli_rejects_snapshot_above_five_megabytes_before_parsing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            oversized = Path(directory) / "metrics.json"
+            oversized.write_bytes(b"{" + b" " * validate_dashboard.MAX_PUBLISHED_FILE_BYTES)
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), str(oversized)],
+                capture_output=True, text=True, check=False,
+            )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("5 MB publication boundary", result.stderr)
 
     def test_snapshot_rejects_unapproved_top_level_field(self):
         snapshot = self.load()
@@ -100,33 +114,36 @@ class DashboardValidationTests(unittest.TestCase):
         errors = validate_dashboard.validate(snapshot)
         self.assertTrue(any("unredacted sensitive pattern" in error for error in errors))
 
-    def test_known_family_requires_qualified_provider_and_time(self):
+    def test_correlated_provider_requires_retrieval_time(self):
         snapshot = self.load()
-        snapshot["artifacts"][0]["classification"] = {
-            "status": "known", "label": "FixtureFamily", "basis": None,
-            "provider": None, "retrieved_at": None,
+        snapshot["artifacts"][0]["correlation"] = {
+            "status": "correlated", "providers": [{
+                "name": "MalwareBazaar", "status": "correlated", "label": "FixtureFamily",
+                "retrieved_at": None, "report_url": None, "tags": [], "malicious": None,
+                "suspicious": None, "harmless": None, "undetected": None,
+            }],
         }
         errors = validate_dashboard.validate(snapshot)
-        self.assertTrue(any("qualified basis" in error for error in errors))
-        self.assertTrue(any("requires a provider" in error for error in errors))
-        self.assertTrue(any("requires retrieval time" in error for error in errors))
+        self.assertTrue(any("retrieved_at is invalid" in error for error in errors))
 
-    def test_unknown_family_requires_provider_and_lookup_time(self):
+    def test_unavailable_correlation_cannot_contain_available_provider(self):
         snapshot = self.load()
-        snapshot["artifacts"][0]["classification"] = {
-            "status": "unknown", "label": None, "basis": None,
-            "provider": None, "retrieved_at": None,
+        snapshot["artifacts"][0]["correlation"] = {
+            "status": "unavailable", "providers": [{
+                "name": "VirusTotal", "status": "not-found", "label": None,
+                "retrieved_at": "2026-09-01T12:00:00Z", "report_url": None, "tags": [],
+                "malicious": None, "suspicious": None, "harmless": None, "undetected": None,
+            }],
         }
         errors = validate_dashboard.validate(snapshot)
-        self.assertTrue(any("unknown classification requires a qualified basis" in error for error in errors))
-        self.assertTrue(any("unknown classification requires a provider" in error for error in errors))
-        self.assertTrue(any("unknown classification requires retrieval time" in error for error in errors))
+        self.assertTrue(any("unavailable state contradicts" in error for error in errors))
 
     def test_decoy_login_cannot_publish_valid_accounts_mapping(self):
         snapshot = self.load()
         snapshot["mitre"].append({
             "id": "T1078", "name": "Valid Accounts", "tactic": "Initial Access",
-            "count": 1, "evidence": ["decoy accepted"],
+            "count": 1, "evidence": [{"value": "decoy accepted", "count": 1, "truncated": False}],
+            "evidence_observed": 1, "evidence_published": 1,
         })
         snapshot["summary"]["attack_techniques"] += 1
         errors = validate_dashboard.validate(snapshot)
@@ -136,7 +153,8 @@ class DashboardValidationTests(unittest.TestCase):
         snapshot = self.load()
         snapshot["mitre"].append({
             "id": "T9999", "name": "Invented Technique", "tactic": "Impact",
-            "count": 1, "evidence": ["unsupported"],
+            "count": 1, "evidence": [{"value": "unsupported", "count": 1, "truncated": False}],
+            "evidence_observed": 1, "evidence_published": 1,
         })
         snapshot["summary"]["attack_techniques"] += 1
         errors = validate_dashboard.validate(snapshot)

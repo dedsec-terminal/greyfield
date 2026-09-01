@@ -1,4 +1,5 @@
 import importlib.util
+import io
 import json
 import tempfile
 import unittest
@@ -26,7 +27,7 @@ class DashboardExportTests(unittest.TestCase):
 
     def test_real_attacker_evidence_is_published_after_operator_exclusion(self):
         snapshot = self.make_snapshot()
-        self.assertEqual(snapshot["schema_version"], "3.0")
+        self.assertEqual(snapshot["schema_version"], "4.0")
         self.assertEqual(snapshot["summary"]["sessions"], 2)
         self.assertEqual(snapshot["summary"]["unique_sources"], 2)
         self.assertEqual(snapshot["summary"]["auth_attempts"], 3)
@@ -47,7 +48,7 @@ class DashboardExportTests(unittest.TestCase):
         self.assertNotIn("fixture-one", rendered)
         self.assertNotIn("T1078", rendered)
         artifact = snapshot["artifacts"][0]
-        self.assertEqual(artifact["classification"]["status"], "unavailable")
+        self.assertEqual(artifact["correlation"]["status"], "unavailable")
         self.assertEqual(artifact["techniques"], ["T1105"])
         command = next(item for item in snapshot["commands"] if item["command"].startswith("curl"))
         self.assertEqual(command["techniques"], ["T1105", "T1059.004"])
@@ -86,30 +87,30 @@ class DashboardExportTests(unittest.TestCase):
         )
         self.assertNotIn("T1110.001", {item["id"] for item in snapshot["mitre"]})
 
-    def test_family_lookup_is_hash_only_and_cached_after_first_query(self):
+    def test_malwarebazaar_lookup_is_hash_only_and_cached_after_first_query(self):
         with tempfile.TemporaryDirectory() as directory:
-            cache = Path(directory) / "family-cache.json"
+            cache = Path(directory) / "enrichment-cache.json"
             auth_key = Path(directory) / "auth-key"
             auth_key.write_text("fixture-auth-key\n", encoding="utf-8")
-            result = {
-                "status": "known", "label": "FixtureFamily", "basis": "third-party",
-                "provider": "MalwareBazaar", "retrieved_at": "2026-09-01T12:30:00Z",
-            }
-            with mock.patch.object(export_dashboard, "lookup_malwarebazaar", return_value=result) as lookup:
+            result = export_dashboard.provider_record(
+                "MalwareBazaar", "correlated", "2026-09-01T12:30:00Z",
+                label="FixtureFamily", report_url="https://bazaar.abuse.ch/sample/" + "a" * 64 + "/",
+            )
+            with mock.patch.object(export_dashboard, "lookup_malwarebazaar", return_value=(result, False)) as lookup:
                 first = self.make_snapshot(
-                    family_cache_path=cache, family_provider="malwarebazaar",
-                    family_auth_key_path=auth_key, family_limit=20,
+                    enrichment_cache_path=cache, enrichment_providers=["malwarebazaar"],
+                    malwarebazaar_key_path=auth_key, provider_limit=3,
                 )
                 second = self.make_snapshot(
-                    family_cache_path=cache, family_provider="malwarebazaar",
-                    family_auth_key_path=auth_key, family_limit=20,
+                    enrichment_cache_path=cache, enrichment_providers=["malwarebazaar"],
+                    malwarebazaar_key_path=auth_key, provider_limit=3,
                 )
             lookup.assert_called_once_with(
                 "a6296a79f44e21b76604d2d2bbf795d2cf380f70e39d45fbf166707ff3b4a6a4",
                 "fixture-auth-key",
             )
-            self.assertEqual(first["artifacts"][0]["classification"], result)
-            self.assertEqual(second["artifacts"][0]["classification"], result)
+            self.assertEqual(first["artifacts"][0]["correlation"]["providers"], [result])
+            self.assertEqual(second["artifacts"][0]["correlation"]["providers"], [result])
             cached = json.loads(cache.read_text(encoding="utf-8"))
             self.assertEqual(list(cached["entries"]), [first["artifacts"][0]["sha256"]])
 
@@ -120,11 +121,11 @@ class DashboardExportTests(unittest.TestCase):
         with mock.patch.object(export_dashboard, "lookup_malwarebazaar") as lookup:
             snapshot = export_dashboard.build_snapshot(
                 events, invalid, {"9.9.9.9"}, "greyfield-test", "test-region-1",
-                family_provider="malwarebazaar",
+                enrichment_providers=["malwarebazaar"],
             )
         lookup.assert_not_called()
         self.assertIsNone(snapshot["artifacts"][0]["sha256"])
-        self.assertEqual(snapshot["artifacts"][0]["classification"]["status"], "unavailable")
+        self.assertEqual(snapshot["artifacts"][0]["correlation"]["status"], "unavailable")
 
     def test_embedded_url_credentials_and_query_are_removed(self):
         cleaned, redactions = export_dashboard.clean_evidence(
@@ -143,12 +144,104 @@ class DashboardExportTests(unittest.TestCase):
         self.assertIsNone(snapshot["artifacts"][0]["url"])
         self.assertIn(
             "Malformed transfer reference withheld",
-            next(item for item in snapshot["mitre"] if item["id"] == "T1105")["evidence"],
+            [item["value"] for item in next(item for item in snapshot["mitre"] if item["id"] == "T1105")["evidence"]],
         )
         self.assertIn(
             "Malformed transfer reference withheld",
             [item["detail"] for item in snapshot["recent"]],
         )
+
+    def test_long_command_is_bounded_and_marked_truncated(self):
+        events, invalid = export_dashboard.load_events(FIXTURE)
+        command = next(event for event in events if event.get("eventid") == "cowrie.command.input")
+        command["input"] = "uname " + "x" * 3000
+        snapshot = export_dashboard.build_snapshot(
+            events, invalid, {"9.9.9.9"}, "greyfield-test", "test-region-1",
+        )
+        published = next(item for item in snapshot["commands"] if item["command"].startswith("uname"))
+        self.assertEqual(len(published["command"]), export_dashboard.COMMAND_LIMIT)
+        self.assertTrue(published["truncated"])
+
+    def test_virustotal_transient_failure_is_backed_off_not_cached_as_evidence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            cache = Path(directory) / "enrichment-cache.json"
+            key = Path(directory) / "vt-key"
+            key.write_text("fixture-vt-key\n", encoding="utf-8")
+            unavailable = export_dashboard.provider_record(
+                "VirusTotal", "unavailable", "2026-09-01T12:30:00Z",
+            )
+            with mock.patch.object(export_dashboard, "lookup_virustotal", return_value=(unavailable, True)) as lookup:
+                first = self.make_snapshot(
+                    enrichment_cache_path=cache, enrichment_providers=["virustotal"],
+                    virustotal_key_path=key, provider_limit=3,
+                )
+                second = self.make_snapshot(
+                    enrichment_cache_path=cache, enrichment_providers=["virustotal"],
+                    virustotal_key_path=key, provider_limit=3,
+                )
+            lookup.assert_called_once()
+            self.assertEqual(first["artifacts"][0]["correlation"]["status"], "unavailable")
+            self.assertEqual(second["artifacts"][0]["correlation"]["providers"], [])
+
+    def test_virustotal_normalizes_existing_hash_report_without_file_submission(self):
+        sha256 = "b" * 64
+        response = io.BytesIO(json.dumps({"data": {"attributes": {
+            "last_analysis_stats": {"malicious": 7, "suspicious": 2, "harmless": 3, "undetected": 58},
+            "popular_threat_classification": {"suggested_threat_label": "Fixture.Loader"},
+            "tags": ["elf", "linux"],
+        }}}).encode())
+        with mock.patch.object(export_dashboard.urllib.request, "urlopen", return_value=response) as request:
+            result, transient = export_dashboard.lookup_virustotal(sha256, "fixture-key")
+        outbound = request.call_args.args[0]
+        self.assertEqual(outbound.full_url, export_dashboard.VIRUSTOTAL_URL + sha256)
+        self.assertEqual(outbound.get_method(), "GET")
+        self.assertIsNone(outbound.data)
+        self.assertFalse(transient)
+        self.assertEqual(result["status"], "correlated")
+        self.assertEqual(result["label"], "Fixture.Loader")
+        self.assertEqual(result["malicious"], 7)
+        self.assertEqual(result["tags"], ["elf", "linux"])
+
+    def test_provider_quota_limits_new_virustotal_hashes_and_spaces_calls(self):
+        with tempfile.TemporaryDirectory() as directory:
+            cache = Path(directory) / "enrichment-cache.json"
+            key = Path(directory) / "vt-key"
+            key.write_text("fixture-vt-key\n", encoding="utf-8")
+            hashes = [f"{index:064x}" for index in range(5)]
+            result = export_dashboard.provider_record("VirusTotal", "not-found", "2026-09-01T12:30:00Z")
+            with mock.patch.object(export_dashboard, "lookup_virustotal", return_value=(result, False)) as lookup, mock.patch.object(export_dashboard.time, "sleep") as pause:
+                mapped, lookups, failures = export_dashboard.enrich_hashes(
+                    hashes, cache, ["virustotal"], None, key, 3,
+                )
+            self.assertEqual(lookup.call_count, 3)
+            self.assertEqual(pause.call_count, 2)
+            self.assertEqual(lookups, 3)
+            self.assertEqual(failures, 0)
+            self.assertEqual(len(mapped), 5)
+
+    def test_schema_four_publication_ceilings_are_explicit(self):
+        events = []
+        for index in range(501):
+            address = f"11.{index // 256}.{index % 256}.1"
+            session = f"session-{index}"
+            timestamp = f"2026-09-01T12:{index % 60:02d}:00Z"
+            events.extend([
+                {"eventid": "cowrie.session.connect", "timestamp": timestamp, "src_ip": address, "session": session, "protocol": "ssh"},
+                {"eventid": "cowrie.login.failed", "timestamp": timestamp, "src_ip": address, "session": session, "username": f"user-{index}", "password": f"pass-{index}"},
+                {"eventid": "cowrie.command.input", "timestamp": timestamp, "src_ip": address, "session": session, "input": f"echo fixture-{index}"},
+                {"eventid": "cowrie.session.file_download", "timestamp": timestamp, "src_ip": address, "session": session, "url": f"http://11.200.{index // 256}.{index % 256}/sample-{index}", "shasum": f"{index:064x}"},
+            ])
+        snapshot = export_dashboard.build_snapshot(events, 0, set(), "greyfield-test", "test-region-1")
+        self.assertEqual(len(snapshot["sources"]), 500)
+        self.assertEqual(len(snapshot["credentials"]["usernames"]), 250)
+        self.assertEqual(len(snapshot["credentials"]["passwords"]), 250)
+        self.assertEqual(len(snapshot["commands"]), 500)
+        self.assertEqual(len(snapshot["artifacts"]), 250)
+        self.assertTrue(all(snapshot["coverage"][key]["truncated"] for key in ("sources", "usernames", "passwords", "commands", "artifacts")))
+        shell = next(item for item in snapshot["mitre"] if item["id"] == "T1059.004")
+        transfer = next(item for item in snapshot["mitre"] if item["id"] == "T1105")
+        self.assertEqual(len(shell["evidence"]), 25)
+        self.assertEqual(len(transfer["evidence"]), 25)
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ import json
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -24,7 +25,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-SCHEMA_VERSION = "3.0"
+SCHEMA_VERSION = "4.0"
 DEFAULT_LOG = Path("/home/cowrie/honeypot/var/log/cowrie/cowrie.json")
 CONTROL_CHARS = re.compile(r"[\x00-\x1f\x7f]+")
 WHITESPACE = re.compile(r"\s+")
@@ -35,8 +36,18 @@ LONG_TOKEN = re.compile(r"\b(?=[A-Za-z0-9_=-]{64,}\b)(?=[A-Za-z0-9_=-]*[_=-])[A-
 SHA256 = re.compile(r"^[a-fA-F0-9]{64}$")
 HOSTNAME = re.compile(r"^(?=.{1,253}$)(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$")
 URL_IN_TEXT = re.compile(r"\b(?:https?|ftp|tftp)://[^\s'\"<>]+", re.I)
-FAMILY_CACHE_SCHEMA = "1.0"
+ENRICHMENT_CACHE_SCHEMA = "2.0"
 MALWAREBAZAAR_URL = "https://mb-api.abuse.ch/api/v1/"
+VIRUSTOTAL_URL = "https://www.virustotal.com/api/v3/files/"
+PUBLIC_LIMITS = {
+    "sources": 500,
+    "usernames": 250,
+    "passwords": 250,
+    "commands": 500,
+    "artifacts": 250,
+    "technique_evidence": 25,
+}
+COMMAND_LIMIT = 2048
 
 TECHNIQUES = {
     "brute_force": ("T1110.001", "Password Guessing", "Credential Access"),
@@ -130,6 +141,11 @@ def clean_evidence(
     return (text[:limit] or "(empty)"), redactions
 
 
+def clean_command(value: Any, sensitive_values: Iterable[str] = ()) -> tuple[str, int, bool]:
+    text, redactions = clean_evidence(value, COMMAND_LIMIT + 1, sensitive_values)
+    return text[:COMMAND_LIMIT], redactions, len(text) > COMMAND_LIMIT
+
+
 def clean_url(value: Any, sensitive_values: Iterable[str] = ()) -> tuple[str | None, int]:
     text, redactions = clean_evidence(value, 512, sensitive_values)
     try:
@@ -213,6 +229,10 @@ def top_rows(counter: Counter[str], limit: int) -> list[dict[str, Any]]:
     return [{"value": label, "count": count} for label, count in counter.most_common(limit)]
 
 
+def coverage_row(observed: int, published: int) -> dict[str, Any]:
+    return {"observed": observed, "published": published, "truncated": observed > published}
+
+
 def load_geo_cache(path: Path | None) -> dict[str, dict[str, Any]]:
     if path is None or not path.exists():
         return {}
@@ -277,22 +297,23 @@ def enrich_sources(
     return cache, lookups, failures
 
 
-def load_family_cache(path: Path | None) -> dict[str, dict[str, Any]]:
+def load_enrichment_cache(path: Path | None) -> dict[str, Any]:
+    empty = {"schema_version": ENRICHMENT_CACHE_SCHEMA, "entries": {}, "retries": {}}
     if path is None or not path.exists():
-        return {}
+        return empty
     try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return {}
-    if not isinstance(payload, dict) or payload.get("schema_version") != FAMILY_CACHE_SCHEMA:
-        return {}
-    entries = payload.get("entries")
-    return entries if isinstance(entries, dict) else {}
+        return empty
+    if not isinstance(payload, dict) or payload.get("schema_version") != ENRICHMENT_CACHE_SCHEMA:
+        return empty
+    if not isinstance(payload.get("entries"), dict) or not isinstance(payload.get("retries"), dict):
+        return empty
+    return payload
 
 
-def save_family_cache(path: Path, entries: dict[str, dict[str, Any]]) -> None:
+def save_enrichment_cache(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"schema_version": FAMILY_CACHE_SCHEMA, "entries": entries}
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     try:
         path.chmod(0o600)
@@ -310,7 +331,20 @@ def read_auth_key(path: Path | None) -> str | None:
     return value or None
 
 
-def lookup_malwarebazaar(sha256: str, auth_key: str) -> dict[str, Any]:
+def provider_record(
+    name: str, status: str, retrieved_at: str, *, label: str | None = None,
+    report_url: str | None = None, tags: list[str] | None = None,
+    malicious: int | None = None, suspicious: int | None = None,
+    harmless: int | None = None, undetected: int | None = None,
+) -> dict[str, Any]:
+    return {
+        "name": name, "status": status, "label": label, "retrieved_at": retrieved_at,
+        "report_url": report_url, "tags": tags or [], "malicious": malicious,
+        "suspicious": suspicious, "harmless": harmless, "undetected": undetected,
+    }
+
+
+def lookup_malwarebazaar(sha256: str, auth_key: str) -> tuple[dict[str, Any], bool]:
     """Query MalwareBazaar by hash only; never submit or retrieve a file."""
     encoded = urllib.parse.urlencode({"query": "get_info", "hash": sha256}).encode("ascii")
     request = urllib.request.Request(
@@ -328,71 +362,141 @@ def lookup_malwarebazaar(sha256: str, auth_key: str) -> dict[str, Any]:
         with urllib.request.urlopen(request, timeout=8) as response:
             payload = json.load(response)
     except (OSError, urllib.error.URLError, json.JSONDecodeError):
-        return {
-            "status": "unavailable", "label": None, "basis": None,
-            "provider": "MalwareBazaar", "retrieved_at": retrieved_at,
-        }
+        return provider_record("MalwareBazaar", "unavailable", retrieved_at), True
     if not isinstance(payload, dict):
-        return {
-            "status": "unavailable", "label": None, "basis": None,
-            "provider": "MalwareBazaar", "retrieved_at": retrieved_at,
-        }
+        return provider_record("MalwareBazaar", "unavailable", retrieved_at), True
     status = str(payload.get("query_status") or "")
     if status in {"hash_not_found", "no_results"}:
-        return {
-            "status": "unknown", "label": None, "basis": "third-party",
-            "provider": "MalwareBazaar", "retrieved_at": retrieved_at,
-        }
+        return provider_record("MalwareBazaar", "not-found", retrieved_at), False
     rows = payload.get("data")
     if status == "ok" and isinstance(rows, list) and rows and isinstance(rows[0], dict):
         label, _ = clean_evidence(rows[0].get("signature"), 80)
-        if label != "(empty)":
-            return {
-                "status": "known", "label": label, "basis": "third-party",
-                "provider": "MalwareBazaar", "retrieved_at": retrieved_at,
-            }
-        return {
-            "status": "unknown", "label": None, "basis": "third-party",
-            "provider": "MalwareBazaar", "retrieved_at": retrieved_at,
-        }
-    return {
-        "status": "unavailable", "label": None, "basis": None,
-        "provider": "MalwareBazaar", "retrieved_at": retrieved_at,
-    }
+        tags = []
+        for value in rows[0].get("tags") or []:
+            cleaned, _ = clean_evidence(value, 40)
+            if cleaned != "(empty)" and cleaned not in tags:
+                tags.append(cleaned)
+            if len(tags) == 8:
+                break
+        return provider_record(
+            "MalwareBazaar", "correlated", retrieved_at,
+            label=None if label == "(empty)" else label,
+            report_url=f"https://bazaar.abuse.ch/sample/{sha256}/", tags=tags,
+        ), False
+    return provider_record("MalwareBazaar", "unavailable", retrieved_at), True
 
 
-def unavailable_classification(provider: str | None = None) -> dict[str, Any]:
-    return {
-        "status": "unavailable", "label": None, "basis": None,
-        "provider": provider, "retrieved_at": None,
-    }
+def lookup_virustotal(sha256: str, api_key: str) -> tuple[dict[str, Any], bool]:
+    """Retrieve an existing VirusTotal hash report; never submit or rescan a file."""
+    retrieved_at = iso_z(datetime.now(timezone.utc))
+    request = urllib.request.Request(
+        VIRUSTOTAL_URL + sha256,
+        headers={"x-apikey": api_key, "User-Agent": "Greyfield/1.0 hash-correlation"},
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=8) as response:
+            payload = json.load(response)
+    except urllib.error.HTTPError as error:
+        if error.code == 404:
+            return provider_record("VirusTotal", "not-found", retrieved_at), False
+        return provider_record("VirusTotal", "unavailable", retrieved_at), True
+    except (OSError, urllib.error.URLError, json.JSONDecodeError):
+        return provider_record("VirusTotal", "unavailable", retrieved_at), True
+    data = payload.get("data") if isinstance(payload, dict) else None
+    attributes = data.get("attributes") if isinstance(data, dict) else None
+    if not isinstance(attributes, dict):
+        return provider_record("VirusTotal", "unavailable", retrieved_at), True
+    stats = attributes.get("last_analysis_stats")
+    stats = stats if isinstance(stats, dict) else {}
+    classification = attributes.get("popular_threat_classification")
+    classification = classification if isinstance(classification, dict) else {}
+    label, _ = clean_evidence(classification.get("suggested_threat_label"), 80)
+    tags = []
+    for value in attributes.get("tags") or []:
+        cleaned, _ = clean_evidence(value, 40)
+        if cleaned != "(empty)" and cleaned not in tags:
+            tags.append(cleaned)
+        if len(tags) == 8:
+            break
+    return provider_record(
+        "VirusTotal", "correlated", retrieved_at,
+        label=None if label == "(empty)" else label,
+        report_url=f"https://www.virustotal.com/gui/file/{sha256}", tags=tags,
+        malicious=int(stats.get("malicious") or 0), suspicious=int(stats.get("suspicious") or 0),
+        harmless=int(stats.get("harmless") or 0), undetected=int(stats.get("undetected") or 0),
+    ), False
 
 
-def enrich_families(
-    hashes: Iterable[str], cache_path: Path | None, provider: str,
-    auth_key_path: Path | None, limit: int,
+def unavailable_correlation() -> dict[str, Any]:
+    return {"status": "unavailable", "providers": []}
+
+
+def correlation_status(records: list[dict[str, Any]], configured_count: int) -> str:
+    if not records:
+        return "unavailable"
+    available = [record for record in records if record.get("status") != "unavailable"]
+    if not available:
+        return "unavailable"
+    if any(record.get("status") == "correlated" for record in available):
+        return "correlated" if len(available) == configured_count else "partial"
+    return "not-found" if len(available) == configured_count else "partial"
+
+
+def enrich_hashes(
+    hashes: Iterable[str], cache_path: Path | None, providers: list[str],
+    malwarebazaar_key_path: Path | None, virustotal_key_path: Path | None,
+    limit: int,
 ) -> tuple[dict[str, dict[str, Any]], int, int]:
-    cache = load_family_cache(cache_path)
+    payload = load_enrichment_cache(cache_path)
+    entries: dict[str, Any] = payload["entries"]
+    retries: dict[str, Any] = payload["retries"]
     normalized_hashes = list(dict.fromkeys(item for item in hashes if SHA256.fullmatch(item)))
     lookups = failures = 0
-    auth_key = read_auth_key(auth_key_path) if provider == "malwarebazaar" else None
-    provider_name = "MalwareBazaar" if provider == "malwarebazaar" else None
-
-    if provider == "malwarebazaar" and auth_key and cache_path is not None:
+    keys = {
+        "malwarebazaar": read_auth_key(malwarebazaar_key_path),
+        "virustotal": read_auth_key(virustotal_key_path),
+    }
+    now = datetime.now(timezone.utc)
+    for provider in providers:
+        key = keys.get(provider)
+        if not key or cache_path is None:
+            continue
+        provider_lookups = 0
         for sha256 in normalized_hashes:
-            if sha256 in cache or lookups >= limit:
+            hash_entries = entries.setdefault(sha256, {})
+            if provider in hash_entries or provider_lookups >= limit:
                 continue
+            retry = retries.get(sha256, {}).get(provider, {})
+            next_retry = parse_timestamp(retry.get("next_retry")) if isinstance(retry, dict) else None
+            if next_retry is not None and next_retry > now:
+                continue
+            if provider == "virustotal" and provider_lookups:
+                time.sleep(16)
+            provider_lookups += 1
             lookups += 1
-            result = lookup_malwarebazaar(sha256, auth_key)
-            cache[sha256] = result
-            if result["status"] == "unavailable":
+            result, transient = (
+                lookup_malwarebazaar(sha256, key) if provider == "malwarebazaar"
+                else lookup_virustotal(sha256, key)
+            )
+            if transient:
                 failures += 1
-        save_family_cache(cache_path, cache)
+                prior_attempts = int(retry.get("attempts") or 0) if isinstance(retry, dict) else 0
+                attempts = min(prior_attempts + 1, 6)
+                delay_hours = min(24, 2 ** (attempts - 1))
+                retries.setdefault(sha256, {})[provider] = {
+                    "attempts": attempts, "next_retry": iso_z(now + timedelta(hours=delay_hours)),
+                }
+            else:
+                hash_entries[provider] = result
+                if sha256 in retries and provider in retries[sha256]:
+                    del retries[sha256][provider]
+        save_enrichment_cache(cache_path, payload)
 
-    output = {}
+    output: dict[str, dict[str, Any]] = {}
     for sha256 in normalized_hashes:
-        cached = cache.get(sha256)
-        output[sha256] = cached if isinstance(cached, dict) else unavailable_classification(provider_name)
+        cached = entries.get(sha256) if isinstance(entries.get(sha256), dict) else {}
+        records = [cached[provider] for provider in providers if isinstance(cached.get(provider), dict)]
+        output[sha256] = {"status": correlation_status(records, len(providers)), "providers": records}
     return output, lookups, failures
 
 
@@ -429,10 +533,13 @@ def build_hourly(events: Iterable[dict[str, Any]], end: datetime) -> list[dict[s
 def build_snapshot(
     events: list[dict[str, Any]], invalid_lines: int, excluded_ips: set[str], sensor_name: str,
     region: str, sensor_status: str = "operational", geo_cache_path: Path | None = None,
-    geo_limit: int = 40, family_cache_path: Path | None = None, family_provider: str = "none",
-    family_auth_key_path: Path | None = None, family_limit: int = 20,
+    geo_limit: int = 40, enrichment_cache_path: Path | None = None,
+    enrichment_providers: list[str] | None = None,
+    malwarebazaar_key_path: Path | None = None, virustotal_key_path: Path | None = None,
+    provider_limit: int = 3,
     public_endpoint: str | None = None,
 ) -> dict[str, Any]:
+    enrichment_providers = enrichment_providers or []
     filtered: list[dict[str, Any]] = []
     excluded_count = non_public_count = 0
     for original in events:
@@ -456,7 +563,7 @@ def build_snapshot(
     usernames: Counter[str] = Counter()
     passwords: Counter[str] = Counter()
     command_counts: Counter[str] = Counter()
-    command_meta: dict[str, tuple[list[str], list[str]]] = {}
+    command_meta: dict[str, tuple[list[str], list[str], bool]] = {}
     artifact_counts: Counter[tuple[str, str | None]] = Counter()
     artifact_times: dict[tuple[str, str | None], list[datetime]] = defaultdict(list)
     auth_evidence: dict[tuple[str, str], list[tuple[str, str]]] = defaultdict(list)
@@ -497,11 +604,11 @@ def build_snapshot(
                 stats["accepted"] += 1
         elif event_id == "cowrie.command.input":
             stats["commands"] += 1
-            command, redacted = clean_evidence(event.get("input"), 220, excluded_ips)
+            command, redacted, truncated = clean_command(event.get("input"), excluded_ips)
             content_redactions += redacted
             families, techniques = classify_command(command)
             command_counts[command] += 1
-            command_meta[command] = (families, techniques)
+            command_meta[command] = (families, techniques, truncated)
             for technique in techniques:
                 technique_counts[technique] += 1
                 technique_evidence[technique][command] += 1
@@ -528,10 +635,13 @@ def build_snapshot(
         source_stats[item]["sessions"] + source_stats[item]["auth_attempts"] + source_stats[item]["commands"],
         source_stats[item]["last_seen"],
     ), reverse=True)
-    geo_cache, geo_lookups, geo_failures = enrich_sources(ranked_addresses[:80], geo_cache_path, excluded_ips, geo_limit)
+    published_addresses = ranked_addresses[:PUBLIC_LIMITS["sources"]]
+    geo_cache, geo_lookups, geo_failures = enrich_sources(
+        published_addresses, geo_cache_path, excluded_ips, geo_limit,
+    )
 
     sources = []
-    for address in ranked_addresses[:80]:
+    for address in published_addresses:
         stats, geo = source_stats[address], geo_cache.get(address, {})
         sources.append({
             "ip": address, "country": geo.get("country", "Unknown"),
@@ -545,34 +655,45 @@ def build_snapshot(
         })
 
     commands = []
-    for command, count in command_counts.most_common(30):
-        families, techniques = command_meta[command]
+    for command, count in command_counts.most_common(PUBLIC_LIMITS["commands"]):
+        families, techniques, truncated = command_meta[command]
         commands.append({
             "command": command, "count": count, "families": families,
             "techniques": [TECHNIQUES[technique][0] for technique in techniques],
+            "truncated": truncated,
         })
 
-    family_map, family_lookups, family_failures = enrich_families(
-        (sha256 for _, sha256 in artifact_counts if sha256), family_cache_path,
-        family_provider, family_auth_key_path, max(0, family_limit),
+    correlation_map, enrichment_lookups, enrichment_failures = enrich_hashes(
+        (sha256 for _, sha256 in artifact_counts if sha256), enrichment_cache_path,
+        enrichment_providers, malwarebazaar_key_path, virustotal_key_path,
+        max(0, provider_limit),
     )
     artifacts = []
-    for (url, sha256), count in artifact_counts.most_common(30):
+    for (url, sha256), count in artifact_counts.most_common(PUBLIC_LIMITS["artifacts"]):
         times = artifact_times[(url, sha256)]
         artifacts.append({
             "url": url, "sha256": sha256, "count": count,
             "first_seen": iso_z(min(times)), "last_seen": iso_z(max(times)),
             "techniques": [TECHNIQUES["tool_transfer"][0]],
-            "classification": family_map.get(sha256, unavailable_classification()) if sha256
-            else unavailable_classification(),
+            "correlation": correlation_map.get(sha256, unavailable_correlation()) if sha256
+            else unavailable_correlation(),
         })
 
     mitre = []
     for key, count in technique_counts.most_common():
         if count:
             technique_id, name, tactic = TECHNIQUES[key]
-            mitre.append({"id": technique_id, "name": name, "tactic": tactic, "count": count,
-                          "evidence": [item for item, _ in technique_evidence[key].most_common(3)]})
+            observed_evidence = technique_evidence[key]
+            evidence = [
+                {"value": value[:COMMAND_LIMIT], "count": evidence_count,
+                 "truncated": len(value) > COMMAND_LIMIT}
+                for value, evidence_count in observed_evidence.most_common(PUBLIC_LIMITS["technique_evidence"])
+            ]
+            mitre.append({
+                "id": technique_id, "name": name, "tactic": tactic, "count": count,
+                "evidence": evidence, "evidence_observed": len(observed_evidence),
+                "evidence_published": len(evidence),
+            })
 
     recent = []
     for event in reversed(filtered):
@@ -586,7 +707,7 @@ def build_snapshot(
             password, _ = clean_evidence(event.get("password"), 64, excluded_ips)
             detail = f"{username} / {password}"
         elif event_id == "cowrie.command.input":
-            detail, _ = clean_evidence(event.get("input"), 180, excluded_ips)
+            detail, _ = clean_evidence(event.get("input"), 512, excluded_ips)
         elif event_id == "cowrie.session.file_download":
             detail, _ = clean_url(event.get("url"), excluded_ips)
             detail = detail or "Malformed transfer reference withheld"
@@ -623,13 +744,23 @@ def build_snapshot(
             "attack_techniques": len(mitre),
         },
         "hourly": build_hourly(filtered, window_end), "protocols": top_rows(protocols, 3), "sources": sources,
-        "credentials": {"usernames": top_rows(usernames, 15), "passwords": top_rows(passwords, 15)},
+        "credentials": {
+            "usernames": top_rows(usernames, PUBLIC_LIMITS["usernames"]),
+            "passwords": top_rows(passwords, PUBLIC_LIMITS["passwords"]),
+        },
         "commands": commands, "artifacts": artifacts, "mitre": mitre, "recent": recent,
+        "coverage": {
+            "sources": coverage_row(len(ranked_addresses), len(sources)),
+            "usernames": coverage_row(len(usernames), min(len(usernames), PUBLIC_LIMITS["usernames"])),
+            "passwords": coverage_row(len(passwords), min(len(passwords), PUBLIC_LIMITS["passwords"])),
+            "commands": coverage_row(len(command_counts), len(commands)),
+            "artifacts": coverage_row(len(artifact_counts), len(artifacts)),
+        },
         "data_quality": {
             "events_published": len(filtered), "invalid_lines": invalid_lines,
             "operator_events_excluded": excluded_count, "non_public_events_excluded": non_public_count,
             "content_redactions": content_redactions, "geo_lookups": geo_lookups, "geo_failures": geo_failures,
-            "family_lookups": family_lookups, "family_failures": family_failures,
+            "enrichment_lookups": enrichment_lookups, "enrichment_failures": enrichment_failures,
             "privacy": "Operator and non-public source IPs excluded before aggregation; sensitive patterns redacted",
         },
         "provenance": {
@@ -646,7 +777,8 @@ def navigator_layer(snapshot: dict[str, Any]) -> dict[str, Any]:
         "domain": "enterprise-attack",
         "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
         "techniques": [{"techniqueID": item["id"], "score": item["count"],
-                        "comment": "; ".join(item["evidence"][:2]), "enabled": True} for item in snapshot["mitre"]],
+                        "comment": "; ".join(evidence["value"] for evidence in item["evidence"][:2]),
+                        "enabled": True} for item in snapshot["mitre"]],
         "gradient": {"colors": ["#17131f", "#7857ff", "#ff5d73"], "minValue": 0, "maxValue": maximum},
     }
 
@@ -663,10 +795,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--public-endpoint")
     parser.add_argument("--geo-cache", type=Path)
     parser.add_argument("--geo-limit", type=int, default=40)
-    parser.add_argument("--family-cache", type=Path)
-    parser.add_argument("--family-provider", choices=("none", "malwarebazaar"), default="none")
-    parser.add_argument("--family-auth-key-file", type=Path)
-    parser.add_argument("--family-limit", type=int, default=20)
+    parser.add_argument("--enrichment-cache", type=Path)
+    parser.add_argument(
+        "--enrichment-provider", action="append", choices=("malwarebazaar", "virustotal"), default=[],
+    )
+    parser.add_argument("--malwarebazaar-auth-key-file", type=Path)
+    parser.add_argument("--virustotal-api-key-file", type=Path)
+    parser.add_argument("--provider-limit", type=int, default=3)
     return parser.parse_args()
 
 
@@ -685,14 +820,23 @@ def main() -> int:
     if args.public_endpoint and clean_public_endpoint(args.public_endpoint) is None:
         print(f"ERROR: Invalid public endpoint: {args.public_endpoint}", file=sys.stderr)
         return 1
-    if args.family_provider == "malwarebazaar" and read_auth_key(args.family_auth_key_file) is None:
-        print("ERROR: MalwareBazaar requires a readable, non-empty --family-auth-key-file", file=sys.stderr)
+    providers = list(dict.fromkeys(args.enrichment_provider))
+    required_keys = {
+        "malwarebazaar": args.malwarebazaar_auth_key_file,
+        "virustotal": args.virustotal_api_key_file,
+    }
+    for provider in providers:
+        if read_auth_key(required_keys[provider]) is None:
+            print(f"ERROR: {provider} requires a readable, non-empty key file", file=sys.stderr)
+            return 1
+    if providers and args.enrichment_cache is None:
+        print("ERROR: configured enrichment providers require --enrichment-cache", file=sys.stderr)
         return 1
     events, invalid = load_events(args.log)
     snapshot = build_snapshot(events, invalid, excluded_ips, args.sensor_name, args.region, args.sensor_status,
-                              args.geo_cache, max(0, args.geo_limit), args.family_cache,
-                              args.family_provider, args.family_auth_key_file, max(0, args.family_limit),
-                              args.public_endpoint)
+                              args.geo_cache, max(0, args.geo_limit), args.enrichment_cache,
+                              providers, args.malwarebazaar_auth_key_file, args.virustotal_api_key_file,
+                              max(0, args.provider_limit), args.public_endpoint)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
     if args.layer_output:

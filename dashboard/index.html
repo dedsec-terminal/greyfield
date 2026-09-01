@@ -15,6 +15,13 @@
   <body>
     <a class="skip-link" href="#main">Skip to observations</a>
     <div class="grain" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="site-brand" href="#top">Greyfield</a>
+      <nav aria-label="Primary navigation">
+        <a href="#pulse">Pulse</a><a href="#origins">Origins</a><a href="#behavior">Behavior</a>
+        <a href="#artifacts">Artifacts</a><a href="#method">Method</a><a href="./evidence.html">Evidence</a>
+      </nav>
+    </header>
 
     <main id="main">
       <section id="top" class="hero">
@@ -36,15 +43,14 @@
         <div class="observatory reveal" aria-label="Geographic distribution of observed attacker sources">
           <div class="observatory-head">
             <span>Source constellation</span>
-            <span id="constellation-label">Awaiting telemetry</span>
+            <span><button id="globe-reset" class="text-button" type="button">Reset globe</button> · <span id="constellation-label">Awaiting telemetry</span></span>
           </div>
           <canvas id="source-canvas"></canvas>
-          <div class="observatory-axis x">180°W <span>0°</span> 180°E</div>
-          <div class="observatory-axis y">90°N <span>0°</span> 90°S</div>
           <div id="source-focus" class="source-focus" aria-live="polite">
-            <small>Hover a signal</small>
-            <strong>Public sources appear here</strong>
+            <small>Rotate or select a signal</small>
+            <strong>Public source details appear here</strong>
           </div>
+          <div id="globe-source-controls" class="visually-hidden" aria-label="Keyboard-accessible source selection"></div>
         </div>
       </section>
 
@@ -62,21 +68,24 @@
       <section id="pulse" class="chapter">
         <header class="chapter-head reveal">
           <div><p class="overline"><span>02</span> Temporal signal</p><h2>Attack pulse</h2></div>
-          <p>A seven-day operating picture of connection volume, credential pressure, post-access commands, and payload-transfer activity reaching the decoy.</p>
+          <p>A 24-hour operating picture by default, with a seven-day view available for longer context. Exact values remain visible at every point.</p>
         </header>
         <div class="pulse-layout">
           <article class="chart-stage reveal">
             <div class="stage-head">
               <div class="legend"><span class="sessions">Sessions</span><span class="auth">Auth</span><span class="commands">Commands</span></div>
               <div class="range-switch" role="group" aria-label="Activity range">
-                <button type="button" data-hours="24">24H</button>
-                <button type="button" data-hours="168" class="active">7D</button>
+                <button type="button" data-series="sessions" class="active" aria-pressed="true">Sessions</button>
+                <button type="button" data-series="auth" class="active" aria-pressed="true">Auth</button>
+                <button type="button" data-series="commands" class="active" aria-pressed="true">Commands</button>
+                <button type="button" data-hours="24" class="active">24H</button>
+                <button type="button" data-hours="168">7D</button>
               </div>
             </div>
             <div id="pulse-chart" class="pulse-chart" role="img" aria-label="Observed activity over time"></div>
           </article>
           <aside class="stream reveal">
-            <div class="stage-head"><strong>Latest evidence</strong><span>UTC</span></div>
+            <div class="stage-head"><strong>Latest evidence</strong><a href="./evidence.html">View evidence ↗</a></div>
             <ol id="event-stream"></ol>
           </aside>
         </div>
@@ -89,7 +98,7 @@
         </header>
         <div class="evidence-toolbar reveal">
           <label><span>Filter source evidence</span><input id="source-search" type="search" placeholder="IP, country, ASN, network…" autocomplete="off"></label>
-          <span id="source-count">— sources</span>
+          <span><span id="source-count">— sources</span> · <a id="source-view-all" href="./evidence.html?section=sources">View all ↗</a></span>
         </div>
         <div class="evidence-table-wrap reveal">
           <table class="evidence-table">
@@ -107,18 +116,18 @@
 
         <div class="credential-pair reveal">
           <article>
-            <header><span>Most-tried usernames</span><small>credential surface</small></header>
+            <header><span>Most-tried usernames</span><a href="./evidence.html?section=credentials">View all ↗</a></header>
             <div id="username-list" class="rank-list"></div>
           </article>
           <article>
-            <header><span>Most-tried passwords</span><small>attacker supplied</small></header>
+            <header><span>Most-tried passwords</span><a href="./evidence.html?section=credentials">View all ↗</a></header>
             <div id="password-list" class="rank-list amber"></div>
           </article>
         </div>
 
         <article class="command-lab reveal">
           <header>
-            <div><span class="terminal-lights" aria-hidden="true"><i></i><i></i><i></i></span><strong>Observed command evidence</strong></div>
+            <div><strong>Observed command evidence</strong><a href="./evidence.html?section=commands">View all ↗</a></div>
             <label><span class="visually-hidden">Filter commands</span><input id="command-search" type="search" placeholder="Search command evidence…" autocomplete="off"></label>
           </header>
           <div class="terminal-heading"><span>count</span><span>observed command</span><span>classification</span><span>ATT&amp;CK</span></div>
@@ -130,6 +139,7 @@
           <a href="./data/attack-layer.json" download>Download Navigator layer <span>↗</span></a>
         </div>
         <div id="mitre-grid" class="mitre-grid"></div>
+        <article id="transfer-intelligence" class="transfer-intelligence reveal"></article>
       </section>
 
       <section id="artifacts" class="chapter">
@@ -138,6 +148,7 @@
           <p>This record identifies transfer infrastructure requested through the decoy, with query material removed and SHA-256 retained for correlation. Retrieval is evidence of transfer activity—not proof of execution, family attribution, or operator identity.</p>
         </header>
         <div id="artifact-empty" class="empty-state" hidden>No artifact retrieval has been observed in this snapshot.</div>
+        <div class="section-action"><a href="./evidence.html?section=artifacts">View all artifact evidence ↗</a></div>
         <div class="artifact-table-wrap reveal">
           <table class="artifact-table">
             <thead><tr><th>Observed URL</th><th>SHA-256</th><th>ATT&amp;CK</th><th>Family correlation</th><th>Count</th><th>Last observed</th></tr></thead>
@@ -161,8 +172,8 @@
           <div><dt>Non-public addresses removed</dt><dd id="quality-private">—</dd></div>
           <div><dt>Sensitive patterns redacted</dt><dd id="quality-redactions">—</dd></div>
           <div><dt>Invalid records skipped</dt><dd id="quality-invalid">—</dd></div>
-          <div><dt>New hash lookups</dt><dd id="quality-family-lookups">—</dd></div>
-          <div><dt>Hash lookup failures</dt><dd id="quality-family-failures">—</dd></div>
+          <div><dt>New hash lookups</dt><dd id="quality-enrichment-lookups">—</dd></div>
+          <div><dt>Hash lookup failures</dt><dd id="quality-enrichment-failures">—</dd></div>
           <div><dt>Schema</dt><dd id="quality-schema">—</dd></div>
         </dl>
       </section>

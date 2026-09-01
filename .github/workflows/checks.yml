@@ -21,7 +21,9 @@ jobs:
       - name: Run telemetry exporter tests
         run: python3 -m unittest discover -s tests -v
       - name: Parse dashboard JavaScript
-        run: node --check dashboard/assets/app.js
+        run: |
+          node --check dashboard/assets/app.js
+          node --check dashboard/assets/evidence.js
       - name: Check repository whitespace
         run: git diff --check
 

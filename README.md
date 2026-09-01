@@ -18,7 +18,9 @@ threat-intelligence enrichment, detection mapping, and governance of sensitive
 security evidence without presenting enrichment as identity or attribution.
 
 The companion observatory is a static GitHub Pages site driven by a validated
-two-file telemetry branch. Raw Cowrie logs, captured files, TTY recordings,
+two-file telemetry branch. Its homepage presents a curated operational view;
+the Evidence explorer provides searchable, paginated reviewed aggregates with
+explicit publication ceilings. Raw Cowrie logs, captured files, TTY recordings,
 session identifiers, operator addresses, secrets, and administrator access
 details never enter the public branch. See the
 [dashboard deployment guide](docs/DASHBOARD.md).
@@ -70,9 +72,10 @@ tests/            Synthetic privacy and aggregation tests
 The dashboard publishes globally routable source addresses, approximate network
 and location context, attempted credentials, inert command text, stripped
 artifact URLs, SHA-256 hashes, and evidence-backed ATT&CK mappings. Optional
-malware-family correlation sends only an unseen hash to the configured provider
-and records the result as known, unknown, or unavailable with its source and
-lookup time.
+MalwareBazaar and VirusTotal correlation sends only unseen hashes and records
+independent, time-stamped provider observations. Greyfield never uploads,
+downloads, rescans, or executes a sample and never presents provider labels as
+confirmed attribution.
 
 Configured operator addresses and all non-public sources are removed before
 aggregation. Email, token, private-key, and URL-query patterns are redacted.

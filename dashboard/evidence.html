@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#08070b">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'">
+    <meta name="description" content="Reviewed and sanitized Greyfield threat evidence across sources, credentials, commands, ATT&CK techniques, and payload transfers.">
+    <title>Evidence — Greyfield Internet Threat Observatory</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script src="./assets/evidence.js" defer></script>
+  </head>
+  <body class="evidence-page">
+    <a class="skip-link" href="#evidence-main">Skip to evidence</a>
+    <div class="grain" aria-hidden="true"></div>
+    <header class="site-header">
+      <a class="site-brand" href="./index.html">Greyfield</a>
+      <nav aria-label="Primary navigation">
+        <a href="./index.html#pulse">Pulse</a><a href="./index.html#origins">Origins</a>
+        <a href="./index.html#behavior">Behavior</a><a href="./index.html#artifacts">Artifacts</a>
+        <a href="./index.html#method">Method</a><a href="./evidence.html" aria-current="page">Evidence</a>
+      </nav>
+    </header>
+
+    <main id="evidence-main" class="evidence-main">
+      <header class="evidence-hero reveal">
+        <p class="overline"><span>Reviewed publication</span> Sanitized evidence explorer</p>
+        <h1>Every published signal.<br><em>Nothing raw.</em></h1>
+        <p>Search the complete reviewed aggregates in the current snapshot. Operator records, private addresses, query secrets, raw session identifiers, and captured files never cross this publication boundary.</p>
+        <div class="hero-meta"><span><small>Snapshot</small><time id="evidence-generated">—</time></span><span><small>Schema</small><strong id="evidence-schema">—</strong></span><span><small>Window</small><strong id="evidence-window">—</strong></span></div>
+      </header>
+
+      <div id="evidence-error" class="error-banner" role="alert" hidden></div>
+      <nav class="evidence-tabs reveal" aria-label="Evidence categories">
+        <button type="button" data-section="sources">Sources</button>
+        <button type="button" data-section="credentials">Credentials</button>
+        <button type="button" data-section="commands">Commands</button>
+        <button type="button" data-section="mitre">ATT&amp;CK</button>
+        <button type="button" data-section="artifacts">Artifacts</button>
+      </nav>
+      <section class="evidence-browser reveal" aria-live="polite">
+        <header class="evidence-browser-head">
+          <div><p class="overline" id="evidence-kicker">Evidence</p><h2 id="evidence-title">Sources</h2></div>
+          <div class="evidence-browser-meta"><strong id="evidence-total">—</strong><span id="evidence-coverage">—</span></div>
+        </header>
+        <label class="evidence-search"><span>Filter this category</span><input id="evidence-search" type="search" placeholder="Search reviewed evidence…" autocomplete="off"></label>
+        <div id="evidence-results" class="evidence-results"></div>
+        <footer class="pagination">
+          <button id="page-previous" type="button">← Previous</button>
+          <span id="page-status">Page 1</span>
+          <button id="page-next" type="button">Next →</button>
+        </footer>
+      </section>
+    </main>
+    <footer><span>Greyfield / Evidence explorer</span><span>Reviewed aggregates · 25 per page</span><a href="./index.html">Return to observatory ↗</a></footer>
+  </body>
+</html>

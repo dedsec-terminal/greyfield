@@ -9,7 +9,7 @@ Cowrie JSON (private on VM)
   -> remove configured operator IPs and non-public addresses
   -> redact email, token, private-key, and URL-query patterns
   -> enrich top public sources through a private local cache
-  -> optionally correlate unseen SHA-256 hashes through a hash-only API lookup
+  -> optionally correlate unseen SHA-256 hashes through independent hash-only providers
   -> telemetry branch: metrics.json + attack-layer.json only
   -> GitHub Actions cross-file schema and privacy validation
   -> GitHub Pages
@@ -20,8 +20,10 @@ Cowrie JSON (private on VM)
 The evidence contract intentionally includes globally routable attacker IPs,
 approximate country/city/ASN context, attempted usernames and passwords,
 commands rendered as inert text, artifact URLs without query strings, SHA-256
-hashes, event times, the public bait endpoint, qualified malware-family context,
-and evidence-backed ATT&CK mappings.
+hashes, event times, the public bait endpoint, qualified third-party provider
+context, and evidence-backed ATT&CK mappings. The homepage is curated; the
+Evidence explorer exposes the reviewed aggregate collection with 25-row
+pagination and explicit observed/published/truncated counts.
 
 It never includes configured operator IPs, private/reserved addresses, Cowrie
 session IDs, TTY recordings, captured binaries, administrator or private
@@ -110,9 +112,11 @@ PUBLIC_ENDPOINT=YOUR_PUBLIC_IP_OR_HOSTNAME
 EXCLUDE_IPS="CURRENT_ADMIN_IP PREVIOUS_TEST_IP ANOTHER_PERSONAL_IP"
 GEO_CACHE=/var/lib/greyfield-dashboard/geo-cache.json
 GEO_LIMIT=40
-FAMILY_PROVIDER=none
-FAMILY_CACHE=/var/lib/greyfield-dashboard/family-cache.json
-FAMILY_LIMIT=20
+ENRICHMENT_PROVIDERS=""
+ENRICHMENT_CACHE=/var/lib/greyfield-dashboard/enrichment-cache.json
+MALWAREBAZAAR_AUTH_KEY_FILE=/etc/greyfield-dashboard/malwarebazaar-auth-key
+VIRUSTOTAL_API_KEY_FILE=/etc/greyfield-dashboard/virustotal-api-key
+PROVIDER_LIMIT=3
 ```
 
 The exporter removes matching events before calculating any counter, source
@@ -126,22 +130,41 @@ the OCI and UFW `/32` rules for real SSH on port `2223`.
 published service list is fixed to Cowrie SSH on public port `22` and Cowrie
 Telnet on public port `23`; the validator rejects administrator port `2223`.
 
-### Optional hash-only family correlation
+### Optional hash-only provider correlation
 
-Family correlation is disabled by default. To enable MalwareBazaar, create a
-separate root-only file containing your MalwareBazaar Auth-Key, then add:
+Provider correlation is disabled by default. Obtain a MalwareBazaar Auth-Key
+from the [abuse.ch authentication portal](https://auth.abuse.ch/) and a
+VirusTotal Community key from
+[VirusTotal personal settings](https://docs.virustotal.com/reference/getting-started).
+Create a separate root-owned file for each key without placing either value in
+the repository, shell history, GitHub telemetry, or browser code:
 
 ```bash
-FAMILY_PROVIDER=malwarebazaar
-FAMILY_AUTH_KEY_FILE=/etc/greyfield-dashboard/malwarebazaar-auth-key
+sudo install -o root -g root -m 0600 /dev/null /etc/greyfield-dashboard/malwarebazaar-auth-key
+sudo install -o root -g root -m 0600 /dev/null /etc/greyfield-dashboard/virustotal-api-key
+sudoedit /etc/greyfield-dashboard/malwarebazaar-auth-key
+sudoedit /etc/greyfield-dashboard/virustotal-api-key
 ```
 
-The exporter submits only previously unseen, syntactically valid SHA-256
-values. It never reads, uploads, downloads, or executes an artifact. Results
-are cached locally and published as `known`, `unknown`, or `unavailable` with
-the provider and lookup time. A returned family name is third-party context,
-not an independently verified attribution. VirusTotal is not integrated and
-must not be enabled without a separate explicit decision and API key.
+Then set `ENRICHMENT_PROVIDERS="malwarebazaar virustotal"` in the root-only
+configuration. The exporter submits only previously unseen, syntactically
+valid SHA-256 values. It never reads, uploads, downloads, rescans, or executes
+an artifact. Successful and not-found results are cached per provider/hash;
+transient failures use bounded backoff. VirusTotal is limited to three new
+hashes per publication and calls are spaced below the Community API rate
+limit. Provider failure never blocks publication.
+
+Published correlation is `correlated`, `not-found`, `partial`, or
+`unavailable`, with provider label, status, retrieval time, report link, and
+normalized metadata. These are time-stamped third-party observations, never a
+Greyfield-confirmed family attribution. Malwarebytes remains an inactive
+adapter boundary until suitable documented API access exists.
+
+Schema `4.0` publication ceilings are 500 sources, 250 usernames, 250
+passwords, 500 distinct commands, 250 artifacts, and 25 evidence values per
+ATT&CK technique. Commands are sanitized to 2,048 characters and carry a
+`truncated` flag when the original exceeded that boundary. Schema `3.0` remains
+temporarily accepted by the website and validator during rollout.
 
 ## 5. Install and test publication
 

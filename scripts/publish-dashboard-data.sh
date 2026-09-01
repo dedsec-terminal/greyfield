@@ -42,10 +42,11 @@ PUBLIC_ENDPOINT="${PUBLIC_ENDPOINT:-}"
 EXCLUDE_IPS="${EXCLUDE_IPS:-}"
 GEO_CACHE="${GEO_CACHE:-/var/lib/greyfield-dashboard/geo-cache.json}"
 GEO_LIMIT="${GEO_LIMIT:-40}"
-FAMILY_PROVIDER="${FAMILY_PROVIDER:-none}"
-FAMILY_CACHE="${FAMILY_CACHE:-/var/lib/greyfield-dashboard/family-cache.json}"
-FAMILY_AUTH_KEY_FILE="${FAMILY_AUTH_KEY_FILE:-}"
-FAMILY_LIMIT="${FAMILY_LIMIT:-20}"
+ENRICHMENT_PROVIDERS="${ENRICHMENT_PROVIDERS:-}"
+ENRICHMENT_CACHE="${ENRICHMENT_CACHE:-/var/lib/greyfield-dashboard/enrichment-cache.json}"
+MALWAREBAZAAR_AUTH_KEY_FILE="${MALWAREBAZAAR_AUTH_KEY_FILE:-}"
+VIRUSTOTAL_API_KEY_FILE="${VIRUSTOTAL_API_KEY_FILE:-}"
+PROVIDER_LIMIT="${PROVIDER_LIMIT:-3}"
 
 require_root_private_file "$DEPLOY_KEY"
 require_root_private_file "$KNOWN_HOSTS"
@@ -75,7 +76,7 @@ git -C "$repo_dir" rm -r -q --ignore-unmatch .
 exclude_args=()
 deny_args=()
 endpoint_args=()
-family_args=(--family-provider "$FAMILY_PROVIDER")
+enrichment_args=()
 if [[ -n "$EXCLUDE_IPS" ]]; then
   read -r -a exclude_ip_list <<<"$EXCLUDE_IPS"
   for address in "${exclude_ip_list[@]}"; do
@@ -86,22 +87,27 @@ fi
 if [[ -n "$PUBLIC_ENDPOINT" ]]; then
   endpoint_args+=(--public-endpoint "$PUBLIC_ENDPOINT")
 fi
-case "$FAMILY_PROVIDER" in
-  none)
-    ;;
-  malwarebazaar)
-    [[ -n "$FAMILY_AUTH_KEY_FILE" ]] || die "Set FAMILY_AUTH_KEY_FILE when FAMILY_PROVIDER=malwarebazaar."
-    require_root_private_file "$FAMILY_AUTH_KEY_FILE"
-    family_args+=(
-      --family-cache "$FAMILY_CACHE"
-      --family-auth-key-file "$FAMILY_AUTH_KEY_FILE"
-      --family-limit "$FAMILY_LIMIT"
-    )
-    ;;
-  *)
-    die "Unsupported FAMILY_PROVIDER: $FAMILY_PROVIDER"
-    ;;
-esac
+if [[ -n "$ENRICHMENT_PROVIDERS" ]]; then
+  read -r -a provider_list <<<"$ENRICHMENT_PROVIDERS"
+  enrichment_args+=(--enrichment-cache "$ENRICHMENT_CACHE" --provider-limit "$PROVIDER_LIMIT")
+  for provider in "${provider_list[@]}"; do
+    case "$provider" in
+      malwarebazaar)
+        [[ -n "$MALWAREBAZAAR_AUTH_KEY_FILE" ]] || die "Set MALWAREBAZAAR_AUTH_KEY_FILE when malwarebazaar is enabled."
+        require_root_private_file "$MALWAREBAZAAR_AUTH_KEY_FILE"
+        enrichment_args+=(--enrichment-provider malwarebazaar --malwarebazaar-auth-key-file "$MALWAREBAZAAR_AUTH_KEY_FILE")
+        ;;
+      virustotal)
+        [[ -n "$VIRUSTOTAL_API_KEY_FILE" ]] || die "Set VIRUSTOTAL_API_KEY_FILE when virustotal is enabled."
+        require_root_private_file "$VIRUSTOTAL_API_KEY_FILE"
+        enrichment_args+=(--enrichment-provider virustotal --virustotal-api-key-file "$VIRUSTOTAL_API_KEY_FILE")
+        ;;
+      *)
+        die "Unsupported enrichment provider: $provider"
+        ;;
+    esac
+  done
+fi
 
 python3 "$EXPORTER" \
   --log "$LOG_FILE" \
@@ -113,7 +119,7 @@ python3 "$EXPORTER" \
   --geo-cache "$GEO_CACHE" \
   --geo-limit "$GEO_LIMIT" \
   "${endpoint_args[@]}" \
-  "${family_args[@]}" \
+  "${enrichment_args[@]}" \
   "${exclude_args[@]}"
 
 python3 "$VALIDATOR" "$repo_dir/metrics.json" \

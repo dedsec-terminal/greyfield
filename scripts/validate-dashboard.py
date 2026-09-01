@@ -18,23 +18,37 @@ FORBIDDEN_RAW_KEYS = {"src_ip", "dst_ip", "src_port", "dst_port", "input", "sess
 REQUIRED_SUMMARY = {
     "sessions", "unique_sources", "auth_attempts", "accepted_logins", "commands", "downloads", "attack_techniques"
 }
-SNAPSHOT_KEYS = {
+SNAPSHOT_KEYS_V3 = {
     "schema_version", "generated_at", "window", "sensor", "summary", "hourly", "protocols", "sources",
     "credentials", "commands", "artifacts", "mitre", "recent", "data_quality", "provenance",
 }
+SNAPSHOT_KEYS_V4 = SNAPSHOT_KEYS_V3 | {"coverage"}
 SOURCE_KEYS = {
     "ip", "country", "country_code", "city", "latitude", "longitude", "asn", "organization", "flag",
     "sessions", "auth_attempts", "accepted", "commands", "downloads", "protocols", "first_seen", "last_seen",
 }
 RECENT_KEYS = {"time", "severity", "protocol", "ip", "country_code", "event", "detail"}
-ARTIFACT_KEYS = {"url", "sha256", "count", "first_seen", "last_seen", "techniques", "classification"}
+ARTIFACT_KEYS_V3 = {"url", "sha256", "count", "first_seen", "last_seen", "techniques", "classification"}
+ARTIFACT_KEYS_V4 = {"url", "sha256", "count", "first_seen", "last_seen", "techniques", "correlation"}
 CLASSIFICATION_KEYS = {"status", "label", "basis", "provider", "retrieved_at"}
-COMMAND_KEYS = {"command", "count", "families", "techniques"}
-MITRE_KEYS = {"id", "name", "tactic", "count", "evidence"}
-DATA_QUALITY_KEYS = {
+CORRELATION_KEYS = {"status", "providers"}
+PROVIDER_KEYS = {
+    "name", "status", "label", "retrieved_at", "report_url", "tags",
+    "malicious", "suspicious", "harmless", "undetected",
+}
+COMMAND_KEYS_V3 = {"command", "count", "families", "techniques"}
+COMMAND_KEYS_V4 = COMMAND_KEYS_V3 | {"truncated"}
+MITRE_KEYS_V3 = {"id", "name", "tactic", "count", "evidence"}
+MITRE_KEYS_V4 = MITRE_KEYS_V3 | {"evidence_observed", "evidence_published"}
+DATA_QUALITY_KEYS_V3 = {
     "events_published", "invalid_lines", "operator_events_excluded", "non_public_events_excluded",
     "content_redactions", "geo_lookups", "geo_failures", "family_lookups", "family_failures", "privacy",
 }
+DATA_QUALITY_KEYS_V4 = (DATA_QUALITY_KEYS_V3 - {"family_lookups", "family_failures"}) | {
+    "enrichment_lookups", "enrichment_failures",
+}
+COVERAGE_GROUPS = {"sources", "usernames", "passwords", "commands", "artifacts"}
+MAX_PUBLISHED_FILE_BYTES = 5 * 1024 * 1024
 APPROVED_TECHNIQUES = {
     "T1110.001": ("Password Guessing", "Credential Access"),
     "T1059.004": ("Unix Shell", "Execution"),
@@ -139,9 +153,11 @@ def validate_sensitive_strings(value: Any, denied_ips: set[str], label: str) -> 
 def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> list[str]:
     errors: list[str] = []
     denied_ips = denied_ips or set()
-    require_exact_keys(snapshot, SNAPSHOT_KEYS, "snapshot", errors)
-    if snapshot.get("schema_version") != "3.0":
-        errors.append("schema_version must equal 3.0")
+    schema = snapshot.get("schema_version")
+    if schema not in {"3.0", "4.0"}:
+        errors.append("schema_version must equal 3.0 or 4.0")
+    is_v4 = schema == "4.0"
+    require_exact_keys(snapshot, SNAPSHOT_KEYS_V4 if is_v4 else SNAPSHOT_KEYS_V3, "snapshot", errors)
     if parse_timestamp(snapshot.get("generated_at")) is None:
         errors.append("generated_at is missing or invalid")
     summary = snapshot.get("summary")
@@ -159,8 +175,23 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         errors.append("window timestamps are invalid")
     elif window_start > window_end:
         errors.append("window.start must not be later than window.end")
-    require_exact_keys(snapshot.get("data_quality"), DATA_QUALITY_KEYS, "data_quality", errors)
+    require_exact_keys(
+        snapshot.get("data_quality"), DATA_QUALITY_KEYS_V4 if is_v4 else DATA_QUALITY_KEYS_V3,
+        "data_quality", errors,
+    )
     require_exact_keys(snapshot.get("provenance"), {"source", "collection", "interpretation"}, "provenance", errors)
+    if is_v4:
+        coverage = snapshot.get("coverage")
+        if require_exact_keys(coverage, COVERAGE_GROUPS, "coverage", errors):
+            for group in sorted(COVERAGE_GROUPS):
+                row = coverage[group]
+                if not require_exact_keys(row, {"observed", "published", "truncated"}, f"coverage.{group}", errors):
+                    continue
+                observed, published = row.get("observed"), row.get("published")
+                if any(not isinstance(value, int) or isinstance(value, bool) or value < 0 for value in (observed, published)):
+                    errors.append(f"coverage.{group} counters must be non-negative integers")
+                elif published > observed or row.get("truncated") is not (observed > published):
+                    errors.append(f"coverage.{group} does not describe its publication boundary")
 
     hourly = snapshot.get("hourly")
     if not isinstance(hourly, list):
@@ -205,8 +236,15 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
             errors.append(f"duplicate source IP in sources[{index}]")
         published_ips.add(normalized)
 
-    if summary is not None and summary.get("unique_sources") != len(sources):
-        errors.append("summary.unique_sources must equal the published sources count")
+    if summary is not None:
+        if is_v4:
+            coverage_sources = snapshot.get("coverage", {}).get("sources", {})
+            if summary.get("unique_sources") != coverage_sources.get("observed"):
+                errors.append("summary.unique_sources must equal coverage.sources.observed")
+            if len(sources) != coverage_sources.get("published"):
+                errors.append("published sources must equal coverage.sources.published")
+        elif summary.get("unique_sources") != len(sources):
+            errors.append("summary.unique_sources must equal the published sources count")
 
     sensor = snapshot.get("sensor")
     endpoint_ip: str | None = None
@@ -253,7 +291,10 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         if not isinstance(artifact, dict):
             errors.append(f"artifacts[{index}] must be an object")
             continue
-        require_exact_keys(artifact, ARTIFACT_KEYS, f"artifacts[{index}]", errors)
+        require_exact_keys(
+            artifact, ARTIFACT_KEYS_V4 if is_v4 else ARTIFACT_KEYS_V3,
+            f"artifacts[{index}]", errors,
+        )
         url = artifact.get("url")
         if url is not None and not isinstance(url, str):
             errors.append(f"artifacts[{index}].url must be null or a string")
@@ -275,6 +316,62 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
             errors.append(f"artifacts[{index}].sha256 must be null or lowercase SHA-256")
         if artifact.get("techniques") != ["T1105"]:
             errors.append(f"artifacts[{index}].techniques must contain only T1105")
+        if is_v4:
+            correlation = artifact.get("correlation")
+            if not require_exact_keys(correlation, CORRELATION_KEYS, f"artifacts[{index}].correlation", errors):
+                continue
+            if correlation.get("status") not in {"correlated", "not-found", "partial", "unavailable"}:
+                errors.append(f"artifacts[{index}].correlation.status is invalid")
+            providers = correlation.get("providers")
+            if not isinstance(providers, list):
+                errors.append(f"artifacts[{index}].correlation.providers must be an array")
+                continue
+            names: set[str] = set()
+            for provider_index, provider_record in enumerate(providers):
+                path = f"artifacts[{index}].correlation.providers[{provider_index}]"
+                if not require_exact_keys(provider_record, PROVIDER_KEYS, path, errors):
+                    continue
+                name = provider_record.get("name")
+                if name not in {"MalwareBazaar", "VirusTotal"}:
+                    errors.append(f"{path}.name is not an approved provider")
+                elif name in names:
+                    errors.append(f"{path}.name is duplicated")
+                names.add(name)
+                if provider_record.get("status") not in {"correlated", "not-found", "unavailable"}:
+                    errors.append(f"{path}.status is invalid")
+                if parse_timestamp(provider_record.get("retrieved_at")) is None:
+                    errors.append(f"{path}.retrieved_at is invalid")
+                label = provider_record.get("label")
+                if label is not None and (not isinstance(label, str) or not label.strip()):
+                    errors.append(f"{path}.label must be null or non-empty text")
+                report_url = provider_record.get("report_url")
+                if report_url is not None:
+                    try:
+                        parsed_report = urllib.parse.urlsplit(report_url)
+                    except ValueError:
+                        parsed_report = None
+                    approved_host = {
+                        "MalwareBazaar": "bazaar.abuse.ch", "VirusTotal": "www.virustotal.com",
+                    }.get(name)
+                    if parsed_report is None or parsed_report.scheme != "https" or parsed_report.hostname != approved_host or parsed_report.query or parsed_report.fragment:
+                        errors.append(f"{path}.report_url is not an approved provider URL")
+                tags = provider_record.get("tags")
+                if not isinstance(tags, list) or len(tags) > 8 or any(not isinstance(tag, str) or not tag for tag in tags):
+                    errors.append(f"{path}.tags must contain at most eight strings")
+                for counter in ("malicious", "suspicious", "harmless", "undetected"):
+                    value = provider_record.get(counter)
+                    if value is not None and (not isinstance(value, int) or isinstance(value, bool) or value < 0):
+                        errors.append(f"{path}.{counter} must be null or a non-negative integer")
+                if name == "MalwareBazaar" and any(provider_record.get(counter) is not None for counter in ("malicious", "suspicious", "harmless", "undetected")):
+                    errors.append(f"{path} must not claim antivirus-engine counts")
+            status = correlation.get("status")
+            available = [record for record in providers if isinstance(record, dict) and record.get("status") != "unavailable"]
+            if status == "unavailable" and available:
+                errors.append(f"artifacts[{index}].correlation unavailable state contradicts provider results")
+            if status == "correlated" and not any(record.get("status") == "correlated" for record in available):
+                errors.append(f"artifacts[{index}].correlation correlated state lacks provider evidence")
+            continue
+
         classification = artifact.get("classification")
         if not isinstance(classification, dict):
             errors.append(f"artifacts[{index}].classification must be an object")
@@ -321,7 +418,14 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         if not isinstance(command, dict):
             errors.append(f"commands[{index}] must be an object")
             continue
-        require_exact_keys(command, COMMAND_KEYS, f"commands[{index}]", errors)
+        require_exact_keys(
+            command, COMMAND_KEYS_V4 if is_v4 else COMMAND_KEYS_V3,
+            f"commands[{index}]", errors,
+        )
+        if is_v4 and not isinstance(command.get("truncated"), bool):
+            errors.append(f"commands[{index}].truncated must be boolean")
+        if not isinstance(command.get("command"), str) or not command["command"] or len(command["command"]) > 2048:
+            errors.append(f"commands[{index}].command must contain at most 2048 characters")
         if not isinstance(command.get("families"), list) or not command["families"]:
             errors.append(f"commands[{index}].families must be a non-empty array")
         techniques = command.get("techniques")
@@ -341,7 +445,7 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         if not isinstance(item, dict) or not isinstance(item.get("id"), str) or not TECHNIQUE_ID.fullmatch(item["id"]):
             errors.append(f"mitre[{index}] must contain a valid ATT&CK ID")
             continue
-        require_exact_keys(item, MITRE_KEYS, f"mitre[{index}]", errors)
+        require_exact_keys(item, MITRE_KEYS_V4 if is_v4 else MITRE_KEYS_V3, f"mitre[{index}]", errors)
         approved = APPROVED_TECHNIQUES.get(item["id"])
         if approved is None:
             if item["id"] == "T1078":
@@ -353,7 +457,27 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         if not isinstance(item.get("count"), int) or isinstance(item.get("count"), bool) or item["count"] < 1:
             errors.append(f"mitre[{index}].count must be a positive integer")
         evidence = item.get("evidence")
-        if not isinstance(evidence, list) or not evidence or len(evidence) > 3 or any(
+        if is_v4:
+            if not isinstance(evidence, list) or not evidence or len(evidence) > 25:
+                errors.append(f"mitre[{index}].evidence must contain one to 25 reviewed entries")
+                evidence = []
+            for evidence_index, evidence_item in enumerate(evidence):
+                path = f"mitre[{index}].evidence[{evidence_index}]"
+                if not require_exact_keys(evidence_item, {"value", "count", "truncated"}, path, errors):
+                    continue
+                if not isinstance(evidence_item.get("value"), str) or not evidence_item["value"] or len(evidence_item["value"]) > 2048:
+                    errors.append(f"{path}.value must contain at most 2048 characters")
+                if not isinstance(evidence_item.get("count"), int) or isinstance(evidence_item.get("count"), bool) or evidence_item["count"] < 1:
+                    errors.append(f"{path}.count must be a positive integer")
+                if not isinstance(evidence_item.get("truncated"), bool):
+                    errors.append(f"{path}.truncated must be boolean")
+            observed = item.get("evidence_observed")
+            published = item.get("evidence_published")
+            if not isinstance(observed, int) or isinstance(observed, bool) or observed < len(evidence):
+                errors.append(f"mitre[{index}].evidence_observed is invalid")
+            if published != len(evidence):
+                errors.append(f"mitre[{index}].evidence_published must equal evidence length")
+        elif not isinstance(evidence, list) or not evidence or len(evidence) > 3 or any(
             not isinstance(value, str) or not value for value in evidence
         ):
             errors.append(f"mitre[{index}].evidence must contain one to three strings")
@@ -436,7 +560,12 @@ def validate_layer(
         if item.get("enabled") is not True:
             errors.append(f"Navigator technique {technique_id} must be enabled")
         evidence = source.get("evidence") if isinstance(source.get("evidence"), list) else []
-        expected_comment = "; ".join(str(value) for value in evidence[:2])
+        if snapshot.get("schema_version") == "4.0":
+            expected_comment = "; ".join(
+                str(value.get("value")) for value in evidence[:2] if isinstance(value, dict)
+            )
+        else:
+            expected_comment = "; ".join(str(value) for value in evidence[:2])
         if item.get("comment") != expected_comment:
             errors.append(f"Navigator technique {technique_id} comment does not match metrics.json")
     if seen != set(expected):
@@ -459,6 +588,16 @@ def main() -> int:
     parser.add_argument("--deny-ip", action="append", default=[])
     parser.add_argument("--max-age-hours", type=float)
     args = parser.parse_args()
+    for label, path in (("snapshot", args.snapshot), ("Navigator layer", args.layer)):
+        if path is None:
+            continue
+        try:
+            if path.stat().st_size > MAX_PUBLISHED_FILE_BYTES:
+                print(f"ERROR: {label} exceeds the 5 MB publication boundary", file=sys.stderr)
+                return 1
+        except OSError as error:
+            print(f"ERROR: {error}", file=sys.stderr)
+            return 1
     try:
         snapshot = json.loads(args.snapshot.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:

@@ -9,15 +9,21 @@
   "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
   "techniques": [
     {
-      "techniqueID": "T1082",
-      "score": 6,
-      "comment": "/bin/./uname -s -v -n -r -m; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH uname=$(uname -s -v -n -m 2>/dev/null || /bin/uname -s -v -n -m 2>/dev/null || /usr/bin/uname -s -v -n -m 2>/dev/null || busybox uname -s -v ",
+      "techniqueID": "T1059.004",
+      "score": 34,
+      "comment": "system; shell",
       "enabled": true
     },
     {
-      "techniqueID": "T1059.004",
-      "score": 1,
-      "comment": "/bin/busybox",
+      "techniqueID": "T1110.001",
+      "score": 20,
+      "comment": "enable\\x00 / linuxshell\\x00; root / xc3511",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1082",
+      "score": 7,
+      "comment": "/bin/./uname -s -v -n -r -m; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH uname=$(uname -s -v -n -m 2>/dev/null || /bin/uname -s -v -n -m 2>/dev/null || /usr/bin/uname -s -v -n -m 2>/dev/null || busybox uname -s -v ",
       "enabled": true
     },
     {
@@ -34,6 +40,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 6
+    "maxValue": 34
   }
 }

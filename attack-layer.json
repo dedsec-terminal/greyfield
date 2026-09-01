@@ -1,0 +1,39 @@
+{
+  "name": "Greyfield observed techniques",
+  "versions": {
+    "attack": "19.2",
+    "navigator": "5.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
+  "techniques": [
+    {
+      "techniqueID": "T1082",
+      "score": 6,
+      "comment": "/bin/./uname -s -v -n -r -m; export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:$PATH uname=$(uname -s -v -n -m 2>/dev/null || /bin/uname -s -v -n -m 2>/dev/null || /usr/bin/uname -s -v -n -m 2>/dev/null || busybox uname -s -v ",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1059.004",
+      "score": 1,
+      "comment": "/bin/busybox",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1083",
+      "score": 1,
+      "comment": "cd /proc && cat self/cmdline",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#17131f",
+      "#7857ff",
+      "#ff5d73"
+    ],
+    "minValue": 0,
+    "maxValue": 6
+  }
+}

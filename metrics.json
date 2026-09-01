@@ -1,9 +1,9 @@
 {
   "schema_version": "4.0",
-  "generated_at": "2026-09-01T23:18:30Z",
+  "generated_at": "2026-09-01T23:21:37Z",
   "window": {
     "start": "2026-09-01T13:12:37Z",
-    "end": "2026-09-01T23:18:25Z"
+    "end": "2026-09-01T23:20:22Z"
   },
   "sensor": {
     "name": "greyfield-honeypot",
@@ -25,9 +25,9 @@
     }
   },
   "summary": {
-    "sessions": 594,
+    "sessions": 596,
     "unique_sources": 84,
-    "auth_attempts": 515,
+    "auth_attempts": 518,
     "accepted_logins": 37,
     "commands": 92,
     "downloads": 2,
@@ -1205,8 +1205,8 @@
     },
     {
       "bucket": "2026-09-01T23:00:00Z",
-      "sessions": 24,
-      "auth": 25,
+      "sessions": 26,
+      "auth": 28,
       "commands": 0,
       "downloads": 0
     }
@@ -1214,7 +1214,7 @@
   "protocols": [
     {
       "value": "SSH",
-      "count": 531
+      "count": 533
     },
     {
       "value": "TELNET",
@@ -1253,8 +1253,8 @@
       "asn": 17762,
       "organization": "Tata Teleservices Maharashtra Ltd",
       "flag": "\ud83c\uddee\ud83c\uddf3",
-      "sessions": 106,
-      "auth_attempts": 106,
+      "sessions": 108,
+      "auth_attempts": 108,
       "accepted": 1,
       "commands": 1,
       "downloads": 0,
@@ -1262,7 +1262,7 @@
         "SSH"
       ],
       "first_seen": "2026-09-01T18:01:31Z",
-      "last_seen": "2026-09-01T23:14:53Z"
+      "last_seen": "2026-09-01T23:20:22Z"
     },
     {
       "ip": "110.173.190.221",
@@ -1275,7 +1275,7 @@
       "organization": "PRIMENET GLOBAL LTD.",
       "flag": "\ud83c\uddee\ud83c\uddf3",
       "sessions": 51,
-      "auth_attempts": 50,
+      "auth_attempts": 51,
       "accepted": 1,
       "commands": 1,
       "downloads": 0,
@@ -1283,7 +1283,7 @@
         "SSH"
       ],
       "first_seen": "2026-09-01T19:15:07Z",
-      "last_seen": "2026-09-01T23:18:25Z"
+      "last_seen": "2026-09-01T23:18:38Z"
     },
     {
       "ip": "178.128.46.237",
@@ -3002,7 +3002,7 @@
     "usernames": [
       {
         "value": "root",
-        "count": 364
+        "count": 367
       },
       {
         "value": "admin",
@@ -3619,6 +3619,10 @@
         "count": 2
       },
       {
+        "value": "112233332211",
+        "count": 2
+      },
+      {
         "value": "system",
         "count": 2
       },
@@ -4028,10 +4032,6 @@
       },
       {
         "value": "1qaz2wsx",
-        "count": 1
-      },
-      {
-        "value": "112233332211",
         "count": 1
       },
       {
@@ -4796,8 +4796,41 @@
         "T1105"
       ],
       "correlation": {
-        "status": "unavailable",
-        "providers": []
+        "status": "correlated",
+        "providers": [
+          {
+            "name": "MalwareBazaar",
+            "status": "correlated",
+            "label": null,
+            "retrieved_at": "2026-09-01T23:21:37Z",
+            "report_url": "https://bazaar.abuse.ch/sample/a6296a79f44e21b76604d2d2bbf795d2cf380f70e39d45fbf166707ff3b4a6a4/",
+            "tags": [
+              "cowrie",
+              "honeypot",
+              "sh"
+            ],
+            "malicious": null,
+            "suspicious": null,
+            "harmless": null,
+            "undetected": null
+          },
+          {
+            "name": "VirusTotal",
+            "status": "correlated",
+            "label": "trojan.shell/i7i1kt",
+            "retrieved_at": "2026-09-01T23:21:40Z",
+            "report_url": "https://www.virustotal.com/gui/file/a6296a79f44e21b76604d2d2bbf795d2cf380f70e39d45fbf166707ff3b4a6a4",
+            "tags": [
+              "detect-debug-environment",
+              "shell",
+              "sets-process-name"
+            ],
+            "malicious": 10,
+            "suspicious": 0,
+            "harmless": 0,
+            "undetected": 50
+          }
+        ]
       }
     },
     {
@@ -4810,8 +4843,35 @@
         "T1105"
       ],
       "correlation": {
-        "status": "unavailable",
-        "providers": []
+        "status": "correlated",
+        "providers": [
+          {
+            "name": "MalwareBazaar",
+            "status": "not-found",
+            "label": null,
+            "retrieved_at": "2026-09-01T23:21:38Z",
+            "report_url": null,
+            "tags": [],
+            "malicious": null,
+            "suspicious": null,
+            "harmless": null,
+            "undetected": null
+          },
+          {
+            "name": "VirusTotal",
+            "status": "correlated",
+            "label": null,
+            "retrieved_at": "2026-09-01T23:21:56Z",
+            "report_url": "https://www.virustotal.com/gui/file/4af5a5c98ad132095c6fbe7b02c242153a190a01cc321e50a916a0ca46fbaa62",
+            "tags": [
+              "text"
+            ],
+            "malicious": 0,
+            "suspicious": 0,
+            "harmless": 0,
+            "undetected": 60
+          }
+        ]
       }
     }
   ],
@@ -5189,6 +5249,51 @@
   ],
   "recent": [
     {
+      "time": "2026-09-01T23:20:21Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "49.248.197.50",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / zxc123"
+    },
+    {
+      "time": "2026-09-01T23:20:21Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "49.248.197.50",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-01T23:18:43Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "49.248.197.50",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / test123"
+    },
+    {
+      "time": "2026-09-01T23:18:43Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "49.248.197.50",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-01T23:18:34Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / 112233332211"
+    },
+    {
       "time": "2026-09-01T23:18:23Z",
       "severity": "info",
       "protocol": "SSH",
@@ -5502,51 +5607,6 @@
       "country_code": "PL",
       "event": "Credential rejected",
       "detail": "support / support"
-    },
-    {
-      "time": "2026-09-01T23:04:42Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.198",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-01T23:04:25Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "49.248.197.50",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / master"
-    },
-    {
-      "time": "2026-09-01T23:04:25Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "49.248.197.50",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-01T23:04:00Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / 1020"
-    },
-    {
-      "time": "2026-09-01T23:03:48Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
     }
   ],
   "coverage": {
@@ -5561,7 +5621,7 @@
       "truncated": false
     },
     "passwords": {
-      "observed": 367,
+      "observed": 369,
       "published": 250,
       "truncated": true
     },
@@ -5577,14 +5637,14 @@
     }
   },
   "data_quality": {
-    "events_published": 2911,
+    "events_published": 2923,
     "invalid_lines": 0,
     "operator_events_excluded": 0,
     "non_public_events_excluded": 0,
     "content_redactions": 1,
-    "geo_lookups": 3,
+    "geo_lookups": 0,
     "geo_failures": 0,
-    "enrichment_lookups": 0,
+    "enrichment_lookups": 4,
     "enrichment_failures": 0,
     "privacy": "Operator and non-public source IPs excluded before aggregation; sensitive patterns redacted"
   },

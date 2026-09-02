@@ -10,13 +10,13 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 387,
+      "score": 480,
       "comment": "sh; shell",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 299,
+      "score": 366,
       "comment": "enable\\x00 / linuxshell\\x00; root / root",
       "enabled": true
     },
@@ -70,6 +70,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 387
+    "maxValue": 480
   }
 }

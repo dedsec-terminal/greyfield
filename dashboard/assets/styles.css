@@ -122,7 +122,9 @@ main, footer { width: var(--content); margin-inline: auto; }
 .metric-band span, .metric-band small { display: block; color: var(--dim); font: 8px var(--mono); letter-spacing: .11em; text-transform: uppercase; }
 .metric-band strong { display: block; margin: 13px 0 8px; font: 400 clamp(30px, 3vw, 48px)/1 var(--serif); }
 
-.chapter { padding: clamp(100px, 11vw, 180px) 0 0; scroll-margin-top: 70px; }
+.chapter { position: relative; isolation: isolate; margin-top: clamp(64px, 7vw, 110px); overflow: clip; border-top: 1px solid var(--line); padding: clamp(86px, 9vw, 145px) 0 0; scroll-margin-top: 92px; }
+.chapter::before { position: absolute; z-index: -1; top: 0; right: 0; left: 0; height: clamp(120px, 16vw, 240px); background: linear-gradient(180deg, rgba(158,131,255,.035), transparent); content: ""; pointer-events: none; }
+.chapter > * { position: relative; }
 .chapter-head { display: grid; grid-template-columns: 1fr minmax(320px, 570px); align-items: end; gap: 70px; margin-bottom: 55px; }
 .chapter-head .overline { margin-bottom: 17px; }
 .chapter h2 { margin: 0; font: 400 clamp(42px, 4.5vw, 72px)/.96 var(--serif); letter-spacing: -.04em; }
@@ -202,7 +204,7 @@ td:last-child, th:last-child { padding-right: 0; }
 .classification { min-width: 190px; }.classification strong, .classification small, .classification time { display: block; }.classification strong { color: #cfc7d7; font-weight: 500; }.classification small, .classification time { margin-top: 6px; color: var(--dim); font-size: 8px; line-height: 1.45; }
 .empty-state { border-block: 1px solid var(--line); padding: 45px 0; color: var(--muted); font: 11px var(--mono); }
 
-.method { display: grid; grid-template-columns: .8fr 1fr .9fr; gap: 70px; align-items: start; margin-top: 130px; border-top: 1px solid var(--line); padding-top: 70px; }
+.method { display: grid; grid-template-columns: .8fr 1fr .9fr; gap: 70px; align-items: start; margin-top: 130px; padding-top: 70px; }
 .method h2 { font-size: clamp(38px, 4vw, 64px); }.method-copy p { margin: 0 0 20px; color: var(--muted); font-size: 13px; line-height: 1.75; }
 .quality-list { display: grid; grid-template-columns: 1fr 1fr; margin: 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
 .quality-list div { min-height: 76px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 15px; }.quality-list dt { color: var(--dim); font: 7px var(--mono); letter-spacing: .08em; text-transform: uppercase; }.quality-list dd { margin: 12px 0 0; color: #cdc5d4; font: 14px var(--mono); }
@@ -321,8 +323,9 @@ footer span:nth-child(2) { text-align: center; }footer a { justify-self: end; co
 .browser-summary { display: flex; justify-content: space-between; gap: 25px; margin: 30px 0 14px; color: var(--dim); font: 9px var(--mono); }
 .record-list { display: grid; border-top: 1px solid var(--line); }
 .evidence-record { display: grid; grid-template-columns: minmax(170px, .45fr) 1.55fr; gap: 38px; border-bottom: 1px solid var(--line); padding: 25px 0; }
-.source-record { grid-template-columns: minmax(230px, .6fr) 1.4fr; }
+.source-record { grid-template-columns: minmax(240px, .65fr) minmax(0, 2.35fr); }
 .source-record .record-secondary { display: block; margin-top: 8px; color: var(--muted); font: 9px/1.55 var(--mono); }
+.source-record .record-facts { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .record-primary { min-width: 0; color: #ded6e5; font: 11px/1.55 var(--mono); overflow-wrap: anywhere; }
 .compact-record { grid-template-columns: 110px minmax(0, 1fr) auto; align-items: center; }
 .record-kind { color: var(--dim); font: 8px var(--mono); text-transform: uppercase; }
@@ -374,6 +377,8 @@ footer span:nth-child(2) { text-align: center; }footer a { justify-self: end; co
   .source-focus { bottom: 22px; left: 16px; width: calc(100% - 32px); }
   .transfer-intelligence { grid-template-columns: 1fr; gap: 25px; padding: 24px 20px; }
   .transfer-intelligence dl { grid-template-columns: 1fr; }
+  .source-record { grid-template-columns: 1fr; }
+  .source-record .record-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .evidence-page main { padding-top: 155px; }
   .evidence-hero { gap: 25px; padding-bottom: 42px; }
   .evidence-hero > .overline, .evidence-hero > .hero-meta { grid-column: 1; }

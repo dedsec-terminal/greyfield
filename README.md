@@ -1,102 +1,152 @@
 # Greyfield
 
-Greyfield is a defensive cloud honeypot and public threat-observation system.
-It captures unsolicited SSH and Telnet activity with
-[Cowrie](https://github.com/cowrie/cowrie), preserves the original evidence on
-an isolated Oracle Cloud Infrastructure instance, and publishes a deliberately
-restricted intelligence view for external analysis.
+Greyfield is a defensive cloud honeypot and public threat observatory. It uses
+[Cowrie](https://github.com/cowrie/cowrie) to record unsolicited SSH and Telnet
+activity on an isolated Oracle Cloud Infrastructure instance, then publishes a
+sanitized, evidence-backed view of what reached the decoy.
 
-The project is built around a separation that matters operationally: collection
-is private, publication is outbound-only, and every public field passes an
-explicit evidence and privacy contract. The observable result is not a stream
-of raw logs. It is a controlled account of where activity originated, which
-credentials and commands were supplied, what payload retrievals were attempted,
-and which ATT&CK behaviors the retained evidence can support.
+**[Open the live Internet Threat Observatory →](https://dedsec-terminal.github.io/greyfield/)**
 
-This design demonstrates cloud security engineering, SOC telemetry handling,
-threat-intelligence enrichment, detection mapping, and governance of sensitive
-security evidence without presenting enrichment as identity or attribution.
+The public dashboard covers source infrastructure, credential pressure,
+attacker-supplied commands, payload retrieval attempts, and MITRE ATT&CK
+techniques supported by retained evidence. It never publishes raw Cowrie logs,
+session identifiers, TTY recordings, captured files, operator addresses,
+administrator access details, or cloud secrets.
 
-The companion observatory is a static GitHub Pages site driven by a validated
-two-file telemetry branch. Its homepage presents a curated operational view;
-the Evidence explorer provides searchable, paginated reviewed aggregates with
-explicit publication ceilings. Raw Cowrie logs, captured files, TTY recordings,
-session identifiers, operator addresses, secrets, and administrator access
-details never enter the public branch. See the
-[dashboard deployment guide](docs/DASHBOARD.md).
+## What this project demonstrates
+
+- Cloud honeypot deployment with strict separation between bait services and
+  administrator access.
+- Defensive telemetry engineering from private collection to a reviewed public
+  evidence contract.
+- Approximate network and geolocation enrichment without treating infrastructure
+  as a person's identity.
+- Evidence-constrained ATT&CK mapping and hash-only provider correlation.
+- Automated privacy validation and outbound-only publication through GitHub
+  Actions and GitHub Pages.
+
+## Architecture
+
+```text
+Internet                         Administrator IP only
+  │                                        │
+  ├─ TCP 22 ─┐                              └─ TCP 2223 ── real OpenSSH
+  └─ TCP 23 ─┤
+             ▼
+       OCI firewall + UFW/NAT
+             │
+             ├─ 2222 ── Cowrie SSH
+             └─ 2323 ── Cowrie Telnet
+
+Private Cowrie JSON
+  └─ filter + redact + aggregate + enrich
+       └─ orphan telemetry branch (metrics.json + attack-layer.json only)
+            └─ fail-closed validation ── GitHub Pages observatory
+```
+
+Collection stays private on the VM. Publication is outbound-only, and every
+field must pass the repository's schema and privacy checks before deployment.
+The `telemetry` branch is deliberately orphaned from `master`; GitHub may show
+it as ahead or behind because it is a rolling two-file data channel, not a code
+branch intended for merging or pull requests.
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the trust boundaries and
+[`docs/DASHBOARD.md`](docs/DASHBOARD.md) for the public-data contract.
 
 ## Supported baseline
 
-- OCI `VM.Standard.E2.1.Micro` (x86-64, 1 GB RAM)
-- `Canonical-Ubuntu-22.04-2026.08.25-0`
-- Cowrie `3.0.13`
-- Windows 10/11 with OpenSSH for administration
+| Component | Supported configuration |
+|---|---|
+| Cloud host | OCI `VM.Standard.E2.1.Micro`, x86-64, 1 GB RAM |
+| Operating system | `Canonical-Ubuntu-22.04-2026.08.25-0` |
+| Honeypot | Cowrie `3.0.13` |
+| Administration | Windows 10/11 with OpenSSH |
 
-Ubuntu 24.04 is intentionally not supported by the initial scripts. Its current
-`ufw` package conflicts with `iptables-persistent`, which Greyfield uses to
-persist the public-port redirects.
+Ubuntu 24.04 is intentionally outside the supported baseline because its `ufw`
+package conflicts with the `iptables-persistent` dependency used by the current
+redirect-persistence procedure.
 
-## Port model
+## Network model
 
 | Public port | Host destination | Access |
 |---|---|---|
 | `22/tcp` | Cowrie SSH on `2222` | Internet |
 | `23/tcp` | Cowrie Telnet on `2323` | Internet |
-| `2223/tcp` | Real OpenSSH server | Administrator IP only |
+| `2223/tcp` | Real OpenSSH server | Administrator IPv4 `/32` only |
 
-## Deployment order
+Real SSH must be verified from a second, independent terminal on port `2223`
+before public port `22` is handed to Cowrie. That gate is mandatory.
 
-1. Provision the OCI network and instance using [the OCI guide](docs/OCI_DEPLOYMENT.md).
-2. Connect to the new instance on port 22 and clone this repository to
-   `/opt/greyfield`.
-3. Run the staged host procedures in [the runbook](docs/RUNBOOK.md).
-4. Verify administrator access, Cowrie listeners, firewall rules, persistence,
-   and logging before leaving the instance unattended.
+## Staged deployment
 
-Never skip a verification gate. In particular, do not hand public port 22 to
-Cowrie until a second, independent administrator login on port 2223 succeeds.
+1. Provision the OCI network and Ubuntu instance with the
+   [OCI deployment guide](docs/OCI_DEPLOYMENT.md).
+2. Clone Greyfield to `/opt/greyfield` while real SSH still uses port `22`.
+3. Follow the numbered stages in [`docs/RUNBOOK.md`](docs/RUNBOOK.md).
+4. Confirm every administrator-access, listener, firewall, persistence, and
+   logging gate before advancing.
+5. Configure telemetry publication separately with
+   [`docs/DASHBOARD.md`](docs/DASHBOARD.md).
 
-## Repository layout
+The stages are intentionally not combined. Final activation occurs only after
+administrator SSH and both Cowrie listeners have been proven healthy.
+
+## Evidence boundary
+
+Greyfield may publish globally routable source IPs, approximate country/city/ASN
+context, attempted credentials, inert command text, artifact URLs with query
+material removed, SHA-256 hashes, and qualified provider observations.
+
+Before aggregation, the exporter removes configured operator addresses and all
+non-public sources. It redacts email-, token-, private-key-, and URL-query-like
+patterns. The validator independently rejects forbidden fields, unexpected
+files, stale snapshots, cross-record inconsistencies, and data outside the
+publication ceilings.
+
+Interpretation remains deliberately constrained:
+
+- An IP address identifies observed infrastructure, not a person.
+- Geolocation and network ownership are approximate enrichment.
+- ATT&CK mappings describe evidenced behavior, not attribution or impact.
+- A payload request is transfer evidence, not proof of execution.
+- Provider labels are time-stamped third-party observations, not Greyfield
+  malware-family attribution.
+
+## Repository map
 
 ```text
-configs/          Cowrie configuration
-dashboard/        Static public threat observatory
-docs/             Architecture, OCI deployment, and operating runbook
-scripts/          Staged host installation and verification
+configs/          Cowrie runtime configuration
+dashboard/        Static public observatory and evidence explorer
+docs/             Architecture, deployment, dashboard, and operations guides
+scripts/          Staged installation, export, validation, and verification
 systemd/          Cowrie and telemetry publication units
-tests/            Synthetic privacy and aggregation tests
+tests/            Synthetic exporter, privacy, and schema tests
 ```
 
-## Dashboard evidence model
+## Validation
 
-The dashboard publishes globally routable source addresses, approximate network
-and location context, attempted credentials, inert command text, stripped
-artifact URLs, SHA-256 hashes, and evidence-backed ATT&CK mappings. Optional
-MalwareBazaar and VirusTotal correlation sends only unseen hashes and records
-independent, time-stamped provider observations. Greyfield never uploads,
-downloads, rescans, or executes a sample and never presents provider labels as
-confirmed attribution.
+Run the same core checks enforced by CI before changing deployment behavior or
+the public evidence contract:
 
-Configured operator addresses and all non-public sources are removed before
-aggregation. Email, token, private-key, and URL-query patterns are redacted.
-ATT&CK mappings describe observed behavior; they do not prove attribution,
-execution, compromise, or impact. Session identifiers, TTY recordings, captured
-files, and raw logs never enter GitHub.
+```bash
+bash -n scripts/*.sh
+shellcheck scripts/*.sh
+python3 -m unittest discover -s tests -v
+node --check dashboard/assets/app.js
+node --check dashboard/assets/evidence.js
+git diff --check
+```
 
-## Safety boundary
+The dashboard workflow additionally validates the latest telemetry snapshot and
+ATT&CK Navigator layer before GitHub Pages receives an artifact.
 
-This host must contain no personal data, production services, reusable cloud
-credentials, or unrelated SSH keys. Cowrie emulates attacker commands, but it
-can make real outbound requests to capture attempted malware downloads. Never
-execute captured samples.
+## Safety
 
-## Inspiration
-
-Greyfield's deployment model was informed by
-[ajcyberdefense/cowrie-honeypot](https://github.com/ajcyberdefense/cowrie-honeypot)
-and the official Cowrie, Ubuntu, and OCI documentation. Greyfield is maintained
-as a separate project rather than a fork.
+Use Greyfield only on a dedicated disposable host. Do not place personal data,
+production services, reusable credentials, unrelated SSH keys, raw logs,
+captured malware, or cloud secrets in this repository. Cowrie may make outbound
+requests while emulating attempted downloads; never execute a captured sample.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+Released under the [MIT License](LICENSE). Copyright © 2026 Swaraj Singh.

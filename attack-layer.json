@@ -16,7 +16,7 @@
     },
     {
       "techniqueID": "T1110.001",
-      "score": 271,
+      "score": 276,
       "comment": "enable\\x00 / linuxshell\\x00; lghkel\\x09 / zpz}ld\\x09",
       "enabled": true
     },

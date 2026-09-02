@@ -9,15 +9,15 @@
   "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
   "techniques": [
     {
-      "techniqueID": "T1059.004",
-      "score": 3,
-      "comment": "system; shell",
+      "techniqueID": "T1110.001",
+      "score": 20,
+      "comment": "enable\\x00 / linuxshell\\x00; root / default",
       "enabled": true
     },
     {
-      "techniqueID": "T1110.001",
-      "score": 2,
-      "comment": "root / default; enable\\x00 / linuxshell\\x00",
+      "techniqueID": "T1059.004",
+      "score": 18,
+      "comment": "shell; system",
       "enabled": true
     }
   ],
@@ -28,6 +28,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 3
+    "maxValue": 20
   }
 }

@@ -16,7 +16,7 @@
     },
     {
       "techniqueID": "T1110.001",
-      "score": 136,
+      "score": 144,
       "comment": "enable\\x00 / linuxshell\\x00; admin / admin",
       "enabled": true
     },

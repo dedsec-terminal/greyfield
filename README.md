@@ -7,6 +7,10 @@ sanitized, evidence-backed view of what reached the decoy.
 
 **[Open the live Internet Threat Observatory →](https://dedsec-terminal.github.io/greyfield/)**
 
+**Public research sensor:** `137.23.33.116` — SSH on `22/tcp` and Telnet on
+`23/tcp`. These are isolated Cowrie deception services; they do not provide
+access to the underlying host.
+
 The public dashboard covers source infrastructure, credential pressure,
 attacker-supplied commands, payload retrieval attempts, and MITRE ATT&CK
 techniques supported by retained evidence. It never publishes raw Cowrie logs,
@@ -49,6 +53,12 @@ field must pass the repository's schema and privacy checks before deployment.
 The `telemetry` branch is deliberately orphaned from `master`; GitHub may show
 it as ahead or behind because it is a rolling two-file data channel, not a code
 branch intended for merging or pull requests.
+
+The sensor is intentionally discoverable through this repository and the live
+observatory. Internet-wide indexes such as Shodan already crawl public services;
+indexing confirms exposure but does not guarantee additional attacks or broader
+ATT&CK coverage. Greyfield measures observed evidence rather than manufacturing
+traffic or inflating event counts.
 
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the trust boundaries and
 [`docs/DASHBOARD.md`](docs/DASHBOARD.md) for the public-data contract.
@@ -121,6 +131,7 @@ docs/             Architecture, deployment, dashboard, and operations guides
 scripts/          Staged installation, export, validation, and verification
 systemd/          Cowrie and telemetry publication units
 tests/            Synthetic exporter, privacy, and schema tests
+THIRD_PARTY_NOTICES.md  Licenses for bundled public map data
 ```
 
 ## Validation

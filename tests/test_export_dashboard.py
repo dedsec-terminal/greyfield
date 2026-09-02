@@ -27,7 +27,9 @@ class DashboardExportTests(unittest.TestCase):
 
     def test_real_attacker_evidence_is_published_after_operator_exclusion(self):
         snapshot = self.make_snapshot()
-        self.assertEqual(snapshot["schema_version"], "4.0")
+        self.assertEqual(snapshot["schema_version"], "5.0")
+        self.assertEqual(len(snapshot["five_minute"]), 288)
+        self.assertEqual(len(snapshot["hourly"]), 168)
         self.assertEqual(snapshot["summary"]["sessions"], 2)
         self.assertEqual(snapshot["summary"]["unique_sources"], 2)
         self.assertEqual(snapshot["summary"]["auth_attempts"], 3)
@@ -219,7 +221,7 @@ class DashboardExportTests(unittest.TestCase):
             self.assertEqual(failures, 0)
             self.assertEqual(len(mapped), 5)
 
-    def test_schema_four_publication_ceilings_are_explicit(self):
+    def test_schema_five_publication_ceilings_are_explicit(self):
         events = []
         for index in range(501):
             address = f"11.{index // 256}.{index % 256}.1"
@@ -242,6 +244,20 @@ class DashboardExportTests(unittest.TestCase):
         transfer = next(item for item in snapshot["mitre"] if item["id"] == "T1105")
         self.assertEqual(len(shell["evidence"]), 25)
         self.assertEqual(len(transfer["evidence"]), 25)
+
+    def test_five_minute_timeline_uses_event_timestamps(self):
+        events = [
+            {"eventid": "cowrie.session.connect", "timestamp": "2026-09-01T12:01:00Z"},
+            {"eventid": "cowrie.session.connect", "timestamp": "2026-09-01T12:04:59Z"},
+            {"eventid": "cowrie.login.failed", "timestamp": "2026-09-01T12:05:00Z"},
+        ]
+        rows = export_dashboard.build_five_minute(
+            events, export_dashboard.parse_timestamp("2026-09-01T12:09:00Z"),
+        )
+        self.assertEqual(rows[-2]["bucket"], "2026-09-01T12:00:00Z")
+        self.assertEqual(rows[-2]["sessions"], 2)
+        self.assertEqual(rows[-1]["bucket"], "2026-09-01T12:05:00Z")
+        self.assertEqual(rows[-1]["auth"], 1)
 
 
 if __name__ == "__main__":

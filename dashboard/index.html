@@ -6,11 +6,12 @@
     <meta name="color-scheme" content="dark">
     <meta name="theme-color" content="#08070b">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'">
-    <meta name="description" content="Greyfield is a live SSH and Telnet honeypot observatory publishing evidence-backed internet threat telemetry.">
+    <meta name="robots" content="index,follow">
+    <meta name="description" content="Greyfield is a live SSH and Telnet honeypot observatory at 137.23.33.116 publishing evidence-backed internet threat telemetry.">
     <title>Greyfield — Internet Threat Observatory</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./assets/styles.css?v=5">
-    <script src="./assets/app.js?v=5" defer></script>
+    <link rel="stylesheet" href="./assets/styles.css?v=6">
+    <script src="./assets/app.js?v=6" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to observations</a>
@@ -42,7 +43,7 @@
 
         <div class="observatory reveal" aria-label="Geographic distribution of observed attacker sources">
           <div class="observatory-head">
-            <span>Source constellation</span>
+            <span>Source constellation · right-drag to rotate</span>
             <span><button id="globe-reset" class="text-button" type="button">Reset globe</button> · <span id="constellation-label">Awaiting telemetry</span></span>
           </div>
           <canvas id="source-canvas"></canvas>
@@ -68,7 +69,7 @@
       <section id="pulse" class="chapter">
         <header class="chapter-head reveal">
           <div><p class="overline"><span>02</span> Temporal signal</p><h2>Attack pulse</h2></div>
-          <p>A 24-hour operating picture by default, with a seven-day view available for longer context. Exact values remain visible at every point.</p>
+          <p>Five-minute event-time detail across the latest 24 hours, with an hourly seven-day view for longer context. The snapshot itself refreshes hourly.</p>
         </header>
         <div class="pulse-layout">
           <article class="chart-stage reveal">
@@ -175,6 +176,10 @@
           <div><dt>Sensitive patterns redacted</dt><dd id="quality-redactions">—</dd></div>
           <div><dt>Operator events removed</dt><dd id="quality-operator">—</dd></div>
           <div><dt>Non-public addresses removed</dt><dd id="quality-private">—</dd></div>
+          <div><dt>Countries observed</dt><dd id="quality-countries">—</dd></div>
+          <div><dt>Networks observed</dt><dd id="quality-networks">—</dd></div>
+          <div><dt>Provider-detected artifacts</dt><dd id="quality-provider-detected">—</dd></div>
+          <div><dt>Artifact publication coverage</dt><dd id="quality-artifact-coverage">—</dd></div>
         </dl>
       </section>
     </main>

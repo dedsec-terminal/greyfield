@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 
-SCHEMA_VERSION = "4.0"
+SCHEMA_VERSION = "5.0"
 DEFAULT_LOG = Path("/home/cowrie/honeypot/var/log/cowrie/cowrie.json")
 CONTROL_CHARS = re.compile(r"[\x00-\x1f\x7f]+")
 WHITESPACE = re.compile(r"\s+")
@@ -500,15 +500,22 @@ def enrich_hashes(
     return output, lookups, failures
 
 
-def build_hourly(events: Iterable[dict[str, Any]], end: datetime) -> list[dict[str, Any]]:
-    end_hour = end.replace(minute=0, second=0, microsecond=0)
-    start_hour = end_hour - timedelta(hours=167)
+def build_timeline(
+    events: Iterable[dict[str, Any]], end: datetime, bucket_minutes: int, bucket_count: int,
+) -> list[dict[str, Any]]:
+    end_bucket = end.replace(
+        minute=(end.minute // bucket_minutes) * bucket_minutes, second=0, microsecond=0,
+    )
+    step = timedelta(minutes=bucket_minutes)
+    start_bucket = end_bucket - step * (bucket_count - 1)
     buckets: dict[datetime, Counter[str]] = defaultdict(Counter)
     for event in events:
         timestamp = parse_timestamp(event.get("timestamp"))
-        if timestamp is None or not start_hour <= timestamp < end_hour + timedelta(hours=1):
+        if timestamp is None or not start_bucket <= timestamp < end_bucket + step:
             continue
-        bucket = timestamp.replace(minute=0, second=0, microsecond=0)
+        bucket = timestamp.replace(
+            minute=(timestamp.minute // bucket_minutes) * bucket_minutes, second=0, microsecond=0,
+        )
         event_id = str(event.get("eventid", ""))
         if event_id == "cowrie.session.connect":
             buckets[bucket]["sessions"] += 1
@@ -520,14 +527,22 @@ def build_hourly(events: Iterable[dict[str, Any]], end: datetime) -> list[dict[s
             buckets[bucket]["downloads"] += 1
     return [
         {
-            "bucket": iso_z(start_hour + timedelta(hours=offset)),
-            "sessions": buckets[start_hour + timedelta(hours=offset)]["sessions"],
-            "auth": buckets[start_hour + timedelta(hours=offset)]["auth"],
-            "commands": buckets[start_hour + timedelta(hours=offset)]["commands"],
-            "downloads": buckets[start_hour + timedelta(hours=offset)]["downloads"],
+            "bucket": iso_z(start_bucket + step * offset),
+            "sessions": buckets[start_bucket + step * offset]["sessions"],
+            "auth": buckets[start_bucket + step * offset]["auth"],
+            "commands": buckets[start_bucket + step * offset]["commands"],
+            "downloads": buckets[start_bucket + step * offset]["downloads"],
         }
-        for offset in range(168)
+        for offset in range(bucket_count)
     ]
+
+
+def build_hourly(events: Iterable[dict[str, Any]], end: datetime) -> list[dict[str, Any]]:
+    return build_timeline(events, end, 60, 168)
+
+
+def build_five_minute(events: Iterable[dict[str, Any]], end: datetime) -> list[dict[str, Any]]:
+    return build_timeline(events, end, 5, 288)
 
 
 def build_snapshot(
@@ -743,7 +758,9 @@ def build_snapshot(
             "commands": sum(command_counts.values()), "downloads": sum(artifact_counts.values()),
             "attack_techniques": len(mitre),
         },
-        "hourly": build_hourly(filtered, window_end), "protocols": top_rows(protocols, 3), "sources": sources,
+        "hourly": build_hourly(filtered, window_end),
+        "five_minute": build_five_minute(filtered, window_end),
+        "protocols": top_rows(protocols, 3), "sources": sources,
         "credentials": {
             "usernames": top_rows(usernames, PUBLIC_LIMITS["usernames"]),
             "passwords": top_rows(passwords, PUBLIC_LIMITS["passwords"]),

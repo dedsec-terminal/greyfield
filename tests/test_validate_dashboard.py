@@ -38,6 +38,18 @@ class DashboardValidationTests(unittest.TestCase):
     def test_synthetic_snapshot_passes(self):
         self.assertEqual(validate_dashboard.validate(self.load()), [])
 
+    def test_five_minute_timeline_requires_contiguous_aligned_buckets(self):
+        snapshot = self.load()
+        snapshot["five_minute"][1]["bucket"] = snapshot["five_minute"][0]["bucket"]
+        errors = validate_dashboard.validate(snapshot)
+        self.assertTrue(any("strictly contiguous" in error for error in errors))
+
+    def test_five_minute_timeline_rejects_negative_counts(self):
+        snapshot = self.load()
+        snapshot["five_minute"][0]["sessions"] = -1
+        errors = validate_dashboard.validate(snapshot)
+        self.assertTrue(any("non-negative integer" in error for error in errors))
+
     def test_cli_rejects_snapshot_above_five_megabytes_before_parsing(self):
         with tempfile.TemporaryDirectory() as directory:
             oversized = Path(directory) / "metrics.json"

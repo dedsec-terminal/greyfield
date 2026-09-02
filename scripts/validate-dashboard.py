@@ -23,6 +23,7 @@ SNAPSHOT_KEYS_V3 = {
     "credentials", "commands", "artifacts", "mitre", "recent", "data_quality", "provenance",
 }
 SNAPSHOT_KEYS_V4 = SNAPSHOT_KEYS_V3 | {"coverage"}
+SNAPSHOT_KEYS_V5 = SNAPSHOT_KEYS_V4 | {"five_minute"}
 SOURCE_KEYS = {
     "ip", "country", "country_code", "city", "latitude", "longitude", "asn", "organization", "flag",
     "sessions", "auth_attempts", "accepted", "commands", "downloads", "protocols", "first_seen", "last_seen",
@@ -125,6 +126,31 @@ def require_exact_keys(value: Any, expected: set[str], path: str, errors: list[s
     return True
 
 
+def validate_timeline(
+    rows: Any, label: str, expected_count: int, bucket_minutes: int, errors: list[str],
+) -> None:
+    if not isinstance(rows, list):
+        errors.append(f"{label} must be an array")
+        return
+    if len(rows) != expected_count:
+        errors.append(f"{label} must contain exactly {expected_count} buckets")
+    prior: datetime | None = None
+    for index, row in enumerate(rows):
+        path = f"{label}[{index}]"
+        if not require_exact_keys(row, {"bucket", "sessions", "auth", "commands", "downloads"}, path, errors):
+            continue
+        bucket = parse_timestamp(row.get("bucket"))
+        if bucket is None or bucket.second or bucket.microsecond or bucket.minute % bucket_minutes:
+            errors.append(f"{path}.bucket must align to {bucket_minutes}-minute UTC boundaries")
+        elif prior is not None and bucket - prior != timedelta(minutes=bucket_minutes):
+            errors.append(f"{label} buckets must be strictly contiguous")
+        prior = bucket
+        for key in ("sessions", "auth", "commands", "downloads"):
+            value = row.get(key)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                errors.append(f"{path}.{key} must be a non-negative integer")
+
+
 def validate_sensitive_strings(value: Any, denied_ips: set[str], label: str) -> list[str]:
     errors: list[str] = []
     for path, key, child in walk(value):
@@ -154,10 +180,11 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
     errors: list[str] = []
     denied_ips = denied_ips or set()
     schema = snapshot.get("schema_version")
-    if schema not in {"3.0", "4.0"}:
-        errors.append("schema_version must equal 3.0 or 4.0")
-    is_v4 = schema == "4.0"
-    require_exact_keys(snapshot, SNAPSHOT_KEYS_V4 if is_v4 else SNAPSHOT_KEYS_V3, "snapshot", errors)
+    if schema not in {"3.0", "4.0", "5.0"}:
+        errors.append("schema_version must equal 3.0, 4.0, or 5.0")
+    is_modern = schema in {"4.0", "5.0"}
+    expected_keys = SNAPSHOT_KEYS_V5 if schema == "5.0" else SNAPSHOT_KEYS_V4 if schema == "4.0" else SNAPSHOT_KEYS_V3
+    require_exact_keys(snapshot, expected_keys, "snapshot", errors)
     if parse_timestamp(snapshot.get("generated_at")) is None:
         errors.append("generated_at is missing or invalid")
     summary = snapshot.get("summary")
@@ -176,11 +203,11 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
     elif window_start > window_end:
         errors.append("window.start must not be later than window.end")
     require_exact_keys(
-        snapshot.get("data_quality"), DATA_QUALITY_KEYS_V4 if is_v4 else DATA_QUALITY_KEYS_V3,
+        snapshot.get("data_quality"), DATA_QUALITY_KEYS_V4 if is_modern else DATA_QUALITY_KEYS_V3,
         "data_quality", errors,
     )
     require_exact_keys(snapshot.get("provenance"), {"source", "collection", "interpretation"}, "provenance", errors)
-    if is_v4:
+    if is_modern:
         coverage = snapshot.get("coverage")
         if require_exact_keys(coverage, COVERAGE_GROUPS, "coverage", errors):
             for group in sorted(COVERAGE_GROUPS):
@@ -193,12 +220,9 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
                 elif published > observed or row.get("truncated") is not (observed > published):
                     errors.append(f"coverage.{group} does not describe its publication boundary")
 
-    hourly = snapshot.get("hourly")
-    if not isinstance(hourly, list):
-        errors.append("hourly must be an array")
-    else:
-        for index, row in enumerate(hourly):
-            require_exact_keys(row, {"bucket", "sessions", "auth", "commands", "downloads"}, f"hourly[{index}]", errors)
+    validate_timeline(snapshot.get("hourly"), "hourly", 168, 60, errors)
+    if schema == "5.0":
+        validate_timeline(snapshot.get("five_minute"), "five_minute", 288, 5, errors)
     protocols = snapshot.get("protocols")
     if not isinstance(protocols, list):
         errors.append("protocols must be an array")
@@ -237,7 +261,7 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         published_ips.add(normalized)
 
     if summary is not None:
-        if is_v4:
+        if is_modern:
             coverage_sources = snapshot.get("coverage", {}).get("sources", {})
             if summary.get("unique_sources") != coverage_sources.get("observed"):
                 errors.append("summary.unique_sources must equal coverage.sources.observed")
@@ -292,7 +316,7 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
             errors.append(f"artifacts[{index}] must be an object")
             continue
         require_exact_keys(
-            artifact, ARTIFACT_KEYS_V4 if is_v4 else ARTIFACT_KEYS_V3,
+            artifact, ARTIFACT_KEYS_V4 if is_modern else ARTIFACT_KEYS_V3,
             f"artifacts[{index}]", errors,
         )
         url = artifact.get("url")
@@ -316,7 +340,7 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
             errors.append(f"artifacts[{index}].sha256 must be null or lowercase SHA-256")
         if artifact.get("techniques") != ["T1105"]:
             errors.append(f"artifacts[{index}].techniques must contain only T1105")
-        if is_v4:
+        if is_modern:
             correlation = artifact.get("correlation")
             if not require_exact_keys(correlation, CORRELATION_KEYS, f"artifacts[{index}].correlation", errors):
                 continue
@@ -419,10 +443,10 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
             errors.append(f"commands[{index}] must be an object")
             continue
         require_exact_keys(
-            command, COMMAND_KEYS_V4 if is_v4 else COMMAND_KEYS_V3,
+            command, COMMAND_KEYS_V4 if is_modern else COMMAND_KEYS_V3,
             f"commands[{index}]", errors,
         )
-        if is_v4 and not isinstance(command.get("truncated"), bool):
+        if is_modern and not isinstance(command.get("truncated"), bool):
             errors.append(f"commands[{index}].truncated must be boolean")
         if not isinstance(command.get("command"), str) or not command["command"] or len(command["command"]) > 2048:
             errors.append(f"commands[{index}].command must contain at most 2048 characters")
@@ -445,7 +469,7 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         if not isinstance(item, dict) or not isinstance(item.get("id"), str) or not TECHNIQUE_ID.fullmatch(item["id"]):
             errors.append(f"mitre[{index}] must contain a valid ATT&CK ID")
             continue
-        require_exact_keys(item, MITRE_KEYS_V4 if is_v4 else MITRE_KEYS_V3, f"mitre[{index}]", errors)
+        require_exact_keys(item, MITRE_KEYS_V4 if is_modern else MITRE_KEYS_V3, f"mitre[{index}]", errors)
         approved = APPROVED_TECHNIQUES.get(item["id"])
         if approved is None:
             if item["id"] == "T1078":
@@ -457,7 +481,7 @@ def validate(snapshot: dict[str, Any], denied_ips: set[str] | None = None) -> li
         if not isinstance(item.get("count"), int) or isinstance(item.get("count"), bool) or item["count"] < 1:
             errors.append(f"mitre[{index}].count must be a positive integer")
         evidence = item.get("evidence")
-        if is_v4:
+        if is_modern:
             if not isinstance(evidence, list) or not evidence or len(evidence) > 25:
                 errors.append(f"mitre[{index}].evidence must contain one to 25 reviewed entries")
                 evidence = []
@@ -560,7 +584,7 @@ def validate_layer(
         if item.get("enabled") is not True:
             errors.append(f"Navigator technique {technique_id} must be enabled")
         evidence = source.get("evidence") if isinstance(source.get("evidence"), list) else []
-        if snapshot.get("schema_version") == "4.0":
+        if snapshot.get("schema_version") in {"4.0", "5.0"}:
             expected_comment = "; ".join(
                 str(value.get("value")) for value in evidence[:2] if isinstance(value, dict)
             )

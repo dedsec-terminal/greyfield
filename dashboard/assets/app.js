@@ -6,22 +6,7 @@ const number = new Intl.NumberFormat("en-US");
 const HOME_LIMITS = { events: 10, sources: 12, credentials: 10, commands: 12, artifacts: 6 };
 const COLORS = { sessions: "#9e83ff", auth: "#73a9ff", commands: "#ff708d" };
 const SERIES_LABELS = { sessions: "Sessions", auth: "Auth", commands: "Commands" };
-const LAND_POLYGONS = [
-  [[-168,72],[-154,70],[-142,60],[-132,55],[-128,50],[-124,49],[-124,42],[-118,33],[-108,25],[-97,20],[-90,19],[-84,22],[-81,25],[-80,32],[-75,36],[-70,43],[-60,47],[-58,53],[-64,60],[-78,63],[-86,70],[-105,73],[-128,72],[-145,75],[-168,72]],
-  [[-82,12],[-77,8],[-79,1],[-75,-7],[-71,-15],[-70,-22],[-65,-28],[-62,-38],[-68,-49],[-73,-55],[-76,-46],[-75,-37],[-80,-27],[-79,-17],[-82,-5],[-78,7],[-82,12]],
-  [[-53,83],[-28,81],[-20,75],[-22,67],[-34,60],[-46,60],[-58,67],[-62,75],[-53,83]],
-  [[-10,36],[-9,43],[-5,48],[2,51],[8,55],[18,58],[30,60],[40,66],[58,70],[78,72],[100,76],[125,72],[145,65],[164,59],[172,52],[160,46],[145,48],[141,43],[130,42],[124,37],[121,30],[115,22],[108,18],[106,10],[100,7],[91,20],[80,22],[70,25],[60,27],[52,30],[45,38],[36,42],[28,41],[20,45],[13,45],[5,43],[-1,43],[-10,36]],
-  [[-18,36],[-6,35],[2,37],[12,36],[24,33],[33,31],[42,16],[51,11],[50,2],[44,-12],[40,-20],[32,-29],[18,-35],[10,-34],[2,-27],[-5,-17],[-10,-2],[-16,13],[-18,24],[-18,36]],
-  [[42,12],[51,12],[57,18],[60,24],[55,27],[50,25],[45,18],[42,12]],
-  [[68,24],[77,8],[81,7],[88,22],[92,26],[86,28],[78,30],[68,24]],
-  [[96,6],[105,1],[111,-7],[118,-8],[124,-3],[130,1],[136,-2],[141,-7],[134,-9],[124,-9],[116,-7],[108,-7],[102,-2],[96,6]],
-  [[112,-11],[121,-17],[130,-13],[139,-17],[151,-24],[153,-31],[147,-39],[136,-35],[129,-39],[116,-35],[113,-25],[112,-11]],
-  [[129,32],[134,34],[140,39],[143,44],[146,43],[145,36],[141,33],[136,35],[129,32]],
-  [[-10,50],[-5,50],[-3,55],[-6,59],[-10,58],[-10,50]],
-  [[43,-13],[50,-16],[50,-24],[46,-26],[43,-20],[43,-13]],
-  [[166,-35],[173,-40],[177,-45],[171,-47],[166,-43],[166,-35]],
-  [[-180,-74],[-150,-72],[-120,-70],[-90,-73],[-60,-71],[-30,-74],[0,-72],[30,-74],[60,-71],[90,-73],[120,-70],[150,-72],[180,-74]],
-];
+const COUNTRY_MAP_URL = "./assets/countries-110m.json";
 
 let snapshotState = null;
 let chartHours = 24;
@@ -37,14 +22,47 @@ const shortTime = (value) => { const date = new Date(value); return Number.isNaN
 const compactDate = (value) => { const date = new Date(value); return Number.isNaN(date.valueOf()) ? "—" : new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", timeZone: "UTC" }).format(date); };
 const evidenceValue = (item) => typeof item === "string" ? item : item?.value || "Unavailable";
 
+let countryRingsPromise = null;
+
+function decodeCountryRings(topology) {
+  const transform = topology.transform || { scale: [1, 1], translate: [0, 0] }, cache = new Map();
+  const decodeArc = (index) => {
+    const reversed = index < 0, key = reversed ? ~index : index;
+    if (!cache.has(key)) {
+      let x = 0, y = 0;
+      cache.set(key, topology.arcs[key].map(([dx, dy]) => {
+        x += dx; y += dy;
+        return [x * transform.scale[0] + transform.translate[0], y * transform.scale[1] + transform.translate[1]];
+      }));
+    }
+    const coordinates = cache.get(key);
+    return reversed ? [...coordinates].reverse() : coordinates;
+  };
+  const join = (indices) => indices.flatMap((index, position) => decodeArc(index).slice(position ? 1 : 0));
+  const rings = [];
+  (topology.objects?.countries?.geometries || []).forEach((geometry) => {
+    const polygons = geometry.type === "Polygon" ? [geometry.arcs] : geometry.type === "MultiPolygon" ? geometry.arcs : [];
+    polygons.forEach((polygon) => polygon.forEach((ring) => rings.push(join(ring))));
+  });
+  return rings;
+}
+
+function loadCountryRings() {
+  if (!countryRingsPromise) countryRingsPromise = fetch(COUNTRY_MAP_URL, { cache: "force-cache" })
+    .then((response) => { if (!response.ok) throw new Error(`map request returned HTTP ${response.status}`); return response.json(); })
+    .then(decodeCountryRings)
+    .catch(() => []);
+  return countryRingsPromise;
+}
+
 function niceCeiling(value) { if (value <= 1) return 1; const padded = value * 1.12, power = 10 ** Math.floor(Math.log10(padded)), unit = padded / power; return (unit <= 2 ? 2 : unit <= 5 ? 5 : 10) * power; }
 
 function renderChart() {
-  const host = byId("pulse-chart"); host.replaceChildren(); const rows = (snapshotState?.hourly || []).slice(-chartHours), active = [...visibleSeries];
+  const host = byId("pulse-chart"); host.replaceChildren(); const detailed = chartHours === 24 && snapshotState?.five_minute?.length, rows = (detailed ? snapshotState.five_minute : snapshotState?.hourly || []).slice(-(detailed ? 288 : chartHours)), active = [...visibleSeries];
   if (!rows.length || !active.length) { host.append(node("p", "empty-state", active.length ? "No time-series observations available." : "Select a series to display.")); return; }
   const width = 1000, height = 390, left = 42, right = 16, top = 22, bottom = 42, plotWidth = width - left - right, plotHeight = height - top - bottom;
   const maximum = niceCeiling(Math.max(0, ...rows.flatMap((row) => active.map((key) => Number(row[key] || 0)))));
-  const svg = svgNode("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `${active.map((key) => SERIES_LABELS[key]).join(", ")} over ${chartHours} hours` });
+  const svg = svgNode("svg", { viewBox: `0 0 ${width} ${height}`, role: "img", "aria-label": `${active.map((key) => SERIES_LABELS[key]).join(", ")} by ${detailed ? "five-minute" : "hourly"} event time over ${chartHours} hours` });
   const defs = svgNode("defs"), gradient = svgNode("linearGradient", { id: "area-gradient", x1: "0", y1: "0", x2: "0", y2: "1" }); gradient.append(svgNode("stop", { offset: "0%", "stop-color": "#9e83ff", "stop-opacity": ".20" }), svgNode("stop", { offset: "100%", "stop-color": "#9e83ff", "stop-opacity": "0" })); defs.append(gradient); svg.append(defs);
   for (let step = 0; step <= 4; step += 1) { const y = top + plotHeight * step / 4; svg.append(svgNode("line", { x1: left, x2: width - right, y1: y, y2: y, stroke: "rgba(225,217,239,.09)" })); const label = svgNode("text", { x: 0, y: y + 3, fill: "#625b6c", "font-size": "9", "font-family": "monospace" }); label.textContent = String(Math.round(maximum * (1 - step / 4))); svg.append(label); }
   const point = (row, index, key) => [left + (rows.length === 1 ? 0 : index * plotWidth / (rows.length - 1)), top + plotHeight - Number(row[key] || 0) / maximum * plotHeight];
@@ -76,26 +94,104 @@ function renderMitre(items) { const host = byId("mitre-grid"); host.replaceChild
 
 function renderTransferIntelligence(snapshot) { const host = byId("transfer-intelligence"); if (!host) return; const artifacts = snapshot.artifacts || [], providers = artifacts.flatMap((item) => item.correlation?.providers || (item.classification?.provider ? [{ name: item.classification.provider, status: item.classification.status }] : [])), correlated = artifacts.filter((item) => item.correlation?.status === "correlated" || item.classification?.status === "known").length; host.replaceChildren(); const copy = node("div"); copy.append(node("p", "overline", "T1105 / Transfer intelligence"), node("h3", "", "Payload context without execution"), node("p", "", "Hashes are correlated through provider reports only. Greyfield never uploads, downloads, rescans, or executes captured files.")); const facts = node("dl", "transfer-facts"); [["Observed artifacts", artifacts.length], ["Correlated hashes", correlated], ["Provider records", providers.length], ["Provider state", providers.length ? "Available" : "Awaiting API activation"]].forEach(([label, value]) => { const row = node("div"); row.append(node("dt", "", label), node("dd", "", String(value))); facts.append(row); }); host.append(copy, facts); }
 
-function renderCorrelation(item) { const cell = node("td", "classification"), correlation = item.correlation; if (!correlation) { const finding = item.classification || {}; cell.append(node("strong", "", finding.status === "known" ? finding.label : "Correlation unavailable"), node("small", "", finding.provider ? `${finding.provider} · legacy snapshot` : "Hash lookup not configured")); return cell; } cell.append(node("strong", "", correlation.status === "correlated" ? "Third-party correlation available" : correlation.status === "not-found" ? "No provider record found" : correlation.status === "partial" ? "Partial provider response" : "Correlation unavailable")); if (!(correlation.providers || []).length) cell.append(node("small", "", "Provider keys not configured")); (correlation.providers || []).forEach((provider) => { const line = node("small", "provider-result", `${provider.name}: ${provider.label || provider.status}`); if (provider.name === "VirusTotal" && provider.malicious !== null) line.textContent += ` · ${provider.malicious} malicious / ${provider.suspicious} suspicious`; cell.append(line); if (provider.retrieved_at) cell.append(node("time", "", `checked ${formatDate(provider.retrieved_at, { year: undefined })}`)); }); return cell; }
+function artifactCategory(item) {
+  const correlation = item.correlation, providers = correlation?.providers || [];
+  if (providers.some((provider) => provider.status === "correlated" && (provider.name !== "VirusTotal" || Number(provider.malicious || 0) > 0))) return "Provider-detected";
+  if (correlation?.status === "correlated") return "Provider-observed";
+  if (correlation?.status === "not-found") return "No provider record";
+  if (correlation?.status === "partial") return "Partial provider coverage";
+  if (item.classification?.status === "known") return "Provider-detected";
+  if (item.classification?.status === "unknown") return "No provider record";
+  return "Correlation unavailable";
+}
+
+function renderCorrelation(item) { const cell = node("td", "classification"), correlation = item.correlation; if (!correlation) { const finding = item.classification || {}; cell.append(node("strong", "", finding.status === "known" ? (finding.label || "Provider-detected") : finding.status === "unknown" ? "No provider record" : "Correlation unavailable"), node("small", "", finding.provider ? `${finding.provider} · legacy snapshot` : "Hash lookup not configured")); return cell; } cell.append(node("strong", "", artifactCategory(item))); if (!(correlation.providers || []).length) cell.append(node("small", "", "Provider keys not configured or no cached response")); (correlation.providers || []).forEach((provider) => { const line = node("small", "provider-result", `${provider.name}: ${provider.label || provider.status}`); if (provider.name === "VirusTotal" && provider.malicious !== null) line.textContent += ` · ${provider.malicious} malicious / ${provider.suspicious} suspicious`; cell.append(line); if (provider.retrieved_at) cell.append(node("time", "", `checked ${formatDate(provider.retrieved_at, { year: undefined })}`)); }); return cell; }
 
 function renderArtifacts(items) { const body = byId("artifact-rows"); body.replaceChildren(); const visible = (items || []).slice(0, HOME_LIMITS.artifacts), empty = byId("artifact-empty"); empty.hidden = Boolean(visible.length); document.querySelector(".artifact-table-wrap").hidden = !visible.length; visible.forEach((item) => { const row = document.createElement("tr"), technique = node("a", "artifact-technique", (item.techniques || []).join(", ") || "—"); if (item.techniques?.[0]) { technique.href = `https://attack.mitre.org/techniques/${item.techniques[0].replace(".", "/")}/`; technique.target = "_blank"; technique.rel = "noopener noreferrer"; } const techniqueCell = node("td"); techniqueCell.append(technique); row.append(node("td", "artifact-url", item.url || "Malformed reference withheld"), node("td", "hash", item.sha256 || "Unavailable"), techniqueCell, renderCorrelation(item), node("td", "number-cell", formatCount(item.count)), node("td", "", formatDate(item.last_seen, { year: undefined }))); body.append(row); }); }
 
+
 function createGlobe(sources) {
-  const canvas = byId("source-canvas"), context = canvas.getContext("2d"), focus = byId("source-focus"), controls = byId("globe-source-controls"), reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let width = 0, height = 0, radius = 0, points = [], rotationLon = -30, centerLat = 15, dragging = false, moved = false, last = null, pinned = null, hover = null, pauseUntil = 0;
+  const canvas = byId("source-canvas"), context = canvas.getContext("2d"), focus = byId("source-focus"), controls = byId("globe-source-controls");
+  const validSources = (sources || []).filter((source) => Number.isFinite(source.latitude) && Number.isFinite(source.longitude));
+  let width = 0, height = 0, radius = 0, points = [], countryRings = [], rotationLon = -30, centerLat = 15, dragging = false, moved = false, last = null, pinned = null, hover = null, frame = 0, visible = true;
   const radians = (value) => value * Math.PI / 180;
-  function project(lon, lat) { const lambda = radians(lon - rotationLon), phi = radians(lat), phi0 = radians(centerLat), visibility = Math.sin(phi0) * Math.sin(phi) + Math.cos(phi0) * Math.cos(phi) * Math.cos(lambda); return { x: width / 2 + radius * Math.cos(phi) * Math.sin(lambda), y: height / 2 - radius * (Math.cos(phi0) * Math.sin(phi) - Math.sin(phi0) * Math.cos(phi) * Math.cos(lambda)), visible: visibility > 0 }; }
-  function pathCoordinates(coordinates) { context.beginPath(); let previous = null; coordinates.forEach(([lon, lat]) => { const point = project(lon, lat); const discontinuity = previous && Math.hypot(point.x - previous.x, point.y - previous.y) > radius * .24; if (!point.visible || discontinuity) { previous = point.visible ? point : null; if (point.visible) context.moveTo(point.x, point.y); return; } if (!previous) context.moveTo(point.x, point.y); else context.lineTo(point.x, point.y); previous = point; }); context.stroke(); }
-  function draw() { context.clearRect(0, 0, width, height); const cx = width / 2, cy = height / 2, glow = context.createRadialGradient(cx - radius * .25, cy - radius * .28, radius * .06, cx, cy, radius); glow.addColorStop(0, "rgba(119,91,165,.20)"); glow.addColorStop(.72, "rgba(18,15,25,.88)"); glow.addColorStop(1, "rgba(5,4,8,.98)"); context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.fillStyle = glow; context.fill(); context.strokeStyle = "rgba(225,217,239,.18)"; context.stroke(); context.save(); context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.clip(); context.lineWidth = .75; context.strokeStyle = "rgba(205,192,224,.07)"; for (let lat = -60; lat <= 60; lat += 30) pathCoordinates(Array.from({ length: 181 }, (_, index) => [-180 + index * 2, lat])); for (let lon = -180; lon < 180; lon += 30) pathCoordinates(Array.from({ length: 91 }, (_, index) => [lon, -90 + index * 2])); context.lineWidth = 1; context.strokeStyle = "rgba(181,169,202,.25)"; LAND_POLYGONS.forEach(pathCoordinates); const origin = project(72.8777, 19.076); points = (sources || []).filter((source) => Number.isFinite(source.latitude) && Number.isFinite(source.longitude)).map((source) => ({ source, ...project(source.longitude, source.latitude) })).filter((point) => point.visible); points.forEach((point) => { if (origin.visible) { context.beginPath(); context.moveTo(origin.x, origin.y); context.quadraticCurveTo((origin.x + point.x) / 2, Math.min(origin.y, point.y) - Math.min(65, Math.abs(origin.x - point.x) * .12), point.x, point.y); context.strokeStyle = "rgba(158,131,255,.12)"; context.stroke(); } const selected = point.source.ip === (pinned || hover), size = Math.min(6, 2.4 + Math.log2(Number(point.source.sessions || 0) + 1) * .55); context.beginPath(); context.arc(point.x, point.y, selected ? size + 7 : size + 3, 0, Math.PI * 2); context.fillStyle = selected ? "rgba(255,112,141,.30)" : "rgba(255,112,141,.14)"; context.fill(); context.beginPath(); context.arc(point.x, point.y, selected ? size + 1 : size, 0, Math.PI * 2); context.fillStyle = "#ff708d"; context.fill(); }); if (origin.visible) { context.beginPath(); context.arc(origin.x, origin.y, 4.2, 0, Math.PI * 2); context.fillStyle = "#65d7b0"; context.fill(); } context.restore(); if (!reducedMotion && !dragging && performance.now() > pauseUntil) rotationLon = (rotationLon + .025 + 540) % 360 - 180; requestAnimationFrame(draw); }
-  function resize() { const rect = canvas.getBoundingClientRect(), ratio = Math.min(devicePixelRatio || 1, 2); width = rect.width; height = rect.height; radius = Math.max(100, Math.min(width, height) * .39); canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio); context.setTransform(ratio, 0, 0, ratio, 0, 0); }
-  function nearest(event) { const rect = canvas.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top; return points.map((point) => ({ point, distance: Math.hypot(point.x - x, point.y - y) })).sort((a, b) => a.distance - b.distance)[0]; }
-  function showSource(source) { if (!source) { focus.replaceChildren(node("small", "", "Rotate or select a signal"), node("strong", "", "Public source details appear here")); return; } const title = node("strong", "", `${source.flag || "◌"} ${source.ip}`), meta = node("span", "", `${source.city}, ${source.country} · ${source.asn ? `AS${source.asn}` : "ASN unresolved"}`), activity = node("span", "", `${formatCount(source.sessions)} sessions · ${formatCount(source.auth_attempts)} auth · ${formatCount(source.commands)} commands · ${formatCount(source.downloads)} artifacts`), link = node("a", "", "Open source evidence ↗"); link.href = `./evidence.html?section=sources&query=${encodeURIComponent(source.ip)}`; focus.replaceChildren(node("small", "", source.organization || "Unresolved network"), title, meta, activity, link); }
-  canvas.addEventListener("pointerdown", (event) => { dragging = true; moved = false; last = { x: event.clientX, y: event.clientY }; pauseUntil = performance.now() + 8000; canvas.setPointerCapture(event.pointerId); });
-  canvas.addEventListener("pointermove", (event) => { if (dragging && last) { const dx = event.clientX - last.x, dy = event.clientY - last.y; if (Math.abs(dx) + Math.abs(dy) > 2) moved = true; rotationLon -= dx * .35; centerLat = Math.max(-55, Math.min(55, centerLat + dy * .2)); last = { x: event.clientX, y: event.clientY }; return; } const candidate = nearest(event); hover = candidate && candidate.distance <= 48 ? candidate.point.source.ip : null; if (!pinned) showSource(candidate && candidate.distance <= 48 ? candidate.point.source : null); });
-  canvas.addEventListener("pointerup", (event) => { if (!moved) { const candidate = nearest(event); if (candidate && candidate.distance <= 48) { pinned = candidate.point.source.ip; showSource(candidate.point.source); } } dragging = false; last = null; });
-  canvas.addEventListener("pointerleave", () => { if (!dragging) { hover = null; if (!pinned) showSource(null); } });
-  controls.replaceChildren(); (sources || []).filter((source) => Number.isFinite(source.latitude) && Number.isFinite(source.longitude)).forEach((source) => { const button = node("button", "", `Select ${source.ip}, ${source.city}, ${source.country}`); button.type = "button"; button.addEventListener("focus", () => { pinned = source.ip; rotationLon = source.longitude; centerLat = Math.max(-55, Math.min(55, source.latitude)); showSource(source); }); controls.append(button); });
-  byId("globe-reset")?.addEventListener("click", () => { rotationLon = -30; centerLat = 15; pinned = null; hover = null; pauseUntil = performance.now() + 3000; showSource(null); }); window.addEventListener("resize", resize, { passive: true }); resize(); draw(); setText("constellation-label", `${(sources || []).filter((source) => Number.isFinite(source.latitude) && Number.isFinite(source.longitude)).length} geolocated sources`);
+  const project = (lon, lat) => {
+    const lambda = radians(lon - rotationLon), phi = radians(lat), phi0 = radians(centerLat);
+    const visibility = Math.sin(phi0) * Math.sin(phi) + Math.cos(phi0) * Math.cos(phi) * Math.cos(lambda);
+    return { x: width / 2 + radius * Math.cos(phi) * Math.sin(lambda), y: height / 2 - radius * (Math.cos(phi0) * Math.sin(phi) - Math.sin(phi0) * Math.cos(phi) * Math.cos(lambda)), visible: visibility > 0 };
+  };
+  function pathCoordinates(coordinates) {
+    context.beginPath(); let previous = null;
+    coordinates.forEach(([lon, lat]) => {
+      const point = project(lon, lat), discontinuity = previous && Math.hypot(point.x - previous.x, point.y - previous.y) > radius * .24;
+      if (!point.visible || discontinuity) { previous = point.visible ? point : null; if (point.visible) context.moveTo(point.x, point.y); return; }
+      if (!previous) context.moveTo(point.x, point.y); else context.lineTo(point.x, point.y); previous = point;
+    });
+    context.stroke();
+  }
+  function draw() {
+    frame = 0;
+    if (!visible || document.hidden || !width || !height) return;
+    context.clearRect(0, 0, width, height);
+    const cx = width / 2, cy = height / 2, glow = context.createRadialGradient(cx - radius * .25, cy - radius * .28, radius * .06, cx, cy, radius);
+    glow.addColorStop(0, "rgba(119,91,165,.20)"); glow.addColorStop(.72, "rgba(18,15,25,.88)"); glow.addColorStop(1, "rgba(5,4,8,.98)");
+    context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.fillStyle = glow; context.fill(); context.strokeStyle = "rgba(225,217,239,.18)"; context.stroke();
+    context.save(); context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.clip();
+    context.lineWidth = .65; context.strokeStyle = "rgba(205,192,224,.055)";
+    for (let lat = -60; lat <= 60; lat += 30) pathCoordinates(Array.from({ length: 121 }, (_, index) => [-180 + index * 3, lat]));
+    for (let lon = -180; lon < 180; lon += 30) pathCoordinates(Array.from({ length: 61 }, (_, index) => [lon, -90 + index * 3]));
+    context.lineWidth = .9; context.strokeStyle = "rgba(190,179,210,.28)"; countryRings.forEach(pathCoordinates);
+    points = validSources.map((source) => ({ source, ...project(source.longitude, source.latitude) })).filter((point) => point.visible);
+    points.forEach((point) => {
+      const selected = point.source.ip === (pinned || hover), size = Math.min(6, 2.4 + Math.log2(Number(point.source.sessions || 0) + 1) * .55);
+      context.beginPath(); context.arc(point.x, point.y, selected ? size + 7 : size + 3, 0, Math.PI * 2); context.fillStyle = selected ? "rgba(255,112,141,.30)" : "rgba(255,112,141,.14)"; context.fill();
+      context.beginPath(); context.arc(point.x, point.y, selected ? size + 1 : size, 0, Math.PI * 2); context.fillStyle = "#ff708d"; context.fill();
+    });
+    context.restore();
+  }
+  function requestDraw() { if (!frame && visible && !document.hidden) frame = requestAnimationFrame(draw); }
+  function resize() {
+    const rect = canvas.getBoundingClientRect(), ratio = Math.min(devicePixelRatio || 1, 2);
+    width = rect.width; height = rect.height; radius = Math.max(100, Math.min(width, height) * .39); canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio); context.setTransform(ratio, 0, 0, ratio, 0, 0); requestDraw();
+  }
+  function nearest(event) {
+    const rect = canvas.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top;
+    return points.map((point) => ({ point, distance: Math.hypot(point.x - x, point.y - y) })).sort((a, b) => a.distance - b.distance)[0];
+  }
+  function showSource(source) {
+    if (!source) { focus.replaceChildren(node("small", "", "Right-drag to rotate or select a signal"), node("strong", "", "Public source details appear here")); return; }
+    const protocols = (source.protocols || []).map((protocol) => typeof protocol === "string" ? protocol : protocol.value).filter(Boolean).join(" / ") || "protocol unresolved";
+    const title = node("strong", "", `${source.flag || "◌"} ${source.ip}`), meta = node("span", "", `${source.city}, ${source.country} · ${source.asn ? `AS${source.asn}` : "ASN unresolved"}`), activity = node("span", "", `${formatCount(source.sessions)} sessions · ${formatCount(source.auth_attempts)} auth · ${formatCount(source.commands)} commands · ${formatCount(source.downloads)} artifacts`), timing = node("span", "", `${protocols} · ${formatDate(source.first_seen)} — ${formatDate(source.last_seen)}`), link = node("a", "", "Open source evidence ↗");
+    link.href = `./evidence.html?section=sources&query=${encodeURIComponent(source.ip)}`; focus.replaceChildren(node("small", "", source.organization || "Unresolved network"), title, meta, activity, timing, link);
+  }
+  canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+  canvas.addEventListener("pointerdown", (event) => {
+    moved = false;
+    const rotateGesture = event.pointerType !== "mouse" || event.button === 2;
+    if (!rotateGesture) return;
+    event.preventDefault(); dragging = true; last = { x: event.clientX, y: event.clientY }; canvas.classList.add("dragging"); canvas.setPointerCapture(event.pointerId);
+  });
+  canvas.addEventListener("pointermove", (event) => {
+    if (dragging && last) { const dx = event.clientX - last.x, dy = event.clientY - last.y; if (Math.abs(dx) + Math.abs(dy) > 2) moved = true; rotationLon -= dx * .35; centerLat = Math.max(-55, Math.min(55, centerLat + dy * .2)); last = { x: event.clientX, y: event.clientY }; requestDraw(); return; }
+    if (event.buttons !== 0) moved = true;
+    const candidate = nearest(event); hover = candidate && candidate.distance <= 36 ? candidate.point.source.ip : null; if (!pinned) showSource(candidate && candidate.distance <= 36 ? candidate.point.source : null); requestDraw();
+  });
+  const stopDragging = () => { dragging = false; last = null; canvas.classList.remove("dragging"); };
+  canvas.addEventListener("pointerup", (event) => {
+    if (!moved && (event.pointerType !== "mouse" || event.button === 0)) {
+      const candidate = nearest(event);
+      if (candidate && candidate.distance <= 36) { pinned = candidate.point.source.ip; showSource(candidate.point.source); }
+      else { pinned = null; showSource(null); }
+    }
+    stopDragging(); requestDraw();
+  });
+  canvas.addEventListener("pointercancel", stopDragging);
+  canvas.addEventListener("pointerleave", () => { if (!dragging) { hover = null; if (!pinned) showSource(null); requestDraw(); } });
+  controls.replaceChildren(); validSources.forEach((source) => { const button = node("button", "", `Select ${source.ip}, ${source.city}, ${source.country}`); button.type = "button"; button.addEventListener("focus", () => { pinned = source.ip; rotationLon = source.longitude; centerLat = Math.max(-55, Math.min(55, source.latitude)); showSource(source); requestDraw(); }); controls.append(button); });
+  byId("globe-reset")?.addEventListener("click", () => { rotationLon = -30; centerLat = 15; pinned = null; hover = null; showSource(null); requestDraw(); });
+  new ResizeObserver(resize).observe(canvas); new IntersectionObserver(([entry]) => { visible = Boolean(entry?.isIntersecting); if (visible) requestDraw(); }, { rootMargin: "100px" }).observe(canvas); document.addEventListener("visibilitychange", () => { if (!document.hidden && visible) requestDraw(); });
+  const loadMap = () => loadCountryRings().then((rings) => { countryRings = rings; requestDraw(); });
+  resize(); if ("requestIdleCallback" in window) requestIdleCallback(loadMap, { timeout: 1200 }); else setTimeout(loadMap, 250); setText("constellation-label", `${validSources.length} geolocated sources`);
 }
 
 function restoreHashPosition() {
@@ -106,7 +202,7 @@ function restoreHashPosition() {
   if (target) requestAnimationFrame(() => requestAnimationFrame(() => target.scrollIntoView({ block: "start" })));
 }
 
-function renderSnapshot(snapshot) { if (!["3.0", "4.0"].includes(snapshot.schema_version)) throw new Error(`Unsupported telemetry schema ${snapshot.schema_version || "missing"}`); snapshotState = snapshot; const summary = snapshot.summary || {}, sensor = snapshot.sensor || {}, quality = snapshot.data_quality || {}; setText("generated-at", formatDate(snapshot.generated_at)); setText("window-label", `${compactDate(snapshot.window?.start)} — ${compactDate(snapshot.window?.end)}`); setText("sensor-label", `${sensor.platform || "Cowrie"} / ${sensor.region || "unknown"}`); const endpoint = sensor.public_endpoint, endpointMeta = byId("endpoint-meta"); if (endpoint?.host && endpointMeta) { setText("endpoint-label", `${endpoint.host} · ${(endpoint.services || []).map((service) => `${service.protocol}/${service.port}`).join(" · ")}`); endpointMeta.hidden = false; } [["metric-sessions", summary.sessions], ["metric-sources", summary.unique_sources], ["metric-auth", summary.auth_attempts], ["metric-commands", summary.commands], ["metric-downloads", summary.downloads], ["metric-techniques", summary.attack_techniques]].forEach(([id, value]) => setText(id, formatCount(value))); renderChart(); renderStream(snapshot.recent); renderSources(snapshot.sources); renderRankedList("username-list", snapshot.credentials?.usernames); renderRankedList("password-list", snapshot.credentials?.passwords); renderCommands(snapshot.commands); renderMitre(snapshot.mitre); renderTransferIntelligence(snapshot); renderArtifacts(snapshot.artifacts); createGlobe(snapshot.sources); setText("provenance-copy", `${snapshot.provenance?.collection || "Live deception sensor"}. ${snapshot.provenance?.interpretation || "Observations are indicative, not attribution."}`); [["quality-events", quality.events_published], ["quality-sources", summary.unique_sources], ["quality-accepted", summary.accepted_logins], ["quality-commands", summary.commands], ["quality-artifacts", summary.downloads], ["quality-redactions", quality.content_redactions], ["quality-operator", quality.operator_events_excluded], ["quality-private", quality.non_public_events_excluded]].forEach(([id, value]) => setText(id, formatCount(value))); restoreHashPosition(); }
+function renderSnapshot(snapshot) { if (!["3.0", "4.0", "5.0"].includes(snapshot.schema_version)) throw new Error(`Unsupported telemetry schema ${snapshot.schema_version || "missing"}`); snapshotState = snapshot; const summary = snapshot.summary || {}, sensor = snapshot.sensor || {}, quality = snapshot.data_quality || {}, sources = snapshot.sources || [], artifacts = snapshot.artifacts || [], coverage = snapshot.coverage || {}; setText("generated-at", formatDate(snapshot.generated_at)); setText("window-label", `${compactDate(snapshot.window?.start)} — ${compactDate(snapshot.window?.end)}`); setText("sensor-label", `${sensor.platform || "Cowrie"} / ${sensor.region || "unknown"}`); const endpoint = sensor.public_endpoint, endpointMeta = byId("endpoint-meta"); if (endpoint?.host && endpointMeta) { setText("endpoint-label", `${endpoint.host} · ${(endpoint.services || []).map((service) => `${service.protocol}/${service.port}`).join(" · ")}`); endpointMeta.hidden = false; } [["metric-sessions", summary.sessions], ["metric-sources", summary.unique_sources], ["metric-auth", summary.auth_attempts], ["metric-commands", summary.commands], ["metric-downloads", summary.downloads], ["metric-techniques", summary.attack_techniques]].forEach(([id, value]) => setText(id, formatCount(value))); renderChart(); renderStream(snapshot.recent); renderSources(sources); renderRankedList("username-list", snapshot.credentials?.usernames); renderRankedList("password-list", snapshot.credentials?.passwords); renderCommands(snapshot.commands); renderMitre(snapshot.mitre); renderTransferIntelligence(snapshot); renderArtifacts(artifacts); createGlobe(sources); setText("provenance-copy", `${snapshot.provenance?.collection || "Live deception sensor"}. ${snapshot.provenance?.interpretation || "Observations are indicative, not attribution."}`); const detected = artifacts.filter((item) => artifactCategory(item) === "Provider-detected").length, countries = new Set(sources.map((source) => source.country_code).filter((value) => value && value !== "ZZ")).size, networks = new Set(sources.map((source) => source.asn).filter(Boolean)).size; [["quality-events", quality.events_published], ["quality-sources", summary.unique_sources], ["quality-accepted", summary.accepted_logins], ["quality-commands", summary.commands], ["quality-artifacts", summary.downloads], ["quality-redactions", quality.content_redactions], ["quality-operator", quality.operator_events_excluded], ["quality-private", quality.non_public_events_excluded], ["quality-countries", countries], ["quality-networks", networks], ["quality-provider-detected", detected], ["quality-artifact-coverage", `${coverage.artifacts?.published ?? artifacts.length} / ${coverage.artifacts?.observed ?? artifacts.length}`]].forEach(([id, value]) => setText(id, typeof value === "string" ? value : formatCount(value))); restoreHashPosition(); }
 function observeReveals() { const observer = new IntersectionObserver((entries, active) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("visible"); active.unobserve(entry.target); } }), { threshold: .08 }); document.querySelectorAll(".reveal:not(.visible)").forEach((element) => observer.observe(element)); }
 async function loadDashboard() { try { const response = await fetch(`${DATA_URL}?v=${Date.now()}`, { cache: "no-store" }); if (!response.ok) throw new Error(`telemetry request returned HTTP ${response.status}`); renderSnapshot(await response.json()); } catch (error) { const banner = byId("dashboard-error"); banner.textContent = `Greyfield snapshot unavailable: ${error.message}`; banner.hidden = false; } }
 document.querySelectorAll("[data-hours]").forEach((button) => button.addEventListener("click", () => { chartHours = Number(button.dataset.hours); document.querySelectorAll("[data-hours]").forEach((item) => item.classList.toggle("active", item === button)); renderChart(); }));

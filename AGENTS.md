@@ -10,3 +10,14 @@
 - Validate shell scripts with `bash -n scripts/*.sh` and ShellCheck before
   changing deployment behavior.
 - Do not commit or push unless the user explicitly requests it.
+
+## Performance & Windows Tooling Rules
+- **DO NOT USE `grep_search`**: On Windows, the native `grep_search` tool has a known bug parsing drive letters (`D:\...` fails with `strconv.Atoi`).
+  - Instead of `grep_search`, ALWAYS use `view_file` to inspect files directly.
+  - If searching across files is required, run `rg` via `run_command`.
+- **Targeted Fast Execution**:
+  - Open the requested dashboard files immediately with `view_file`.
+  - Apply edits with `replace_file_content`.
+  - Run syntax checks (`node -c <file>`) via `run_command` and return promptly.
+  - **No Browser Automation**: Do not launch Chrome, Lighthouse, or browser tests during code editing passes.
+  - Return a concise summary (`### Files Changed`, `### Verification`) in under 30 seconds.

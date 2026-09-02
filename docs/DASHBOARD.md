@@ -160,7 +160,7 @@ normalized metadata. These are time-stamped third-party observations, never a
 Greyfield-confirmed family attribution. Malwarebytes remains an inactive
 adapter boundary until suitable documented API access exists.
 
-Schema `4.0` publication ceilings are 500 sources, 250 usernames, 250
+Schema `5.0` publication ceilings are 500 sources, 250 usernames, 250
 passwords, 500 distinct commands, 250 artifacts, and 25 evidence values per
 ATT&CK technique. Commands are sanitized to 2,048 characters and carry a
 `truncated` flag when the original exceeded that boundary. Schema `3.0` remains
@@ -204,6 +204,15 @@ The VM refreshes telemetry hourly with a randomized delay. This schedule keeps
 the public observatory current; it is not an OCI instance keepalive mechanism.
 GitHub Actions checks for a new snapshot every 15 minutes and rejects evidence
 older than three hours or outside the schema and privacy contract.
+
+The snapshot contains 288 five-minute buckets for the 24-hour Attack Pulse and
+168 hourly buckets for its seven-day view. Both are derived from Cowrie event
+timestamps; the publication time is not used as the activity timestamp.
+
+The public endpoint is deliberately discoverable, but only the Cowrie bait
+listeners on SSH/22 and Telnet/23 are publicized. Internet indexes may be asked
+to refresh their view of those services, but indexing is not represented as
+attacker activity and does not guarantee broader ATT&CK coverage.
 
 ## Operations
 

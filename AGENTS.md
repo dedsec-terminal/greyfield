@@ -11,6 +11,12 @@
   changing deployment behavior.
 - Do not commit or push unless the user explicitly requests it.
 
+## Prime Objective: Aggressive Codex Token Preservation
+- **Codex Tokens Are Precious; Antigravity Tokens Are Abundant**:
+  - Never write large diffs or whole files inside Codex. Always offload code generation and file edits to Antigravity.
+  - Fan out aggressively: whenever 2 or more files are involved, spawn parallel Antigravity subagents concurrently.
+  - Keep Codex context lean: return only concise 3-line summaries (`### Files Changed`, `### Verification`).
+
 ## Performance & Windows Tooling Rules
 - **DO NOT USE `grep_search`**: On Windows, the native `grep_search` tool has a known bug parsing drive letters (`D:\...` fails with `strconv.Atoi`).
   - Instead of `grep_search`, ALWAYS use `view_file` to inspect files directly.

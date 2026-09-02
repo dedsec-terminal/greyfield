@@ -10,8 +10,8 @@
     <meta name="description" content="Greyfield is a live SSH and Telnet honeypot observatory at 137.23.33.116 publishing evidence-backed internet threat telemetry.">
     <title>Greyfield — Internet Threat Observatory</title>
     <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./assets/styles.css?v=6">
-    <script src="./assets/app.js?v=6" defer></script>
+    <link rel="stylesheet" href="./assets/styles.css?v=7">
+    <script src="./assets/app.js?v=7" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to observations</a>
@@ -43,12 +43,12 @@
 
         <div class="observatory reveal" aria-label="Geographic distribution of observed attacker sources">
           <div class="observatory-head">
-            <span>Source constellation · right-drag to rotate</span>
+            <span>Source constellation · auto-rotates · drag or touch to rotate</span>
             <span><button id="globe-reset" class="text-button" type="button">Reset globe</button> · <span id="constellation-label">Awaiting telemetry</span></span>
           </div>
           <canvas id="source-canvas"></canvas>
           <div id="source-focus" class="source-focus" aria-live="polite">
-            <small>Rotate or select a signal</small>
+            <small>Drag, touch, or select a signal</small>
             <strong>Public source details appear here</strong>
           </div>
           <div id="globe-source-controls" class="visually-hidden" aria-label="Keyboard-accessible source selection"></div>

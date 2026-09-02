@@ -47,13 +47,65 @@ function decodeCountryRings(topology) {
   return rings;
 }
 
+function simplifyRing(ring, tolerance = 1.0) {
+  if (!ring || ring.length <= 6) return ring;
+  const tolSq = tolerance * tolerance;
+  const p0 = ring[0];
+  let maxD = 0, mid = 1;
+  for (let i = 1; i < ring.length - 1; i++) {
+    const d = (ring[i][0] - p0[0]) ** 2 + (ring[i][1] - p0[1]) ** 2;
+    if (d > maxD) { maxD = d; mid = i; }
+  }
+  const simplifySegment = (pts) => {
+    if (pts.length <= 2) return pts;
+    let maxDist = 0, idx = 0;
+    const a = pts[0], b = pts[pts.length - 1];
+    const dx = b[0] - a[0], dy = b[1] - a[1];
+    const magSq = dx * dx + dy * dy;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const p = pts[i];
+      let dist;
+      if (magSq === 0) {
+        dist = (p[0] - a[0]) ** 2 + (p[1] - a[1]) ** 2;
+      } else {
+        const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / magSq));
+        dist = (p[0] - (a[0] + t * dx)) ** 2 + (p[1] - (a[1] + t * dy)) ** 2;
+      }
+      if (dist > maxDist) { maxDist = dist; idx = i; }
+    }
+    if (maxDist > tolSq) {
+      const left = simplifySegment(pts.slice(0, idx + 1));
+      const right = simplifySegment(pts.slice(idx));
+      return left.slice(0, -1).concat(right);
+    }
+    return [a, b];
+  };
+
+  const left = simplifySegment(ring.slice(0, mid + 1));
+  const right = simplifySegment(ring.slice(mid));
+  const result = left.slice(0, -1).concat(right);
+  return result.length >= 4 ? result : ring;
+}
+
+function simplifyCountryRings(rings) {
+  return rings.map((ring) => simplifyRing(ring, 1.0));
+}
+
 function loadCountryRings() {
   if (!countryRingsPromise) countryRingsPromise = fetch(COUNTRY_MAP_URL, { cache: "force-cache" })
     .then((response) => { if (!response.ok) throw new Error(`map request returned HTTP ${response.status}`); return response.json(); })
     .then(decodeCountryRings)
+    .then(simplifyCountryRings)
     .catch(() => []);
   return countryRingsPromise;
 }
+
+const GRATICULE_LINES = (() => {
+  const lines = [];
+  for (let lat = -60; lat <= 60; lat += 30) lines.push(Array.from({ length: 121 }, (_, index) => [-180 + index * 3, lat]));
+  for (let lon = -180; lon < 180; lon += 30) lines.push(Array.from({ length: 61 }, (_, index) => [lon, -90 + index * 3]));
+  return lines;
+})();
 
 function niceCeiling(value) { if (value <= 1) return 1; const padded = value * 1.12, power = 10 ** Math.floor(Math.log10(padded)), unit = padded / power; return (unit <= 2 ? 2 : unit <= 5 ? 5 : 10) * power; }
 
@@ -113,85 +165,435 @@ function renderArtifacts(items) { const body = byId("artifact-rows"); body.repla
 function createGlobe(sources) {
   const canvas = byId("source-canvas"), context = canvas.getContext("2d"), focus = byId("source-focus"), controls = byId("globe-source-controls");
   const validSources = (sources || []).filter((source) => Number.isFinite(source.latitude) && Number.isFinite(source.longitude));
-  let width = 0, height = 0, radius = 0, points = [], countryRings = [], rotationLon = -30, centerLat = 15, dragging = false, moved = false, last = null, pinned = null, hover = null, frame = 0, visible = true;
-  const radians = (value) => value * Math.PI / 180;
+  const SENSOR = { id: "__sensor__", lon: 72.8777, lat: 19.076, label: "Greyfield sensor / ap-mumbai-1" };
+  const IDLE_FPS = 4, IDLE_INTERVAL = 1000 / IDLE_FPS, ROTATION_SPEED = 1.8;
+
+  let width = 0, height = 0, radius = 0, points = [], countryRings = [];
+  let rotationLon = -30, centerLat = 15;
+  let dragging = false, dragMoved = false, downPos = null, downTime = 0, last = null;
+  let pinned = null, hover = null, visible = true;
+  let animId = 0, drawRafId = 0, lastAnimTime = 0;
+  let glowGradient = null;
+  validSources.forEach((source) => { source._size = Math.min(6, 2.4 + Math.log2(Number(source.sessions || 0) + 1) * .55); });
+
+  const motionQuery = typeof window !== "undefined" && window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  let prefersReducedMotion = Boolean(motionQuery?.matches);
+  motionQuery?.addEventListener?.("change", (event) => {
+    prefersReducedMotion = Boolean(event.matches);
+    if (prefersReducedMotion) stopAutoRotate();
+    else if (canAutoRotate()) startAutoRotate();
+  });
+
+  canvas.style.touchAction = "none";
+
+  const DEG2RAD = Math.PI / 180;
+  const radians = (value) => value * DEG2RAD;
   const project = (lon, lat) => {
-    const lambda = radians(lon - rotationLon), phi = radians(lat), phi0 = radians(centerLat);
-    const visibility = Math.sin(phi0) * Math.sin(phi) + Math.cos(phi0) * Math.cos(phi) * Math.cos(lambda);
-    return { x: width / 2 + radius * Math.cos(phi) * Math.sin(lambda), y: height / 2 - radius * (Math.cos(phi0) * Math.sin(phi) - Math.sin(phi0) * Math.cos(phi) * Math.cos(lambda)), visible: visibility > 0 };
+    const lambda = (lon - rotationLon) * DEG2RAD, phi = lat * DEG2RAD, phi0 = centerLat * DEG2RAD;
+    const cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+    const cosPhi0 = Math.cos(phi0), sinPhi0 = Math.sin(phi0);
+    const cosLambda = Math.cos(lambda), sinLambda = Math.sin(lambda);
+    const visibility = sinPhi0 * sinPhi + cosPhi0 * cosPhi * cosLambda;
+    return { x: width / 2 + radius * cosPhi * sinLambda, y: height / 2 - radius * (cosPhi0 * sinPhi - sinPhi0 * cosPhi * cosLambda), visible: visibility > 0 };
   };
+
+  function appendRings(rings) {
+    const cx = width / 2, cy = height / 2;
+    const phi0 = centerLat * DEG2RAD;
+    const cosPhi0 = Math.cos(phi0), sinPhi0 = Math.sin(phi0);
+    const rotLon = rotationLon;
+    const maxDistSq = (radius * .24) ** 2;
+
+    for (let r = 0; r < rings.length; r++) {
+      const ring = rings[r];
+      let hasPrevious = false, prevX = 0, prevY = 0;
+      for (let i = 0; i < ring.length; i++) {
+        const coord = ring[i];
+        const lambda = (coord[0] - rotLon) * DEG2RAD, phi = coord[1] * DEG2RAD;
+        const cosPhi = Math.cos(phi), sinPhi = Math.sin(phi);
+        const cosLambda = Math.cos(lambda), sinLambda = Math.sin(lambda);
+        const visibility = sinPhi0 * sinPhi + cosPhi0 * cosPhi * cosLambda;
+        if (visibility <= 0) {
+          hasPrevious = false;
+          continue;
+        }
+        const px = cx + radius * cosPhi * sinLambda;
+        const py = cy - radius * (cosPhi0 * sinPhi - sinPhi0 * cosPhi * cosLambda);
+        if (hasPrevious) {
+          const dx = px - prevX, dy = py - prevY;
+          if (dx * dx + dy * dy > maxDistSq) {
+            context.moveTo(px, py);
+          } else {
+            context.lineTo(px, py);
+          }
+        } else {
+          context.moveTo(px, py);
+          hasPrevious = true;
+        }
+        prevX = px;
+        prevY = py;
+      }
+    }
+  }
+
   function pathCoordinates(coordinates) {
-    context.beginPath(); let previous = null;
-    coordinates.forEach(([lon, lat]) => {
-      const point = project(lon, lat), discontinuity = previous && Math.hypot(point.x - previous.x, point.y - previous.y) > radius * .24;
-      if (!point.visible || discontinuity) { previous = point.visible ? point : null; if (point.visible) context.moveTo(point.x, point.y); return; }
-      if (!previous) context.moveTo(point.x, point.y); else context.lineTo(point.x, point.y); previous = point;
-    });
+    context.beginPath();
+    appendRings([coordinates]);
     context.stroke();
   }
+
   function draw() {
-    frame = 0;
     if (!visible || document.hidden || !width || !height) return;
     context.clearRect(0, 0, width, height);
-    const cx = width / 2, cy = height / 2, glow = context.createRadialGradient(cx - radius * .25, cy - radius * .28, radius * .06, cx, cy, radius);
-    glow.addColorStop(0, "rgba(119,91,165,.20)"); glow.addColorStop(.72, "rgba(18,15,25,.88)"); glow.addColorStop(1, "rgba(5,4,8,.98)");
-    context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.fillStyle = glow; context.fill(); context.strokeStyle = "rgba(225,217,239,.18)"; context.stroke();
+    const cx = width / 2, cy = height / 2;
+    if (!glowGradient) {
+      glowGradient = context.createRadialGradient(cx - radius * .25, cy - radius * .28, radius * .06, cx, cy, radius);
+      glowGradient.addColorStop(0, "rgba(119,91,165,.20)");
+      glowGradient.addColorStop(.72, "rgba(18,15,25,.88)");
+      glowGradient.addColorStop(1, "rgba(5,4,8,.98)");
+    }
+    context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.fillStyle = glowGradient; context.fill(); context.strokeStyle = "rgba(225,217,239,.18)"; context.stroke();
     context.save(); context.beginPath(); context.arc(cx, cy, radius, 0, Math.PI * 2); context.clip();
     context.lineWidth = .65; context.strokeStyle = "rgba(205,192,224,.055)";
-    for (let lat = -60; lat <= 60; lat += 30) pathCoordinates(Array.from({ length: 121 }, (_, index) => [-180 + index * 3, lat]));
-    for (let lon = -180; lon < 180; lon += 30) pathCoordinates(Array.from({ length: 61 }, (_, index) => [lon, -90 + index * 3]));
-    context.lineWidth = .9; context.strokeStyle = "rgba(190,179,210,.28)"; countryRings.forEach(pathCoordinates);
-    points = validSources.map((source) => ({ source, ...project(source.longitude, source.latitude) })).filter((point) => point.visible);
+    context.beginPath();
+    appendRings(GRATICULE_LINES);
+    context.stroke();
+    context.lineWidth = .9; context.strokeStyle = "rgba(190,179,210,.28)";
+    context.beginPath();
+    appendRings(countryRings);
+    context.stroke();
+
+    points = [];
+    for (let i = 0; i < validSources.length; i++) {
+      const source = validSources[i];
+      const pt = project(source.longitude, source.latitude);
+      if (pt.visible) points.push({ source, x: pt.x, y: pt.y, visible: true });
+    }
     points.forEach((point) => {
-      const selected = point.source.ip === (pinned || hover), size = Math.min(6, 2.4 + Math.log2(Number(point.source.sessions || 0) + 1) * .55);
+      const selected = (point.source.ip === pinned || point.source.ip === hover), size = point.source._size || Math.min(6, 2.4 + Math.log2(Number(point.source.sessions || 0) + 1) * .55);
       context.beginPath(); context.arc(point.x, point.y, selected ? size + 7 : size + 3, 0, Math.PI * 2); context.fillStyle = selected ? "rgba(255,112,141,.30)" : "rgba(255,112,141,.14)"; context.fill();
       context.beginPath(); context.arc(point.x, point.y, selected ? size + 1 : size, 0, Math.PI * 2); context.fillStyle = "#ff708d"; context.fill();
     });
+
+    const sensorPt = project(SENSOR.lon, SENSOR.lat);
+    if (sensorPt.visible) {
+      const isSensorActive = (pinned === SENSOR.id || hover === SENSOR.id);
+      context.beginPath(); context.arc(sensorPt.x, sensorPt.y, isSensorActive ? 13 : 8, 0, Math.PI * 2);
+      context.fillStyle = isSensorActive ? "rgba(101,215,176,.35)" : "rgba(101,215,176,.15)"; context.fill();
+      context.beginPath(); context.arc(sensorPt.x, sensorPt.y, isSensorActive ? 7.5 : 5, 0, Math.PI * 2);
+      context.strokeStyle = "#65d7b0"; context.lineWidth = 1.4; context.stroke();
+      context.beginPath(); context.arc(sensorPt.x, sensorPt.y, isSensorActive ? 3.5 : 2.5, 0, Math.PI * 2);
+      context.fillStyle = "#65d7b0"; context.fill();
+    }
+
     context.restore();
   }
-  function requestDraw() { if (!frame && visible && !document.hidden) frame = requestAnimationFrame(draw); }
+
+  function canAutoRotate() {
+    return !prefersReducedMotion && visible && !document.hidden && !dragging && !pinned && !hover;
+  }
+
+  function autoRotateLoop(timestamp) {
+    animId = 0;
+    if (!canAutoRotate()) return;
+    if (!lastAnimTime) {
+      lastAnimTime = timestamp;
+      draw();
+    } else {
+      const delta = timestamp - lastAnimTime;
+      if (delta >= IDLE_INTERVAL - 4) {
+        const seconds = Math.min(delta / 1000, 0.25);
+        rotationLon -= ROTATION_SPEED * seconds;
+        if (rotationLon < -180) rotationLon += 360;
+        else if (rotationLon > 180) rotationLon -= 360;
+        lastAnimTime = timestamp;
+        draw();
+      }
+    }
+    if (canAutoRotate()) animId = requestAnimationFrame(autoRotateLoop);
+  }
+
+  function startAutoRotate() {
+    if (animId || !canAutoRotate()) return;
+    cancelDraw();
+    lastAnimTime = 0;
+    animId = requestAnimationFrame(autoRotateLoop);
+  }
+
+  function stopAutoRotate() {
+    if (animId) { cancelAnimationFrame(animId); animId = 0; }
+    lastAnimTime = 0;
+  }
+
+  function cancelDraw() {
+    if (drawRafId) { cancelAnimationFrame(drawRafId); drawRafId = 0; }
+  }
+
+  function requestDraw() {
+    if (!visible || document.hidden) return;
+    if (canAutoRotate()) {
+      startAutoRotate();
+      return;
+    }
+    if (drawRafId) return;
+    drawRafId = requestAnimationFrame(() => {
+      drawRafId = 0;
+      if (!visible || document.hidden) return;
+      draw();
+    });
+  }
+
   function resize() {
     const rect = canvas.getBoundingClientRect(), ratio = Math.min(devicePixelRatio || 1, 2);
-    width = rect.width; height = rect.height; radius = Math.max(100, Math.min(width, height) * .39); canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio); context.setTransform(ratio, 0, 0, ratio, 0, 0); requestDraw();
+    width = rect.width; height = rect.height; radius = Math.max(100, Math.min(width, height) * .39);
+    glowGradient = null;
+    canvas.width = Math.round(width * ratio); canvas.height = Math.round(height * ratio); context.setTransform(ratio, 0, 0, ratio, 0, 0); draw();
   }
+
   function nearest(event) {
     const rect = canvas.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top;
-    return points.map((point) => ({ point, distance: Math.hypot(point.x - x, point.y - y) })).sort((a, b) => a.distance - b.distance)[0];
+    let closest = null, minDist = Infinity;
+    for (let i = 0; i < points.length; i++) {
+      const dist = Math.hypot(points[i].x - x, points[i].y - y);
+      if (dist < minDist) { minDist = dist; closest = { point: points[i], distance: dist }; }
+    }
+    return closest;
   }
+
+  function sensorHit(event) {
+    const rect = canvas.getBoundingClientRect(), x = event.clientX - rect.left, y = event.clientY - rect.top;
+    const sensorPt = project(SENSOR.lon, SENSOR.lat);
+    return sensorPt.visible ? { distance: Math.hypot(sensorPt.x - x, sensorPt.y - y), point: sensorPt } : null;
+  }
+
+  function showSensor() {
+    focus.replaceChildren(
+      node("small", "", "Sensor reference"),
+      node("strong", "", SENSOR.label),
+      node("span", "", "19.076° N, 72.878° E · OCI Mumbai"),
+      node("span", "", "Passive threat research observatory · Decoy active")
+    );
+  }
+
   function showSource(source) {
-    if (!source) { focus.replaceChildren(node("small", "", "Right-drag to rotate or select a signal"), node("strong", "", "Public source details appear here")); return; }
+    if (!source) { focus.replaceChildren(node("small", "", "Drag, touch, or select a signal"), node("strong", "", "Public source details appear here")); return; }
     const protocols = (source.protocols || []).map((protocol) => typeof protocol === "string" ? protocol : protocol.value).filter(Boolean).join(" / ") || "protocol unresolved";
     const title = node("strong", "", `${source.flag || "◌"} ${source.ip}`), meta = node("span", "", `${source.city}, ${source.country} · ${source.asn ? `AS${source.asn}` : "ASN unresolved"}`), activity = node("span", "", `${formatCount(source.sessions)} sessions · ${formatCount(source.auth_attempts)} auth · ${formatCount(source.commands)} commands · ${formatCount(source.downloads)} artifacts`), timing = node("span", "", `${protocols} · ${formatDate(source.first_seen)} — ${formatDate(source.last_seen)}`), link = node("a", "", "Open source evidence ↗");
     link.href = `./evidence.html?section=sources&query=${encodeURIComponent(source.ip)}`; focus.replaceChildren(node("small", "", source.organization || "Unresolved network"), title, meta, activity, timing, link);
   }
+
   canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+
   canvas.addEventListener("pointerdown", (event) => {
-    moved = false;
-    const rotateGesture = event.pointerType !== "mouse" || event.button === 2;
-    if (!rotateGesture) return;
-    event.preventDefault(); dragging = true; last = { x: event.clientX, y: event.clientY }; canvas.classList.add("dragging"); canvas.setPointerCapture(event.pointerId);
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    event.preventDefault();
+    dragging = true;
+    dragMoved = false;
+    downPos = { x: event.clientX, y: event.clientY };
+    downTime = performance.now();
+    last = { x: event.clientX, y: event.clientY };
+    canvas.classList.add("dragging");
+    try { canvas.setPointerCapture(event.pointerId); } catch (_) {}
+    stopAutoRotate();
   });
+
   canvas.addEventListener("pointermove", (event) => {
-    if (dragging && last) { const dx = event.clientX - last.x, dy = event.clientY - last.y; if (Math.abs(dx) + Math.abs(dy) > 2) moved = true; rotationLon -= dx * .35; centerLat = Math.max(-55, Math.min(55, centerLat + dy * .2)); last = { x: event.clientX, y: event.clientY }; requestDraw(); return; }
-    if (event.buttons !== 0) moved = true;
-    const candidate = nearest(event); hover = candidate && candidate.distance <= 36 ? candidate.point.source.ip : null; if (!pinned) showSource(candidate && candidate.distance <= 36 ? candidate.point.source : null); requestDraw();
-  });
-  const stopDragging = () => { dragging = false; last = null; canvas.classList.remove("dragging"); };
-  canvas.addEventListener("pointerup", (event) => {
-    if (!moved && (event.pointerType !== "mouse" || event.button === 0)) {
-      const candidate = nearest(event);
-      if (candidate && candidate.distance <= 36) { pinned = candidate.point.source.ip; showSource(candidate.point.source); }
-      else { pinned = null; showSource(null); }
+    if (dragging && last) {
+      const dx = event.clientX - last.x, dy = event.clientY - last.y;
+      if (downPos && Math.hypot(event.clientX - downPos.x, event.clientY - downPos.y) > 4) dragMoved = true;
+      if (dragMoved) {
+        rotationLon -= dx * .35;
+        centerLat = Math.max(-55, Math.min(55, centerLat + dy * .2));
+        last = { x: event.clientX, y: event.clientY };
+        requestDraw();
+        return;
+      }
     }
-    stopDragging(); requestDraw();
+
+    if (!dragging && event.pointerType !== "touch") {
+      const candidate = nearest(event), sHit = sensorHit(event);
+      let newHover = null;
+      if (sHit && sHit.distance <= 22 && (!candidate || sHit.distance < candidate.distance)) {
+        newHover = SENSOR.id;
+      } else if (candidate && candidate.distance <= 36) {
+        newHover = candidate.point.source.ip;
+      }
+      if (hover !== newHover) {
+        hover = newHover;
+        canvas.classList.toggle("hovering", Boolean(hover));
+        if (!pinned) {
+          if (hover === SENSOR.id) showSensor();
+          else if (candidate && hover === candidate.point.source.ip) showSource(candidate.point.source);
+          else showSource(null);
+        }
+        if (canAutoRotate()) {
+          startAutoRotate();
+        } else {
+          stopAutoRotate();
+          requestDraw();
+        }
+      }
+    }
   });
-  canvas.addEventListener("pointercancel", stopDragging);
-  canvas.addEventListener("pointerleave", () => { if (!dragging) { hover = null; if (!pinned) showSource(null); requestDraw(); } });
-  controls.replaceChildren(); validSources.forEach((source) => { const button = node("button", "", `Select ${source.ip}, ${source.city}, ${source.country}`); button.type = "button"; button.addEventListener("focus", () => { pinned = source.ip; rotationLon = source.longitude; centerLat = Math.max(-55, Math.min(55, source.latitude)); showSource(source); requestDraw(); }); controls.append(button); });
-  byId("globe-reset")?.addEventListener("click", () => { rotationLon = -30; centerLat = 15; pinned = null; hover = null; showSource(null); requestDraw(); });
-  new ResizeObserver(resize).observe(canvas); new IntersectionObserver(([entry]) => { visible = Boolean(entry?.isIntersecting); if (visible) requestDraw(); }, { rootMargin: "100px" }).observe(canvas); document.addEventListener("visibilitychange", () => { if (!document.hidden && visible) requestDraw(); });
-  const loadMap = () => loadCountryRings().then((rings) => { countryRings = rings; requestDraw(); });
-  resize(); if ("requestIdleCallback" in window) requestIdleCallback(loadMap, { timeout: 1200 }); else setTimeout(loadMap, 250); setText("constellation-label", `${validSources.length} geolocated sources`);
+
+  const handlePointerEnd = (event) => {
+    if (!dragging) return;
+    try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
+    const wasMoved = dragMoved, duration = performance.now() - downTime;
+    dragging = false;
+    canvas.classList.remove("dragging");
+    last = null;
+
+    if (!wasMoved && (event.pointerType === "mouse" ? event.button === 0 : duration < 650)) {
+      const candidate = nearest(event), sHit = sensorHit(event);
+      if (sHit && sHit.distance <= 22 && (!candidate || sHit.distance < candidate.distance)) {
+        pinned = SENSOR.id;
+        showSensor();
+      } else if (candidate && candidate.distance <= 36) {
+        pinned = candidate.point.source.ip;
+        showSource(candidate.point.source);
+      } else {
+        pinned = null;
+        showSource(null);
+      }
+    }
+
+    if (event.pointerType === "mouse") {
+      const candidate = nearest(event), sHit = sensorHit(event);
+      if (sHit && sHit.distance <= 22 && (!candidate || sHit.distance < candidate.distance)) hover = SENSOR.id;
+      else if (candidate && candidate.distance <= 36) hover = candidate.point.source.ip;
+      else hover = null;
+      if (!pinned) {
+        if (hover === SENSOR.id) showSensor();
+        else if (candidate && hover === candidate.point.source.ip) showSource(candidate.point.source);
+        else showSource(null);
+      }
+    } else {
+      hover = null;
+    }
+    canvas.classList.toggle("hovering", Boolean(pinned || hover));
+
+    if (canAutoRotate()) {
+      startAutoRotate();
+    } else {
+      stopAutoRotate();
+      requestDraw();
+    }
+  };
+
+  canvas.addEventListener("pointerup", handlePointerEnd);
+  canvas.addEventListener("pointercancel", (event) => {
+    if (!dragging) return;
+    try { canvas.releasePointerCapture(event.pointerId); } catch (_) {}
+    dragging = false;
+    dragMoved = false;
+    canvas.classList.remove("dragging");
+    last = null;
+    hover = null;
+    canvas.classList.toggle("hovering", Boolean(pinned));
+    if (!pinned) showSource(null);
+    if (canAutoRotate()) {
+      startAutoRotate();
+    } else {
+      stopAutoRotate();
+      requestDraw();
+    }
+  });
+
+  canvas.addEventListener("pointerleave", () => {
+    if (!dragging) {
+      hover = null;
+      canvas.classList.remove("hovering");
+      if (!pinned) showSource(null);
+      if (canAutoRotate()) {
+        startAutoRotate();
+      } else {
+        stopAutoRotate();
+        requestDraw();
+      }
+    }
+  });
+
+  controls.replaceChildren();
+  const sensorBtn = node("button", "", "Select Greyfield sensor, ap-mumbai-1");
+  sensorBtn.type = "button";
+  sensorBtn.addEventListener("focus", () => {
+    pinned = SENSOR.id;
+    rotationLon = SENSOR.lon;
+    centerLat = Math.max(-55, Math.min(55, SENSOR.lat));
+    showSensor();
+    stopAutoRotate();
+    requestDraw();
+  });
+  controls.append(sensorBtn);
+
+  validSources.forEach((source) => {
+    const button = node("button", "", `Select ${source.ip}, ${source.city}, ${source.country}`);
+    button.type = "button";
+    button.addEventListener("focus", () => {
+      pinned = source.ip;
+      rotationLon = source.longitude;
+      centerLat = Math.max(-55, Math.min(55, source.latitude));
+      showSource(source);
+      stopAutoRotate();
+      requestDraw();
+    });
+    controls.append(button);
+  });
+
+  byId("globe-reset")?.addEventListener("click", () => {
+    rotationLon = -30;
+    centerLat = 15;
+    pinned = null;
+    hover = null;
+    canvas.classList.remove("hovering");
+    showSource(null);
+    if (canAutoRotate()) {
+      stopAutoRotate();
+      startAutoRotate();
+    } else {
+      stopAutoRotate();
+      requestDraw();
+    }
+  });
+
+  new ResizeObserver(resize).observe(canvas);
+  new IntersectionObserver(([entry]) => {
+    visible = Boolean(entry?.isIntersecting);
+    if (visible) {
+      if (canAutoRotate()) startAutoRotate();
+      else requestDraw();
+    } else {
+      stopAutoRotate();
+      cancelDraw();
+    }
+  }, { rootMargin: "100px" }).observe(canvas);
+
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && visible) {
+      if (canAutoRotate()) startAutoRotate();
+      else requestDraw();
+    } else {
+      stopAutoRotate();
+      cancelDraw();
+    }
+  });
+
+  const loadMap = () => loadCountryRings().then((rings) => {
+    countryRings = rings;
+    if (canAutoRotate()) {
+      if (!animId) startAutoRotate();
+      else draw();
+    } else {
+      requestDraw();
+    }
+  });
+  resize();
+  if ("requestIdleCallback" in window) requestIdleCallback(loadMap, { timeout: 1200 });
+  else setTimeout(loadMap, 250);
+  setText("constellation-label", `${validSources.length} geolocated sources`);
+  if (canAutoRotate()) startAutoRotate();
+  else requestDraw();
 }
 
 function restoreHashPosition() {

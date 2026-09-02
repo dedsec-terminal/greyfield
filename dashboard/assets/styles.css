@@ -270,7 +270,8 @@ footer span:nth-child(2) { text-align: center; }footer a { justify-self: end; co
 .site-header a:focus-visible, .text-button:focus-visible, .category-tabs button:focus-visible, .pagination button:focus-visible { outline: 1px solid var(--violet); outline-offset: 5px; }
 .text-button { border: 0; padding: 0; background: transparent; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
 
-#source-canvas { cursor: crosshair; touch-action: none; }
+#source-canvas { cursor: grab; touch-action: none; }
+#source-canvas.hovering { cursor: pointer; }
 #source-canvas.dragging { cursor: grabbing; }
 .source-focus { width: min(330px, calc(100% - 64px)); max-width: 330px; }
 .source-focus strong { white-space: normal; overflow-wrap: anywhere; }

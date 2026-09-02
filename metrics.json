@@ -1,9 +1,9 @@
 {
   "schema_version": "4.0",
-  "generated_at": "2026-09-02T14:02:12Z",
+  "generated_at": "2026-09-02T15:05:12Z",
   "window": {
     "start": "2026-09-02T00:00:00Z",
-    "end": "2026-09-02T13:58:17Z"
+    "end": "2026-09-02T15:00:48Z"
   },
   "sensor": {
     "name": "greyfield-honeypot",
@@ -25,29 +25,15 @@
     }
   },
   "summary": {
-    "sessions": 1704,
-    "unique_sources": 124,
-    "auth_attempts": 1723,
-    "accepted_logins": 128,
-    "commands": 410,
+    "sessions": 1728,
+    "unique_sources": 128,
+    "auth_attempts": 1750,
+    "accepted_logins": 129,
+    "commands": 412,
     "downloads": 4,
     "attack_techniques": 9
   },
   "hourly": [
-    {
-      "bucket": "2026-08-26T14:00:00Z",
-      "sessions": 0,
-      "auth": 0,
-      "commands": 0,
-      "downloads": 0
-    },
-    {
-      "bucket": "2026-08-26T15:00:00Z",
-      "sessions": 0,
-      "auth": 0,
-      "commands": 0,
-      "downloads": 0
-    },
     {
       "bucket": "2026-08-26T16:00:00Z",
       "sessions": 0,
@@ -1209,16 +1195,30 @@
       "auth": 63,
       "commands": 0,
       "downloads": 0
+    },
+    {
+      "bucket": "2026-09-02T14:00:00Z",
+      "sessions": 23,
+      "auth": 26,
+      "commands": 2,
+      "downloads": 0
+    },
+    {
+      "bucket": "2026-09-02T15:00:00Z",
+      "sessions": 1,
+      "auth": 1,
+      "commands": 0,
+      "downloads": 0
     }
   ],
   "protocols": [
     {
       "value": "SSH",
-      "count": 1501
+      "count": 1523
     },
     {
       "value": "TELNET",
-      "count": 203
+      "count": 205
     }
   ],
   "sources": [
@@ -1274,8 +1274,8 @@
       "asn": 17426,
       "organization": "PRIMENET GLOBAL LTD.",
       "flag": "\ud83c\uddee\ud83c\uddf3",
-      "sessions": 174,
-      "auth_attempts": 174,
+      "sessions": 187,
+      "auth_attempts": 187,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
@@ -1283,7 +1283,7 @@
         "SSH"
       ],
       "first_seen": "2026-09-02T00:02:06Z",
-      "last_seen": "2026-09-02T13:58:17Z"
+      "last_seen": "2026-09-02T15:00:48Z"
     },
     {
       "ip": "49.248.197.50",
@@ -1358,8 +1358,8 @@
       "asn": 18206,
       "organization": "TM ONE Cloud Alpha Edge",
       "flag": "\ud83c\uddf2\ud83c\uddfe",
-      "sessions": 38,
-      "auth_attempts": 38,
+      "sessions": 41,
+      "auth_attempts": 41,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
@@ -1367,7 +1367,7 @@
         "SSH"
       ],
       "first_seen": "2026-09-02T00:02:17Z",
-      "last_seen": "2026-09-02T13:49:48Z"
+      "last_seen": "2026-09-02T14:56:52Z"
     },
     {
       "ip": "2.57.122.238",
@@ -1389,6 +1389,27 @@
       ],
       "first_seen": "2026-09-02T07:08:56Z",
       "last_seen": "2026-09-02T13:50:32Z"
+    },
+    {
+      "ip": "2.57.121.112",
+      "country": "Romania",
+      "country_code": "RO",
+      "city": "Bucharest",
+      "latitude": 44.4268,
+      "longitude": 26.1025,
+      "asn": 47890,
+      "organization": "UNMANAGED LTD",
+      "flag": "\ud83c\uddf7\ud83c\uddf4",
+      "sessions": 10,
+      "auth_attempts": 50,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-02T00:14:46Z",
+      "last_seen": "2026-09-02T14:42:01Z"
     },
     {
       "ip": "92.118.39.50",
@@ -1433,27 +1454,6 @@
       "last_seen": "2026-09-02T12:37:47Z"
     },
     {
-      "ip": "2.57.121.112",
-      "country": "Romania",
-      "country_code": "RO",
-      "city": "Bucharest",
-      "latitude": 44.4268,
-      "longitude": 26.1025,
-      "asn": 47890,
-      "organization": "UNMANAGED LTD",
-      "flag": "\ud83c\uddf7\ud83c\uddf4",
-      "sessions": 9,
-      "auth_attempts": 45,
-      "accepted": 0,
-      "commands": 0,
-      "downloads": 0,
-      "protocols": [
-        "SSH"
-      ],
-      "first_seen": "2026-09-02T00:14:46Z",
-      "last_seen": "2026-09-02T13:09:43Z"
-    },
-    {
       "ip": "185.93.89.72",
       "country": "Netherlands",
       "country_code": "NL",
@@ -1473,6 +1473,27 @@
       ],
       "first_seen": "2026-09-02T10:08:17Z",
       "last_seen": "2026-09-02T12:42:52Z"
+    },
+    {
+      "ip": "193.46.255.86",
+      "country": "Romania",
+      "country_code": "RO",
+      "city": "Bucharest",
+      "latitude": 44.4268,
+      "longitude": 26.1025,
+      "asn": 47890,
+      "organization": "UNMANAGED LTD",
+      "flag": "\ud83c\uddf7\ud83c\uddf4",
+      "sessions": 11,
+      "auth_attempts": 33,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-02T00:05:25Z",
+      "last_seen": "2026-09-02T14:04:27Z"
     },
     {
       "ip": "2.57.122.168",
@@ -1515,27 +1536,6 @@
       ],
       "first_seen": "2026-09-02T02:33:41Z",
       "last_seen": "2026-09-02T13:47:06Z"
-    },
-    {
-      "ip": "193.46.255.86",
-      "country": "Romania",
-      "country_code": "RO",
-      "city": "Bucharest",
-      "latitude": 44.4268,
-      "longitude": 26.1025,
-      "asn": 47890,
-      "organization": "UNMANAGED LTD",
-      "flag": "\ud83c\uddf7\ud83c\uddf4",
-      "sessions": 10,
-      "auth_attempts": 30,
-      "accepted": 0,
-      "commands": 0,
-      "downloads": 0,
-      "protocols": [
-        "SSH"
-      ],
-      "first_seen": "2026-09-02T00:05:25Z",
-      "last_seen": "2026-09-02T12:42:25Z"
     },
     {
       "ip": "103.134.255.114",
@@ -1789,6 +1789,27 @@
       ],
       "first_seen": "2026-09-02T00:46:54Z",
       "last_seen": "2026-09-02T00:49:04Z"
+    },
+    {
+      "ip": "65.49.20.69",
+      "country": "United States",
+      "country_code": "US",
+      "city": "Livermore-Pleasanton",
+      "latitude": 37.6968,
+      "longitude": -121.8443,
+      "asn": 6939,
+      "organization": "Hurricane Electric LLC",
+      "flag": "\ud83c\uddfa\ud83c\uddf8",
+      "sessions": 1,
+      "auth_attempts": 2,
+      "accepted": 1,
+      "commands": 2,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-02T14:22:56Z",
+      "last_seen": "2026-09-02T14:22:57Z"
     },
     {
       "ip": "37.98.158.123",
@@ -2339,6 +2360,69 @@
       ],
       "first_seen": "2026-09-02T02:17:02Z",
       "last_seen": "2026-09-02T02:17:10Z"
+    },
+    {
+      "ip": "168.228.143.23",
+      "country": "Argentina",
+      "country_code": "AR",
+      "city": "Caleta Olivia",
+      "latitude": -46.4478,
+      "longitude": -67.5227,
+      "asn": 264689,
+      "organization": "Luciano Gabriel Chersanaz Ubnet Datacenter",
+      "flag": "\ud83c\udde6\ud83c\uddf7",
+      "sessions": 2,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-02T14:34:22Z",
+      "last_seen": "2026-09-02T14:34:47Z"
+    },
+    {
+      "ip": "188.253.212.230",
+      "country": "Azerbaijan",
+      "country_code": "AZ",
+      "city": "Baku",
+      "latitude": 40.3771,
+      "longitude": 49.8875,
+      "asn": 28787,
+      "organization": "Aztelekom LLC",
+      "flag": "\ud83c\udde6\ud83c\uddff",
+      "sessions": 2,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-02T14:06:57Z",
+      "last_seen": "2026-09-02T14:07:27Z"
+    },
+    {
+      "ip": "223.84.239.151",
+      "country": "China",
+      "country_code": "CN",
+      "city": "Ji'an",
+      "latitude": 27.0937,
+      "longitude": 114.9614,
+      "asn": 56045,
+      "organization": "China Mobile Communications Corporation",
+      "flag": "\ud83c\udde8\ud83c\uddf3",
+      "sessions": 1,
+      "auth_attempts": 1,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-02T14:02:36Z",
+      "last_seen": "2026-09-02T14:02:37Z"
     },
     {
       "ip": "146.158.124.105",
@@ -3842,11 +3926,11 @@
     "usernames": [
       {
         "value": "root",
-        "count": 833
+        "count": 852
       },
       {
         "value": "admin",
-        "count": 96
+        "count": 97
       },
       {
         "value": "enable\\x00",
@@ -4010,6 +4094,10 @@
       },
       {
         "value": "jazzmin",
+        "count": 5
+      },
+      {
+        "value": "jordon",
         "count": 5
       },
       {
@@ -4835,10 +4923,6 @@
       {
         "value": "amine",
         "count": 1
-      },
-      {
-        "value": "teste",
-        "count": 1
       }
     ],
     "passwords": [
@@ -4860,7 +4944,7 @@
       },
       {
         "value": "admin",
-        "count": 29
+        "count": 30
       },
       {
         "value": "password",
@@ -4955,6 +5039,10 @@
         "count": 6
       },
       {
+        "value": "1qaz@WSX",
+        "count": 6
+      },
+      {
         "value": "default",
         "count": 5
       },
@@ -4995,7 +5083,7 @@
         "count": 5
       },
       {
-        "value": "1qaz@WSX",
+        "value": "Aa123456",
         "count": 5
       },
       {
@@ -5012,6 +5100,10 @@
       },
       {
         "value": "admin1",
+        "count": 4
+      },
+      {
+        "value": "321",
         "count": 4
       },
       {
@@ -5032,10 +5124,6 @@
       },
       {
         "value": "qwe123456",
-        "count": 4
-      },
-      {
-        "value": "Aa123456",
         "count": 4
       },
       {
@@ -5063,7 +5151,7 @@
         "count": 4
       },
       {
-        "value": "321",
+        "value": "0",
         "count": 3
       },
       {
@@ -5135,6 +5223,10 @@
         "count": 3
       },
       {
+        "value": "Admin@123",
+        "count": 3
+      },
+      {
         "value": "ubuntu",
         "count": 3
       },
@@ -5151,15 +5243,15 @@
         "count": 2
       },
       {
-        "value": "0",
-        "count": 2
-      },
-      {
         "value": "Test1234",
         "count": 2
       },
       {
         "value": "\\xef\\xbb\\xbf------fuck------",
+        "count": 2
+      },
+      {
+        "value": "00",
         "count": 2
       },
       {
@@ -5295,7 +5387,15 @@
         "count": 2
       },
       {
+        "value": "Admin123",
+        "count": 2
+      },
+      {
         "value": "0987654321",
+        "count": 2
+      },
+      {
+        "value": "Huawei@123",
         "count": 2
       },
       {
@@ -5363,6 +5463,10 @@
         "count": 2
       },
       {
+        "value": "redhat123",
+        "count": 2
+      },
+      {
         "value": "Aa123321",
         "count": 2
       },
@@ -5379,11 +5483,11 @@
         "count": 2
       },
       {
-        "value": "Admin@123",
+        "value": "ansible",
         "count": 2
       },
       {
-        "value": "ansible",
+        "value": "P@ssw0rd123",
         "count": 2
       },
       {
@@ -5532,10 +5636,6 @@
       },
       {
         "value": "Abcd#1234",
-        "count": 1
-      },
-      {
-        "value": "00",
         "count": 1
       },
       {
@@ -5825,22 +5925,6 @@
       {
         "value": "abcd1234@",
         "count": 1
-      },
-      {
-        "value": "f",
-        "count": 1
-      },
-      {
-        "value": "zxm10",
-        "count": 1
-      },
-      {
-        "value": "Azerty1",
-        "count": 1
-      },
-      {
-        "value": "qwqw1212",
-        "count": 1
       }
     ]
   },
@@ -6066,6 +6150,17 @@
       ],
       "techniques": [
         "T1083"
+      ],
+      "truncated": false
+    },
+    {
+      "command": "(empty)",
+      "count": 2,
+      "families": [
+        "Other shell activity"
+      ],
+      "techniques": [
+        "T1059.004"
       ],
       "truncated": false
     },
@@ -6329,17 +6424,6 @@
       "truncated": false
     },
     {
-      "command": "(empty)",
-      "count": 1,
-      "families": [
-        "Other shell activity"
-      ],
-      "techniques": [
-        "T1059.004"
-      ],
-      "truncated": false
-    },
-    {
       "command": "uname -s -v -n -r -m",
       "count": 1,
       "families": [
@@ -6546,6 +6630,17 @@
         "T1082"
       ],
       "truncated": false
+    },
+    {
+      "command": "Accept-Encoding: gzip",
+      "count": 1,
+      "families": [
+        "Other shell activity"
+      ],
+      "techniques": [
+        "T1059.004"
+      ],
+      "truncated": false
     }
   ],
   "artifacts": [
@@ -6643,7 +6738,7 @@
       "id": "T1059.004",
       "name": "Unix Shell",
       "tactic": "Execution",
-      "count": 361,
+      "count": 363,
       "evidence": [
         {
           "value": "sh",
@@ -6711,6 +6806,11 @@
           "truncated": false
         },
         {
+          "value": "(empty)",
+          "count": 2,
+          "truncated": false
+        },
+        {
           "value": "/bin/busybox BOTNET",
           "count": 1,
           "truncated": false
@@ -6764,21 +6864,16 @@
           "value": "Cp0yJp+7n8gw696Uf/LGAAAACGRsckBzZnRwAQIDBAU=",
           "count": 1,
           "truncated": false
-        },
-        {
-          "value": "-----END OPENSSH PRIVATE KEY-----' > key.ppk; echo 'StrictHostKeyChecking no",
-          "count": 1,
-          "truncated": false
         }
       ],
-      "evidence_observed": 28,
+      "evidence_observed": 29,
       "evidence_published": 25
     },
     {
       "id": "T1110.001",
       "name": "Password Guessing",
       "tactic": "Credential Access",
-      "count": 276,
+      "count": 286,
       "evidence": [
         {
           "value": "enable\\x00 / linuxshell\\x00",
@@ -6906,7 +7001,7 @@
           "truncated": false
         }
       ],
-      "evidence_observed": 116,
+      "evidence_observed": 126,
       "evidence_published": 25
     },
     {
@@ -7212,16 +7307,16 @@
   ],
   "recent": [
     {
-      "time": "2026-09-02T13:58:14Z",
+      "time": "2026-09-02T15:00:44Z",
       "severity": "medium",
       "protocol": "SSH",
       "ip": "110.173.190.221",
       "country_code": "IN",
       "event": "Credential rejected",
-      "detail": "root / qweqaz123"
+      "detail": "root / admin11!!"
     },
     {
-      "time": "2026-09-02T13:58:04Z",
+      "time": "2026-09-02T15:00:35Z",
       "severity": "info",
       "protocol": "SSH",
       "ip": "110.173.190.221",
@@ -7230,52 +7325,16 @@
       "detail": ""
     },
     {
-      "time": "2026-09-02T13:53:25Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / Aa111111"
-    },
-    {
-      "time": "2026-09-02T13:53:16Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:50:31Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Credential rejected",
-      "detail": "bot / 12345"
-    },
-    {
-      "time": "2026-09-02T13:50:30Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:49:47Z",
+      "time": "2026-09-02T14:56:50Z",
       "severity": "medium",
       "protocol": "SSH",
       "ip": "202.165.25.8",
       "country_code": "MY",
       "event": "Credential rejected",
-      "detail": "root / 4321"
+      "detail": "root / 00"
     },
     {
-      "time": "2026-09-02T13:49:46Z",
+      "time": "2026-09-02T14:56:49Z",
       "severity": "info",
       "protocol": "SSH",
       "ip": "202.165.25.8",
@@ -7284,34 +7343,16 @@
       "detail": ""
     },
     {
-      "time": "2026-09-02T13:48:46Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Credential rejected",
-      "detail": "bot / 123456"
-    },
-    {
-      "time": "2026-09-02T13:48:46Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:48:38Z",
+      "time": "2026-09-02T14:55:56Z",
       "severity": "medium",
       "protocol": "SSH",
       "ip": "110.173.190.221",
       "country_code": "IN",
       "event": "Credential rejected",
-      "detail": "root / p@ssw0rd"
+      "detail": "root / Pa$$wort"
     },
     {
-      "time": "2026-09-02T13:48:28Z",
+      "time": "2026-09-02T14:55:47Z",
       "severity": "info",
       "protocol": "SSH",
       "ip": "110.173.190.221",
@@ -7320,115 +7361,259 @@
       "detail": ""
     },
     {
-      "time": "2026-09-02T13:47:30Z",
+      "time": "2026-09-02T14:51:08Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / admin12345!"
+    },
+    {
+      "time": "2026-09-02T14:50:59Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:46:19Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / ABCabc123"
+    },
+    {
+      "time": "2026-09-02T14:46:10Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:42:00Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "2.57.121.112",
+      "country_code": "RO",
+      "event": "Credential rejected",
+      "detail": "jordon / jordon12345"
+    },
+    {
+      "time": "2026-09-02T14:41:59Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "2.57.121.112",
+      "country_code": "RO",
+      "event": "Credential rejected",
+      "detail": "jordon / jordon1234"
+    },
+    {
+      "time": "2026-09-02T14:41:58Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "2.57.121.112",
+      "country_code": "RO",
+      "event": "Credential rejected",
+      "detail": "jordon / jordon123"
+    },
+    {
+      "time": "2026-09-02T14:41:56Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "2.57.121.112",
+      "country_code": "RO",
+      "event": "Credential rejected",
+      "detail": "jordon / jordon1"
+    },
+    {
+      "time": "2026-09-02T14:41:55Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "2.57.121.112",
+      "country_code": "RO",
+      "event": "Credential rejected",
+      "detail": "jordon / jordon"
+    },
+    {
+      "time": "2026-09-02T14:41:55Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "2.57.121.112",
+      "country_code": "RO",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:41:31Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / Admin123"
+    },
+    {
+      "time": "2026-09-02T14:41:21Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:36:42Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / P@ssw0rd123"
+    },
+    {
+      "time": "2026-09-02T14:36:32Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:34:59Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Credential rejected",
+      "detail": "root / 0"
+    },
+    {
+      "time": "2026-09-02T14:34:58Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:34:47Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "168.228.143.23",
+      "country_code": "AR",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:34:22Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "168.228.143.23",
+      "country_code": "AR",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:31:53Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / 1qaz@WSX"
+    },
+    {
+      "time": "2026-09-02T14:31:44Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:27:05Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / Zxc123!@#"
+    },
+    {
+      "time": "2026-09-02T14:26:55Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:22:56Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "65.49.20.69",
+      "country_code": "US",
+      "event": "Command executed",
+      "detail": "(empty)"
+    },
+    {
+      "time": "2026-09-02T14:22:56Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "65.49.20.69",
+      "country_code": "US",
+      "event": "Command executed",
+      "detail": "Accept-Encoding: gzip"
+    },
+    {
+      "time": "2026-09-02T14:22:56Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "65.49.20.69",
+      "country_code": "US",
+      "event": "Decoy access granted",
+      "detail": "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; / Accept: */*"
+    },
+    {
+      "time": "2026-09-02T14:22:56Z",
+      "severity": "medium",
+      "protocol": "TELNET",
+      "ip": "65.49.20.69",
+      "country_code": "US",
+      "event": "Credential rejected",
+      "detail": "GET / HTTP/1.1 / Host: 137.23.33.116:23"
+    },
+    {
+      "time": "2026-09-02T14:22:56Z",
       "severity": "info",
       "protocol": "TELNET",
-      "ip": "213.230.100.20",
-      "country_code": "UZ",
+      "ip": "65.49.20.69",
+      "country_code": "US",
       "event": "Connection opened",
       "detail": ""
     },
     {
-      "time": "2026-09-02T13:47:05Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Credential rejected",
-      "detail": "bot / bot"
-    },
-    {
-      "time": "2026-09-02T13:47:05Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Credential rejected",
-      "detail": "support / support"
-    },
-    {
-      "time": "2026-09-02T13:47:05Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:47:04Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:45:34Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Credential rejected",
-      "detail": "support / support"
-    },
-    {
-      "time": "2026-09-02T13:45:33Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:45:20Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Credential rejected",
-      "detail": "tradingbot / tradingbot"
-    },
-    {
-      "time": "2026-09-02T13:45:19Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:44:03Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Credential rejected",
-      "detail": "support / support"
-    },
-    {
-      "time": "2026-09-02T13:44:02Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:43:50Z",
+      "time": "2026-09-02T14:22:16Z",
       "severity": "medium",
       "protocol": "SSH",
       "ip": "110.173.190.221",
       "country_code": "IN",
       "event": "Credential rejected",
-      "detail": "root / qwe!@#123"
+      "detail": "root / Admin123456"
     },
     {
-      "time": "2026-09-02T13:43:41Z",
+      "time": "2026-09-02T14:22:06Z",
       "severity": "info",
       "protocol": "SSH",
       "ip": "110.173.190.221",
@@ -7437,124 +7622,16 @@
       "detail": ""
     },
     {
-      "time": "2026-09-02T13:43:34Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Credential rejected",
-      "detail": "trader / trader"
-    },
-    {
-      "time": "2026-09-02T13:43:33Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:42:32Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Credential rejected",
-      "detail": "support / support"
-    },
-    {
-      "time": "2026-09-02T13:42:31Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:41:55Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Credential rejected",
-      "detail": "trading / trading"
-    },
-    {
-      "time": "2026-09-02T13:41:54Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:41:01Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Credential rejected",
-      "detail": "support / support"
-    },
-    {
-      "time": "2026-09-02T13:41:00Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:40:14Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Credential rejected",
-      "detail": "sol / 12345678"
-    },
-    {
-      "time": "2026-09-02T13:40:13Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:39:30Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Credential rejected",
-      "detail": "support / support"
-    },
-    {
-      "time": "2026-09-02T13:39:29Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-02T13:39:05Z",
+      "time": "2026-09-02T14:17:25Z",
       "severity": "medium",
       "protocol": "SSH",
       "ip": "110.173.190.221",
       "country_code": "IN",
       "event": "Credential rejected",
-      "detail": "root / qweQWE!@#123"
+      "detail": "root / Admin@123"
     },
     {
-      "time": "2026-09-02T13:38:55Z",
+      "time": "2026-09-02T14:17:15Z",
       "severity": "info",
       "protocol": "SSH",
       "ip": "110.173.190.221",
@@ -7563,34 +7640,52 @@
       "detail": ""
     },
     {
-      "time": "2026-09-02T13:38:28Z",
+      "time": "2026-09-02T14:12:38Z",
       "severity": "medium",
       "protocol": "SSH",
-      "ip": "2.57.122.238",
-      "country_code": "RO",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
       "event": "Credential rejected",
-      "detail": "sol / 123"
+      "detail": "root / 123@com"
+    },
+    {
+      "time": "2026-09-02T14:12:29Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-02T14:11:55Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Credential rejected",
+      "detail": "root / 321"
     }
   ],
   "coverage": {
     "sources": {
-      "observed": 124,
-      "published": 124,
+      "observed": 128,
+      "published": 128,
       "truncated": false
     },
     "usernames": {
-      "observed": 283,
+      "observed": 286,
       "published": 250,
       "truncated": true
     },
     "passwords": {
-      "observed": 1004,
+      "observed": 1020,
       "published": 250,
       "truncated": true
     },
     "commands": {
-      "observed": 62,
-      "published": 62,
+      "observed": 63,
+      "published": 63,
       "truncated": false
     },
     "artifacts": {
@@ -7600,12 +7695,12 @@
     }
   },
   "data_quality": {
-    "events_published": 9123,
+    "events_published": 9240,
     "invalid_lines": 0,
     "operator_events_excluded": 0,
     "non_public_events_excluded": 0,
     "content_redactions": 5,
-    "geo_lookups": 5,
+    "geo_lookups": 4,
     "geo_failures": 0,
     "enrichment_lookups": 0,
     "enrichment_failures": 0,

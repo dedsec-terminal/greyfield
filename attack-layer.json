@@ -10,13 +10,13 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 361,
+      "score": 363,
       "comment": "sh; shell",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 276,
+      "score": 286,
       "comment": "enable\\x00 / linuxshell\\x00; lghkel\\x09 / zpz}ld\\x09",
       "enabled": true
     },
@@ -70,6 +70,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 361
+    "maxValue": 363
   }
 }

@@ -10,13 +10,13 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 181,
+      "score": 220,
       "comment": "shell; system",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 168,
+      "score": 197,
       "comment": "enable\\x00 / linuxshell\\x00; admin / admin",
       "enabled": true
     },
@@ -70,6 +70,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 181
+    "maxValue": 220
   }
 }

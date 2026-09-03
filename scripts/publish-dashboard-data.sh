@@ -136,7 +136,7 @@ python3 "$VALIDATOR" "$repo_dir/metrics.json" \
 
 git -C "$repo_dir" add -- metrics.json attack-layer.json
 
-if [[ -n "$telemetry_lease" ]] && git -C "$repo_dir" rev-parse --verify FETCH_HEAD^{commit} >/dev/null 2>&1; then
+if [[ -n "$telemetry_lease" ]] && git -C "$repo_dir" rev-parse --verify "FETCH_HEAD^{commit}" >/dev/null 2>&1; then
   staged_tree="$(git -C "$repo_dir" write-tree)"
   telemetry_tree="$(git -C "$repo_dir" rev-parse "FETCH_HEAD^{tree}")"
   telemetry_parent="$(git -C "$repo_dir" rev-parse "FETCH_HEAD^" 2>/dev/null || true)"

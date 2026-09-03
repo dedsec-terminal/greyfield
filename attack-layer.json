@@ -10,13 +10,13 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 1659,
+      "score": 1662,
       "comment": "shell; sh",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 1065,
+      "score": 1075,
       "comment": "enable\\x00 / linuxshell\\x00; root / vizxv",
       "enabled": true
     },
@@ -70,6 +70,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 1659
+    "maxValue": 1662
   }
 }

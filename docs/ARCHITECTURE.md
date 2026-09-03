@@ -70,8 +70,9 @@ but never operator IPs, session artifacts, or captured payloads. The VM initiate
 listen on HTTP/HTTPS and requires no additional OCI ingress rule. A dedicated
 repository deploy key is stored root-only and used solely by the hourly
 publisher. Protect the default branch with a GitHub ruleset and do not grant
-the deploy key a ruleset bypass; its intended write target is only the orphan
-`telemetry` branch.
+the deploy key a ruleset bypass; its intended write target is only the
+`telemetry` branch (pushed with `--force-with-lease` as a single commit atop
+`master` containing strictly the two public evidence files).
 
 The public-data contract and deployment gates are documented in
 [`DASHBOARD.md`](DASHBOARD.md).

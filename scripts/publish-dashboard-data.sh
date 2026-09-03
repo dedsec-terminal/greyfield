@@ -47,12 +47,16 @@ ENRICHMENT_CACHE="${ENRICHMENT_CACHE:-/var/lib/greyfield-dashboard/enrichment-ca
 MALWAREBAZAAR_AUTH_KEY_FILE="${MALWAREBAZAAR_AUTH_KEY_FILE:-}"
 VIRUSTOTAL_API_KEY_FILE="${VIRUSTOTAL_API_KEY_FILE:-}"
 PROVIDER_LIMIT="${PROVIDER_LIMIT:-3}"
+BASELINE_SNAPSHOT="${BASELINE_SNAPSHOT:-}"
 
 require_root_private_file "$DEPLOY_KEY"
 require_root_private_file "$KNOWN_HOSTS"
 [[ -r "$LOG_FILE" ]] || die "Cowrie log is not readable: $LOG_FILE"
 [[ -f "$EXPORTER" ]] || die "Exporter is missing: $EXPORTER"
 [[ -f "$VALIDATOR" ]] || die "Validator is missing: $VALIDATOR"
+if [[ -n "$BASELINE_SNAPSHOT" ]]; then
+  [[ -r "$BASELINE_SNAPSHOT" ]] || die "Baseline snapshot is not readable: $BASELINE_SNAPSHOT"
+fi
 
 work_dir="$(mktemp -d /tmp/greyfield-telemetry.XXXXXX)"
 trap 'rm -rf -- "$work_dir"' EXIT
@@ -60,23 +64,26 @@ trap 'rm -rf -- "$work_dir"' EXIT
 export GIT_SSH_COMMAND="ssh -i $DEPLOY_KEY -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$KNOWN_HOSTS"
 
 repo_dir="$work_dir/repository"
-if git ls-remote --exit-code --heads "$REPO_SSH" telemetry >/dev/null 2>&1; then
-  git clone --quiet --depth 1 --single-branch --branch telemetry "$REPO_SSH" "$repo_dir"
-else
-  mkdir -p "$repo_dir"
-  git -C "$repo_dir" init --quiet
-  git -C "$repo_dir" checkout --quiet --orphan telemetry
-  git -C "$repo_dir" remote add origin "$REPO_SSH"
+telemetry_lease="$(git ls-remote "$REPO_SSH" refs/heads/telemetry | awk '{print $1}')"
+
+git clone --quiet --depth 1 --single-branch --branch master "$REPO_SSH" "$repo_dir"
+
+if [[ -n "$telemetry_lease" ]]; then
+  git -C "$repo_dir" fetch --quiet --depth 1 origin refs/heads/telemetry 2>/dev/null || true
 fi
 
 # The telemetry branch is an intentionally minimal publication boundary. Remove
-# any previously tracked content before recreating its two allowed artifacts.
+# any master working tree content before recreating its two allowed artifacts.
 git -C "$repo_dir" rm -r -q --ignore-unmatch .
 
 exclude_args=()
 deny_args=()
 endpoint_args=()
 enrichment_args=()
+baseline_args=()
+if [[ -n "$BASELINE_SNAPSHOT" ]]; then
+  baseline_args+=(--baseline-snapshot "$BASELINE_SNAPSHOT")
+fi
 if [[ -n "$EXCLUDE_IPS" ]]; then
   read -r -a exclude_ip_list <<<"$EXCLUDE_IPS"
   for address in "${exclude_ip_list[@]}"; do
@@ -120,20 +127,36 @@ python3 "$EXPORTER" \
   --geo-limit "$GEO_LIMIT" \
   "${endpoint_args[@]}" \
   "${enrichment_args[@]}" \
-  "${exclude_args[@]}"
+  "${exclude_args[@]}" \
+  "${baseline_args[@]}"
 
 python3 "$VALIDATOR" "$repo_dir/metrics.json" \
   --layer "$repo_dir/attack-layer.json" \
   "${deny_args[@]}"
 
 git -C "$repo_dir" add -- metrics.json attack-layer.json
-if git -C "$repo_dir" diff --cached --quiet; then
-  printf 'Telemetry is unchanged; nothing to publish.\n'
-  exit 0
+
+if [[ -n "$telemetry_lease" ]] && git -C "$repo_dir" rev-parse --verify FETCH_HEAD^{commit} >/dev/null 2>&1; then
+  staged_tree="$(git -C "$repo_dir" write-tree)"
+  telemetry_tree="$(git -C "$repo_dir" rev-parse "FETCH_HEAD^{tree}")"
+  telemetry_parent="$(git -C "$repo_dir" rev-parse "FETCH_HEAD^" 2>/dev/null || true)"
+  current_master="$(git -C "$repo_dir" rev-parse HEAD)"
+  if [[ "$staged_tree" == "$telemetry_tree" && "$telemetry_parent" == "$current_master" ]]; then
+    printf 'Telemetry is unchanged; nothing to publish.\n'
+    exit 0
+  fi
 fi
 
 git -C "$repo_dir" config user.name "Greyfield Telemetry"
 git -C "$repo_dir" config user.email "telemetry@localhost"
 git -C "$repo_dir" commit --quiet -m "telemetry: publish reviewed evidence snapshot"
-git -C "$repo_dir" push --quiet origin HEAD:telemetry
+
+lease_arg=()
+if [[ -n "$telemetry_lease" ]]; then
+  lease_arg=(--force-with-lease="refs/heads/telemetry:$telemetry_lease")
+else
+  lease_arg=(--force-with-lease="refs/heads/telemetry:")
+fi
+
+git -C "$repo_dir" push --quiet "${lease_arg[@]}" origin HEAD:telemetry
 printf 'Published a reviewed Greyfield evidence snapshot.\n'

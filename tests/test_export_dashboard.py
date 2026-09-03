@@ -1,6 +1,7 @@
 import importlib.util
 import io
 import json
+import copy
 import tempfile
 import unittest
 from pathlib import Path
@@ -258,6 +259,42 @@ class DashboardExportTests(unittest.TestCase):
         self.assertEqual(rows[-2]["sessions"], 2)
         self.assertEqual(rows[-1]["bucket"], "2026-09-01T12:05:00Z")
         self.assertEqual(rows[-1]["auth"], 1)
+
+    def test_schema_four_baseline_is_carried_into_schema_five_without_fabricated_five_minute_data(self):
+        baseline = self.make_snapshot()
+        baseline["schema_version"] = "4.0"
+        baseline.pop("five_minute")
+        baseline["sensor"]["name"] = "retired-sensor"
+        baseline["sensor"]["public_endpoint"]["host"] = "old.example.invalid"
+        current = self.make_snapshot()
+        current_five_minute = copy.deepcopy(current["five_minute"])
+
+        merged = export_dashboard.merge_baseline(current, baseline, {"9.9.9.9"})
+
+        self.assertEqual(merged["schema_version"], "5.0")
+        self.assertEqual(merged["sensor"]["name"], "greyfield-test")
+        self.assertEqual(merged["sensor"]["public_endpoint"]["host"], "sensor.example.invalid")
+        self.assertEqual(merged["summary"]["sessions"], 4)
+        self.assertEqual(merged["summary"]["unique_sources"], 2)
+        self.assertEqual(len(merged["five_minute"]), 288)
+        self.assertEqual(merged["five_minute"], current_five_minute)
+        self.assertIn("historical evidence", merged["provenance"]["collection"].lower())
+        self.assertIn("current-sensor timestamps", merged["provenance"]["interpretation"])
+
+    def test_baseline_with_denied_operator_source_fails_closed(self):
+        baseline = self.make_snapshot()
+        baseline["schema_version"] = "4.0"
+        baseline.pop("five_minute")
+        baseline["sources"][0]["ip"] = "9.9.9.9"
+        with self.assertRaisesRegex(ValueError, "denied operator IP"):
+            export_dashboard.merge_baseline(self.make_snapshot(), baseline, {"9.9.9.9"})
+
+    def test_load_baseline_rejects_unsupported_schema(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "baseline.json"
+            path.write_text('{"schema_version":"2.0"}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "schema 4.0 or 5.0"):
+                export_dashboard.load_baseline(path)
 
 
 if __name__ == "__main__":

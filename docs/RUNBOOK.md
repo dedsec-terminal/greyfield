@@ -135,8 +135,11 @@ and both NAT redirects survive reboot.
 Only begin dashboard publication after the Stage 6 reboot gate passes. Follow
 the independent gates in [the dashboard guide](DASHBOARD.md): publish the static
 site, create the repository-scoped key, pin GitHub's host key, configure every
-operator/test IP exclusion, perform one manual publication, inspect the orphan
-`telemetry` branch, and only then enable the hourly timer.
+operator/test IP exclusion, perform one manual publication, inspect the
+published `telemetry` branch (rebuilt as a single commit atop `master` with
+strictly the two allowed public files), and only then enable the hourly timer.
+If carrying forward evidence from a retired sensor instance, configure
+`BASELINE_SNAPSHOT` in `/etc/greyfield-dashboard/config`.
 
 No OCI port `80` or `443` rule is needed because the dashboard is hosted by
 GitHub Pages and the VM initiates an outbound Git connection.

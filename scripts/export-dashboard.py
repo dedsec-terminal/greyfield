@@ -49,6 +49,29 @@ PUBLIC_LIMITS = {
 }
 COMMAND_LIMIT = 2048
 
+SNAPSHOT_KEYS_V4 = {
+    "schema_version", "generated_at", "window", "sensor", "summary", "hourly", "protocols", "sources",
+    "credentials", "commands", "artifacts", "mitre", "recent", "coverage", "data_quality", "provenance",
+}
+SNAPSHOT_KEYS_V5 = SNAPSHOT_KEYS_V4 | {"five_minute"}
+REQUIRED_SUMMARY = {
+    "sessions", "unique_sources", "auth_attempts", "accepted_logins", "commands", "downloads", "attack_techniques"
+}
+SOURCE_KEYS = {
+    "ip", "country", "country_code", "city", "latitude", "longitude", "asn", "organization", "flag",
+    "sessions", "auth_attempts", "accepted", "commands", "downloads", "protocols", "first_seen", "last_seen",
+}
+RECENT_KEYS = {"time", "severity", "protocol", "ip", "country_code", "event", "detail"}
+ARTIFACT_KEYS_V4 = {"url", "sha256", "count", "first_seen", "last_seen", "techniques", "correlation"}
+COMMAND_KEYS_V4 = {"command", "count", "families", "techniques", "truncated"}
+MITRE_KEYS_V4 = {"id", "name", "tactic", "count", "evidence", "evidence_observed", "evidence_published"}
+DATA_QUALITY_KEYS_V4 = {
+    "events_published", "invalid_lines", "operator_events_excluded", "non_public_events_excluded",
+    "content_redactions", "geo_lookups", "geo_failures", "enrichment_lookups", "enrichment_failures", "privacy",
+}
+COVERAGE_GROUPS = {"sources", "usernames", "passwords", "commands", "artifacts"}
+FORBIDDEN_RAW_KEYS = {"src_ip", "dst_ip", "src_port", "dst_port", "input", "session", "ttylog", "outfile"}
+
 TECHNIQUES = {
     "brute_force": ("T1110.001", "Password Guessing", "Credential Access"),
     "shell": ("T1059.004", "Unix Shell", "Execution"),
@@ -787,6 +810,199 @@ def build_snapshot(
     }
 
 
+def load_baseline(path: Path) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"cannot read baseline snapshot: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ValueError("baseline snapshot must be a JSON object")
+    schema = payload.get("schema_version")
+    expected = SNAPSHOT_KEYS_V5 if schema == "5.0" else SNAPSHOT_KEYS_V4 if schema == "4.0" else None
+    if expected is None or set(payload) != expected:
+        raise ValueError("baseline snapshot must be an exact schema 4.0 or 5.0 metrics snapshot")
+    return payload
+
+
+def _count_rows(
+    baseline: list[dict[str, Any]], current: list[dict[str, Any]], key: str, limit: int,
+) -> list[dict[str, Any]]:
+    counts: Counter[str] = Counter()
+    for row in [*baseline, *current]:
+        value, count = row.get(key), row.get("count")
+        if not isinstance(value, str) or not isinstance(count, int) or isinstance(count, bool) or count < 0:
+            raise ValueError(f"invalid baseline/current count row for {key}")
+        counts[value] += count
+    return [{key: value, "count": count} for value, count in sorted(counts.items(), key=lambda item: (-item[1], item[0]))[:limit]]
+
+
+def _earliest(left: Any, right: Any) -> str:
+    values = [value for value in (parse_timestamp(left), parse_timestamp(right)) if value is not None]
+    if not values:
+        raise ValueError("baseline timestamp is invalid")
+    return iso_z(min(values))
+
+
+def _latest(left: Any, right: Any) -> str:
+    values = [value for value in (parse_timestamp(left), parse_timestamp(right)) if value is not None]
+    if not values:
+        raise ValueError("baseline timestamp is invalid")
+    return iso_z(max(values))
+
+
+def merge_baseline(
+    current: dict[str, Any], baseline: dict[str, Any], denied_ips: set[str],
+) -> dict[str, Any]:
+    """Carry a sanitized, non-overlapping retired-sensor snapshot into a live export."""
+    baseline_sources = baseline.get("sources")
+    current_sources = current.get("sources")
+    if not isinstance(baseline_sources, list) or not isinstance(current_sources, list):
+        raise ValueError("baseline/current sources must be arrays")
+    sources: dict[str, dict[str, Any]] = {}
+    activity_keys = ("sessions", "auth_attempts", "accepted", "commands", "downloads")
+    for is_current, row in [(False, item) for item in baseline_sources] + [(True, item) for item in current_sources]:
+        if not isinstance(row, dict) or set(row) != SOURCE_KEYS:
+            raise ValueError("baseline/current source row has an invalid shape")
+        address = row.get("ip")
+        try:
+            normalized = str(ipaddress.ip_address(address))
+        except ValueError as exc:
+            raise ValueError("baseline/current source contains an invalid IP") from exc
+        if normalized in denied_ips:
+            raise ValueError(f"denied operator IP found in baseline snapshot: {normalized}")
+        for key in activity_keys:
+            if not isinstance(row.get(key), int) or isinstance(row[key], bool) or row[key] < 0:
+                raise ValueError(f"source {normalized} has invalid {key}")
+        prior = sources.get(normalized)
+        if prior is None:
+            sources[normalized] = dict(row)
+            sources[normalized]["protocols"] = sorted(set(row.get("protocols", [])))
+            continue
+        merged = dict(prior)
+        # A current-sensor row has fresher enrichment metadata when available.
+        if is_current:
+            merged.update(row)
+        for key in activity_keys:
+            merged[key] = prior[key] + row[key]
+        merged["protocols"] = sorted(set(prior.get("protocols", [])) | set(row.get("protocols", [])))
+        merged["first_seen"] = _earliest(prior.get("first_seen"), row.get("first_seen"))
+        merged["last_seen"] = _latest(prior.get("last_seen"), row.get("last_seen"))
+        sources[normalized] = merged
+    ranked_sources = sorted(sources.values(), key=lambda row: (-row["sessions"], row["ip"]))
+    current["sources"] = ranked_sources[:PUBLIC_LIMITS["sources"]]
+
+    current["protocols"] = _count_rows(baseline.get("protocols", []), current.get("protocols", []), "value", 3)
+    for group in ("usernames", "passwords"):
+        current["credentials"][group] = _count_rows(
+            baseline.get("credentials", {}).get(group, []), current["credentials"].get(group, []),
+            "value", PUBLIC_LIMITS[group],
+        )
+
+    command_rows: dict[str, dict[str, Any]] = {}
+    for row in [*baseline.get("commands", []), *current.get("commands", [])]:
+        if not isinstance(row, dict) or set(row) != COMMAND_KEYS_V4:
+            raise ValueError("baseline/current command row has an invalid shape")
+        key = row.get("command")
+        if not isinstance(key, str) or not isinstance(row.get("count"), int):
+            raise ValueError("baseline/current command row is invalid")
+        prior = command_rows.get(key)
+        if prior is None:
+            command_rows[key] = dict(row)
+        else:
+            prior["count"] += row["count"]
+            prior["families"] = sorted(set(prior.get("families", [])) | set(row.get("families", [])))
+            prior["techniques"] = sorted(set(prior.get("techniques", [])) | set(row.get("techniques", [])))
+            prior["truncated"] = bool(prior.get("truncated") or row.get("truncated"))
+    current["commands"] = sorted(command_rows.values(), key=lambda row: (-row["count"], row["command"]))[:PUBLIC_LIMITS["commands"]]
+
+    artifacts: dict[tuple[Any, Any], dict[str, Any]] = {}
+    for row in [*baseline.get("artifacts", []), *current.get("artifacts", [])]:
+        if not isinstance(row, dict) or set(row) != ARTIFACT_KEYS_V4:
+            raise ValueError("baseline/current artifact row has an invalid shape")
+        key = (row.get("url"), row.get("sha256"))
+        prior = artifacts.get(key)
+        if prior is None:
+            artifacts[key] = dict(row)
+        else:
+            prior["count"] += row["count"]
+            prior["first_seen"] = _earliest(prior.get("first_seen"), row.get("first_seen"))
+            prior["last_seen"] = _latest(prior.get("last_seen"), row.get("last_seen"))
+            prior["techniques"] = sorted(set(prior.get("techniques", [])) | set(row.get("techniques", [])))
+            if row.get("correlation", {}).get("status") != "unavailable":
+                prior["correlation"] = row["correlation"]
+    current["artifacts"] = sorted(artifacts.values(), key=lambda row: (-row["count"], str(row.get("sha256") or row.get("url") or "")))[:PUBLIC_LIMITS["artifacts"]]
+
+    techniques: dict[str, dict[str, Any]] = {}
+    for row in [*baseline.get("mitre", []), *current.get("mitre", [])]:
+        if not isinstance(row, dict) or set(row) != MITRE_KEYS_V4:
+            raise ValueError("baseline/current MITRE row has an invalid shape")
+        technique_id = row.get("id")
+        prior = techniques.get(technique_id)
+        if prior is None:
+            prior = {**row, "evidence": []}
+            techniques[technique_id] = prior
+        else:
+            prior["count"] += row["count"]
+        evidence: dict[str, dict[str, Any]] = {item["value"]: dict(item) for item in prior["evidence"]}
+        for item in row.get("evidence", []):
+            value = item.get("value")
+            if value in evidence:
+                evidence[value]["count"] += item["count"]
+                evidence[value]["truncated"] = bool(evidence[value].get("truncated") or item.get("truncated"))
+            else:
+                evidence[value] = dict(item)
+        observed = max(prior.get("evidence_observed", 0), row.get("evidence_observed", 0), len(evidence))
+        prior["evidence"] = sorted(evidence.values(), key=lambda item: (-item["count"], item["value"]))[:PUBLIC_LIMITS["technique_evidence"]]
+        prior["evidence_observed"] = observed
+        prior["evidence_published"] = len(prior["evidence"])
+    current["mitre"] = sorted(techniques.values(), key=lambda row: (-row["count"], row["id"]))
+
+    baseline_hourly = {row.get("bucket"): row for row in baseline.get("hourly", []) if isinstance(row, dict)}
+    for row in current.get("hourly", []):
+        old = baseline_hourly.get(row.get("bucket"))
+        if old:
+            for key in ("sessions", "auth", "commands", "downloads"):
+                row[key] += old[key]
+
+    published_ips = {row["ip"] for row in current["sources"]}
+    recent = [row for row in [*baseline.get("recent", []), *current.get("recent", [])]
+              if isinstance(row, dict) and set(row) == RECENT_KEYS and row.get("ip") in published_ips]
+    current["recent"] = sorted(recent, key=lambda row: parse_timestamp(row.get("time")) or datetime.min.replace(tzinfo=timezone.utc), reverse=True)[:40]
+
+    baseline_summary = baseline.get("summary", {})
+    for key in REQUIRED_SUMMARY - {"unique_sources", "attack_techniques"}:
+        old, new = baseline_summary.get(key), current["summary"].get(key)
+        if not isinstance(old, int) or isinstance(old, bool) or not isinstance(new, int) or isinstance(new, bool):
+            raise ValueError(f"baseline/current summary.{key} is invalid")
+        current["summary"][key] = old + new
+    current["summary"]["unique_sources"] = len(sources)
+    current["summary"]["attack_techniques"] = len(current["mitre"])
+    current["window"]["start"] = _earliest(baseline.get("window", {}).get("start"), current["window"].get("start"))
+
+    published_counts = {
+        "sources": len(current["sources"]), "usernames": len(current["credentials"]["usernames"]),
+        "passwords": len(current["credentials"]["passwords"]), "commands": len(current["commands"]),
+        "artifacts": len(current["artifacts"]),
+    }
+    for group in COVERAGE_GROUPS:
+        old = baseline.get("coverage", {}).get(group, {}).get("observed", 0)
+        new = current.get("coverage", {}).get(group, {}).get("observed", 0)
+        observed = max(old, new, len(sources) if group == "sources" else published_counts[group])
+        current["coverage"][group] = coverage_row(observed, published_counts[group])
+
+    for key in DATA_QUALITY_KEYS_V4 - {"privacy"}:
+        old, new = baseline.get("data_quality", {}).get(key), current["data_quality"].get(key)
+        if not isinstance(old, int) or isinstance(old, bool) or not isinstance(new, int) or isinstance(new, bool):
+            raise ValueError(f"baseline/current data_quality.{key} is invalid")
+        current["data_quality"][key] = old + new
+    current["provenance"] = {
+        "source": "Sanitized historical Greyfield snapshot plus current Cowrie JSON event log",
+        "collection": "Sanitized historical evidence carried across a sensor replacement and merged with the live deception sensor",
+        "interpretation": "Five-minute detail begins with current-sensor timestamps; historical evidence retains its original hourly resolution and is not reconstructed",
+    }
+    return current
+
+
 def navigator_layer(snapshot: dict[str, Any]) -> dict[str, Any]:
     maximum = max((item["count"] for item in snapshot["mitre"]), default=1)
     return {
@@ -819,6 +1035,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--malwarebazaar-auth-key-file", type=Path)
     parser.add_argument("--virustotal-api-key-file", type=Path)
     parser.add_argument("--provider-limit", type=int, default=3)
+    parser.add_argument("--baseline-snapshot", type=Path)
     return parser.parse_args()
 
 
@@ -854,6 +1071,12 @@ def main() -> int:
                               args.geo_cache, max(0, args.geo_limit), args.enrichment_cache,
                               providers, args.malwarebazaar_auth_key_file, args.virustotal_api_key_file,
                               max(0, args.provider_limit), args.public_endpoint)
+    if args.baseline_snapshot:
+        try:
+            snapshot = merge_baseline(snapshot, load_baseline(args.baseline_snapshot), excluded_ips)
+        except ValueError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(snapshot, indent=2) + "\n", encoding="utf-8")
     if args.layer_output:

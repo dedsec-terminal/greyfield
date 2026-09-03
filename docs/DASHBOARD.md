@@ -117,7 +117,16 @@ ENRICHMENT_CACHE=/var/lib/greyfield-dashboard/enrichment-cache.json
 MALWAREBAZAAR_AUTH_KEY_FILE=/etc/greyfield-dashboard/malwarebazaar-auth-key
 VIRUSTOTAL_API_KEY_FILE=/etc/greyfield-dashboard/virustotal-api-key
 PROVIDER_LIMIT=3
+# Optional: path to a previously published sanitized metrics.json for sensor continuity
+BASELINE_SNAPSHOT=/etc/greyfield-dashboard/baseline.json
 ```
+
+`BASELINE_SNAPSHOT` is optional. It points to a previously published, sanitized
+`metrics.json` snapshot (schema `4.0` or `5.0`) from a retired sensor. When
+configured, historical counters, sources, credentials, commands, artifacts,
+and ATT&CK techniques carry forward without fabricating sub-hour timestamps:
+the 288 five-minute buckets remain strictly drawn from current-sensor events.
+Raw logs remain private on the VM.
 
 The exporter removes matching events before calculating any counter, source
 table, timeline, credential list, command list, or ATT&CK technique. The
@@ -183,12 +192,19 @@ sudo systemctl start greyfield-telemetry.service
 sudo systemctl status greyfield-telemetry.service --no-pager
 ```
 
-Run the service manually once. The first successful run creates the orphan
-`telemetry` branch. Inspect that publication on GitHub before enabling
-automation. It must contain only:
+Run the service manually once. The publisher builds each snapshot as a
+single commit whose parent is current `master` (yielding 1 commit ahead, 0
+behind master) and pushes to `origin HEAD:telemetry` with `--force-with-lease`.
+This avoids branch divergence while preserving the strict two-file privacy
+contract:
 
 - `metrics.json`
 - `attack-layer.json`
+
+Older telemetry histories are preserved under permanent Git tags (such as
+`telemetry-history-pre-rebuild-2026-09-03`). GitHub may still display a transient
+"Compare & pull request" banner after a fresh push because `telemetry` is a
+non-default branch, but the branch has no missing `master` commits.
 
 Search both files for every excluded operator IP. Confirm that no raw session
 identifier, URL query, private address, administrator endpoint, token-like

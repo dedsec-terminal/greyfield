@@ -1,9 +1,9 @@
 {
   "schema_version": "5.0",
-  "generated_at": "2026-09-03T12:19:22Z",
+  "generated_at": "2026-09-03T12:24:39Z",
   "window": {
-    "start": "2026-09-03T12:19:22Z",
-    "end": "2026-09-03T12:19:22Z"
+    "start": "2026-09-03T12:24:39Z",
+    "end": "2026-09-03T12:24:39Z"
   },
   "sensor": {
     "name": "greyfield-honeypot-v2",
@@ -1212,13 +1212,6 @@
     }
   ],
   "five_minute": [
-    {
-      "bucket": "2026-09-02T12:20:00Z",
-      "sessions": 0,
-      "auth": 0,
-      "commands": 0,
-      "downloads": 0
-    },
     {
       "bucket": "2026-09-02T12:25:00Z",
       "sessions": 0,
@@ -3227,6 +3220,13 @@
       "auth": 0,
       "commands": 0,
       "downloads": 0
+    },
+    {
+      "bucket": "2026-09-03T12:20:00Z",
+      "sessions": 0,
+      "auth": 0,
+      "commands": 0,
+      "downloads": 0
     }
   ],
   "protocols": [],
@@ -3269,7 +3269,7 @@
   "data_quality": {
     "events_published": 0,
     "invalid_lines": 0,
-    "operator_events_excluded": 0,
+    "operator_events_excluded": 10,
     "non_public_events_excluded": 0,
     "content_redactions": 0,
     "geo_lookups": 0,

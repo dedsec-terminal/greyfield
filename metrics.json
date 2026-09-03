@@ -1,9 +1,9 @@
 {
   "schema_version": "4.0",
-  "generated_at": "2026-09-03T01:01:46Z",
+  "generated_at": "2026-09-03T02:00:46Z",
   "window": {
     "start": "2026-09-03T00:00:00Z",
-    "end": "2026-09-03T01:01:43Z"
+    "end": "2026-09-03T01:58:24Z"
   },
   "sensor": {
     "name": "greyfield-honeypot",
@@ -25,11 +25,11 @@
     }
   },
   "summary": {
-    "sessions": 372,
-    "unique_sources": 14,
-    "auth_attempts": 593,
-    "accepted_logins": 230,
-    "commands": 716,
+    "sessions": 679,
+    "unique_sources": 26,
+    "auth_attempts": 1123,
+    "accepted_logins": 462,
+    "commands": 1400,
     "downloads": 2,
     "attack_techniques": 7
   },
@@ -1205,20 +1205,20 @@
     },
     {
       "bucket": "2026-09-03T01:00:00Z",
-      "sessions": 25,
-      "auth": 47,
-      "commands": 69,
+      "sessions": 332,
+      "auth": 577,
+      "commands": 753,
       "downloads": 0
     }
   ],
   "protocols": [
     {
       "value": "TELNET",
-      "count": 236
+      "count": 474
     },
     {
       "value": "SSH",
-      "count": 136
+      "count": 205
     }
   ],
   "sources": [
@@ -1232,16 +1232,16 @@
       "asn": 398101,
       "organization": "GoDaddy.com, LLC",
       "flag": "\ud83c\uddfa\ud83c\uddf8",
-      "sessions": 226,
-      "auth_attempts": 452,
-      "accepted": 226,
-      "commands": 678,
+      "sessions": 454,
+      "auth_attempts": 908,
+      "accepted": 454,
+      "commands": 1362,
       "downloads": 0,
       "protocols": [
         "TELNET"
       ],
       "first_seen": "2026-09-03T00:05:55Z",
-      "last_seen": "2026-09-03T01:01:43Z"
+      "last_seen": "2026-09-03T01:55:53Z"
     },
     {
       "ip": "77.239.124.178",
@@ -1274,8 +1274,8 @@
       "asn": 18206,
       "organization": "TM ONE Cloud Alpha Edge",
       "flag": "\ud83c\uddf2\ud83c\uddfe",
-      "sessions": 20,
-      "auth_attempts": 17,
+      "sessions": 39,
+      "auth_attempts": 34,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
@@ -1283,7 +1283,7 @@
         "SSH"
       ],
       "first_seen": "2026-09-03T00:00:00Z",
-      "last_seen": "2026-09-03T01:00:52Z"
+      "last_seen": "2026-09-03T01:58:24Z"
     },
     {
       "ip": "110.173.190.221",
@@ -1295,8 +1295,8 @@
       "asn": 17426,
       "organization": "PRIMENET GLOBAL LTD.",
       "flag": "\ud83c\uddee\ud83c\uddf3",
-      "sessions": 13,
-      "auth_attempts": 13,
+      "sessions": 25,
+      "auth_attempts": 25,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
@@ -1304,7 +1304,49 @@
         "SSH"
       ],
       "first_seen": "2026-09-03T00:00:47Z",
-      "last_seen": "2026-09-03T00:58:43Z"
+      "last_seen": "2026-09-03T01:56:30Z"
+    },
+    {
+      "ip": "116.110.211.230",
+      "country": "Viet Nam",
+      "country_code": "VN",
+      "city": "Hanoi",
+      "latitude": 21.0184,
+      "longitude": 105.8461,
+      "asn": 24086,
+      "organization": "Viettel Group",
+      "flag": "\ud83c\uddfb\ud83c\uddf3",
+      "sessions": 20,
+      "auth_attempts": 20,
+      "accepted": 1,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T01:33:51Z",
+      "last_seen": "2026-09-03T01:51:22Z"
+    },
+    {
+      "ip": "116.110.16.246",
+      "country": "Viet Nam",
+      "country_code": "VN",
+      "city": "Da Nang",
+      "latitude": 16.0678,
+      "longitude": 108.221,
+      "asn": 24086,
+      "organization": "Viettel Group",
+      "flag": "\ud83c\uddfb\ud83c\uddf3",
+      "sessions": 12,
+      "auth_attempts": 12,
+      "accepted": 1,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T01:20:03Z",
+      "last_seen": "2026-09-03T01:30:56Z"
     },
     {
       "ip": "112.46.213.162",
@@ -1349,6 +1391,90 @@
       "last_seen": "2026-09-03T00:02:02Z"
     },
     {
+      "ip": "193.46.255.86",
+      "country": "Romania",
+      "country_code": "RO",
+      "city": "Bucharest",
+      "latitude": 44.4268,
+      "longitude": 26.1025,
+      "asn": 47890,
+      "organization": "UNMANAGED LTD",
+      "flag": "\ud83c\uddf7\ud83c\uddf4",
+      "sessions": 2,
+      "auth_attempts": 6,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T00:23:02Z",
+      "last_seen": "2026-09-03T01:40:56Z"
+    },
+    {
+      "ip": "2.57.121.112",
+      "country": "Romania",
+      "country_code": "RO",
+      "city": "Bucharest",
+      "latitude": 44.4268,
+      "longitude": 26.1025,
+      "asn": 47890,
+      "organization": "UNMANAGED LTD",
+      "flag": "\ud83c\uddf7\ud83c\uddf4",
+      "sessions": 1,
+      "auth_attempts": 5,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T01:04:34Z",
+      "last_seen": "2026-09-03T01:04:40Z"
+    },
+    {
+      "ip": "201.148.118.205",
+      "country": "Brazil",
+      "country_code": "BR",
+      "city": "Sorocaba",
+      "latitude": -23.4685,
+      "longitude": -47.4424,
+      "asn": 61863,
+      "organization": "TVAC TV ANTENA COMUNIT\u00c1RIA LTDA EPP",
+      "flag": "\ud83c\udde7\ud83c\uddf7",
+      "sessions": 2,
+      "auth_attempts": 2,
+      "accepted": 1,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T01:35:53Z",
+      "last_seen": "2026-09-03T01:36:13Z"
+    },
+    {
+      "ip": "88.173.173.107",
+      "country": "France",
+      "country_code": "FR",
+      "city": "Morsang-sur-Orge",
+      "latitude": 48.6618,
+      "longitude": 2.3534,
+      "asn": 12322,
+      "organization": "Proxad / Free SAS",
+      "flag": "\ud83c\uddeb\ud83c\uddf7",
+      "sessions": 2,
+      "auth_attempts": 2,
+      "accepted": 1,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T01:07:08Z",
+      "last_seen": "2026-09-03T01:08:58Z"
+    },
+    {
       "ip": "41.249.165.32",
       "country": "Morocco",
       "country_code": "MA",
@@ -1391,25 +1517,67 @@
       "last_seen": "2026-09-03T00:42:30Z"
     },
     {
-      "ip": "193.46.255.86",
-      "country": "Romania",
-      "country_code": "RO",
-      "city": "Bucharest",
-      "latitude": 44.4268,
-      "longitude": 26.1025,
-      "asn": 47890,
-      "organization": "UNMANAGED LTD",
-      "flag": "\ud83c\uddf7\ud83c\uddf4",
-      "sessions": 1,
-      "auth_attempts": 3,
+      "ip": "109.105.210.22",
+      "country": "United States",
+      "country_code": "US",
+      "city": "Dallas",
+      "latitude": 32.7797,
+      "longitude": -96.8022,
+      "asn": 21859,
+      "organization": "Nsec - Sistemas Informaticos, S.A.",
+      "flag": "\ud83c\uddfa\ud83c\uddf8",
+      "sessions": 3,
+      "auth_attempts": 0,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
       "protocols": [
-        "SSH"
+        "TELNET"
       ],
-      "first_seen": "2026-09-03T00:23:02Z",
-      "last_seen": "2026-09-03T00:23:06Z"
+      "first_seen": "2026-09-03T01:22:57Z",
+      "last_seen": "2026-09-03T01:23:03Z"
+    },
+    {
+      "ip": "186.60.194.1",
+      "country": "Argentina",
+      "country_code": "AR",
+      "city": "El Talar",
+      "latitude": -34.4721,
+      "longitude": -58.6537,
+      "asn": 22927,
+      "organization": "Telefonica de Argentina",
+      "flag": "\ud83c\udde6\ud83c\uddf7",
+      "sessions": 2,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T01:22:15Z",
+      "last_seen": "2026-09-03T01:23:00Z"
+    },
+    {
+      "ip": "160.20.35.118",
+      "country": "Brazil",
+      "country_code": "BR",
+      "city": "Tres Lagoas",
+      "latitude": -20.7918,
+      "longitude": -51.6931,
+      "asn": 266141,
+      "organization": "GIGABYTE TELECOM - REGINALDO TORRES NOGUEIRA ME",
+      "flag": "\ud83c\udde7\ud83c\uddf7",
+      "sessions": 1,
+      "auth_attempts": 1,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T01:17:16Z",
+      "last_seen": "2026-09-03T01:17:20Z"
     },
     {
       "ip": "3.129.187.38",
@@ -1452,6 +1620,90 @@
       ],
       "first_seen": "2026-09-03T00:37:36Z",
       "last_seen": "2026-09-03T00:37:38Z"
+    },
+    {
+      "ip": "80.94.92.55",
+      "country": "Romania",
+      "country_code": "RO",
+      "city": "Bucharest",
+      "latitude": 44.4268,
+      "longitude": 26.1025,
+      "asn": 47890,
+      "organization": "TECHOFF SRV LIMITED",
+      "flag": "\ud83c\uddf7\ud83c\uddf4",
+      "sessions": 1,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T01:54:28Z",
+      "last_seen": "2026-09-03T01:54:28Z"
+    },
+    {
+      "ip": "64.62.156.152",
+      "country": "United States",
+      "country_code": "US",
+      "city": "Livermore-Pleasanton",
+      "latitude": 37.6968,
+      "longitude": -121.8443,
+      "asn": 6939,
+      "organization": "Hurricane Electric LLC",
+      "flag": "\ud83c\uddfa\ud83c\uddf8",
+      "sessions": 1,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T01:53:45Z",
+      "last_seen": "2026-09-03T01:53:45Z"
+    },
+    {
+      "ip": "91.92.47.172",
+      "country": "Netherlands",
+      "country_code": "NL",
+      "city": "Amsterdam",
+      "latitude": 52.3785,
+      "longitude": 4.9,
+      "asn": 197170,
+      "organization": "TechTies Inc.",
+      "flag": "\ud83c\uddf3\ud83c\uddf1",
+      "sessions": 1,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T01:47:57Z",
+      "last_seen": "2026-09-03T01:48:05Z"
+    },
+    {
+      "ip": "45.177.144.213",
+      "country": "Argentina",
+      "country_code": "AR",
+      "city": "General Rodriguez",
+      "latitude": -34.6082,
+      "longitude": -58.9522,
+      "asn": 264732,
+      "organization": "NETLATIN S.R.L.",
+      "flag": "\ud83c\udde6\ud83c\uddf7",
+      "sessions": 1,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T01:46:35Z",
+      "last_seen": "2026-09-03T01:46:35Z"
     },
     {
       "ip": "200.233.40.144",
@@ -1520,27 +1772,39 @@
   "credentials": {
     "usernames": [
       {
-        "value": "root",
-        "count": 227
+        "value": "enable\\x00",
+        "count": 454
       },
       {
-        "value": "enable\\x00",
-        "count": 226
+        "value": "root",
+        "count": 448
       },
       {
         "value": "admin",
-        "count": 46
+        "count": 93
       },
       {
         "value": "support",
-        "count": 8
+        "count": 18
       },
       {
         "value": "user",
-        "count": 6
+        "count": 10
       },
       {
         "value": "test",
+        "count": 5
+      },
+      {
+        "value": "guest",
+        "count": 5
+      },
+      {
+        "value": "arik",
+        "count": 5
+      },
+      {
+        "value": "ftp",
         "count": 4
       },
       {
@@ -1549,10 +1813,6 @@
       },
       {
         "value": "deploy",
-        "count": 3
-      },
-      {
-        "value": "ftp",
         "count": 3
       },
       {
@@ -1580,7 +1840,7 @@
         "count": 2
       },
       {
-        "value": "guest",
+        "value": "ubnt",
         "count": 2
       },
       {
@@ -1794,131 +2054,195 @@
       {
         "value": "trans",
         "count": 1
+      },
+      {
+        "value": "Admin",
+        "count": 1
+      },
+      {
+        "value": "installer",
+        "count": 1
+      },
+      {
+        "value": "squid",
+        "count": 1
+      },
+      {
+        "value": "config",
+        "count": 1
+      },
+      {
+        "value": "operator",
+        "count": 1
+      },
+      {
+        "value": "sync",
+        "count": 1
+      },
+      {
+        "value": "1234",
+        "count": 1
+      },
+      {
+        "value": "nikita",
+        "count": 1
       }
     ],
     "passwords": [
       {
         "value": "linuxshell\\x00",
-        "count": 226
-      },
-      {
-        "value": "123456",
-        "count": 24
+        "count": 454
       },
       {
         "value": "admin",
-        "count": 22
+        "count": 51
       },
       {
         "value": "vizxv",
-        "count": 17
+        "count": 38
+      },
+      {
+        "value": "123456",
+        "count": 34
       },
       {
         "value": "xc3511",
-        "count": 16
+        "count": 30
       },
       {
         "value": "password",
-        "count": 14
-      },
-      {
-        "value": "default",
-        "count": 13
-      },
-      {
-        "value": "xmhdipc",
-        "count": 12
-      },
-      {
-        "value": "54321",
-        "count": 12
+        "count": 29
       },
       {
         "value": "root",
-        "count": 11
+        "count": 28
+      },
+      {
+        "value": "54321",
+        "count": 25
       },
       {
         "value": "juantech",
-        "count": 11
+        "count": 24
       },
       {
-        "value": "smcadmin",
-        "count": 10
+        "value": "default",
+        "count": 23
       },
       {
-        "value": "888888",
-        "count": 10
+        "value": "xmhdipc",
+        "count": 23
       },
       {
         "value": "(empty)",
-        "count": 9
+        "count": 19
+      },
+      {
+        "value": "888888",
+        "count": 19
       },
       {
         "value": "12345",
-        "count": 9
+        "count": 19
       },
       {
         "value": "support",
-        "count": 8
+        "count": 18
       },
       {
         "value": "1111",
-        "count": 7
+        "count": 15
       },
       {
-        "value": "admin1234",
-        "count": 6
+        "value": "anko",
+        "count": 14
+      },
+      {
+        "value": "smcadmin",
+        "count": 13
+      },
+      {
+        "value": "pass",
+        "count": 9
       },
       {
         "value": "user",
-        "count": 5
+        "count": 8
+      },
+      {
+        "value": "hi3518",
+        "count": 8
+      },
+      {
+        "value": "admin1234",
+        "count": 8
+      },
+      {
+        "value": "1234",
+        "count": 7
+      },
+      {
+        "value": "7ujMko0vizxv",
+        "count": 6
       },
       {
         "value": "123",
         "count": 5
       },
       {
-        "value": "7ujMko0vizxv",
-        "count": 5
-      },
-      {
-        "value": "pass",
-        "count": 5
-      },
-      {
-        "value": "anko",
-        "count": 4
-      },
-      {
         "value": "666666",
-        "count": 4
-      },
-      {
-        "value": "1234",
-        "count": 3
+        "count": 5
       },
       {
         "value": "1",
         "count": 3
       },
       {
-        "value": "hi3518",
+        "value": "12345678",
         "count": 3
       },
       {
-        "value": "12345678",
-        "count": 2
-      },
-      {
         "value": "7ujMko0admin",
-        "count": 2
+        "count": 3
       },
       {
         "value": "zlxx.",
-        "count": 2
+        "count": 3
       },
       {
         "value": "Zte521",
+        "count": 3
+      },
+      {
+        "value": "jvbzd",
+        "count": 3
+      },
+      {
+        "value": "guest",
+        "count": 3
+      },
+      {
+        "value": "admin123",
+        "count": 2
+      },
+      {
+        "value": "ftp",
+        "count": 2
+      },
+      {
+        "value": "test",
+        "count": 2
+      },
+      {
+        "value": "klv123",
+        "count": 2
+      },
+      {
+        "value": "ubnt",
+        "count": 2
+      },
+      {
+        "value": "klv1234",
         "count": 2
       },
       {
@@ -1959,10 +2283,6 @@
       },
       {
         "value": "erpnext",
-        "count": 1
-      },
-      {
-        "value": "admin123",
         "count": 1
       },
       {
@@ -2278,10 +2598,6 @@
         "count": 1
       },
       {
-        "value": "ftp",
-        "count": 1
-      },
-      {
         "value": "aA@1234567",
         "count": 1
       },
@@ -2354,15 +2670,211 @@
         "count": 1
       },
       {
-        "value": "jvbzd",
-        "count": 1
-      },
-      {
         "value": "BrAhMoS@15",
         "count": 1
       },
       {
         "value": "adminpass",
+        "count": 1
+      },
+      {
+        "value": "Pa$$word@123",
+        "count": 1
+      },
+      {
+        "value": "arik",
+        "count": 1
+      },
+      {
+        "value": "arik1",
+        "count": 1
+      },
+      {
+        "value": "arik123",
+        "count": 1
+      },
+      {
+        "value": "arik1234",
+        "count": 1
+      },
+      {
+        "value": "arik12345",
+        "count": 1
+      },
+      {
+        "value": "server",
+        "count": 1
+      },
+      {
+        "value": "abc12345678",
+        "count": 1
+      },
+      {
+        "value": "Abcd@1234",
+        "count": 1
+      },
+      {
+        "value": "scan",
+        "count": 1
+      },
+      {
+        "value": "Supp0rt@123",
+        "count": 1
+      },
+      {
+        "value": "temp",
+        "count": 1
+      },
+      {
+        "value": "1234.abcd",
+        "count": 1
+      },
+      {
+        "value": "installer",
+        "count": 1
+      },
+      {
+        "value": "computer",
+        "count": 1
+      },
+      {
+        "value": "squid",
+        "count": 1
+      },
+      {
+        "value": "config",
+        "count": 1
+      },
+      {
+        "value": "@",
+        "count": 1
+      },
+      {
+        "value": "1q2w3e4r",
+        "count": 1
+      },
+      {
+        "value": "admin@123",
+        "count": 1
+      },
+      {
+        "value": "mypc",
+        "count": 1
+      },
+      {
+        "value": "root123",
+        "count": 1
+      },
+      {
+        "value": "AAA123",
+        "count": 1
+      },
+      {
+        "value": "backup",
+        "count": 1
+      },
+      {
+        "value": "0l0ctyQh243O63uD",
+        "count": 1
+      },
+      {
+        "value": "vertex25ektks123",
+        "count": 1
+      },
+      {
+        "value": "tsgoingon",
+        "count": 1
+      },
+      {
+        "value": "demo",
+        "count": 1
+      },
+      {
+        "value": "Pa$$w0rd",
+        "count": 1
+      },
+      {
+        "value": "admin01",
+        "count": 1
+      },
+      {
+        "value": "Desktop",
+        "count": 1
+      },
+      {
+        "value": "Aa123456",
+        "count": 1
+      },
+      {
+        "value": "pfsense",
+        "count": 1
+      },
+      {
+        "value": "work",
+        "count": 1
+      },
+      {
+        "value": "Password123",
+        "count": 1
+      },
+      {
+        "value": "4321",
+        "count": 1
+      },
+      {
+        "value": "operator",
+        "count": 1
+      },
+      {
+        "value": "windows",
+        "count": 1
+      },
+      {
+        "value": "ipscan",
+        "count": 1
+      },
+      {
+        "value": "system32",
+        "count": 1
+      },
+      {
+        "value": "click1",
+        "count": 1
+      },
+      {
+        "value": "Admin",
+        "count": 1
+      },
+      {
+        "value": "abcd1234",
+        "count": 1
+      },
+      {
+        "value": "nikita",
+        "count": 1
+      },
+      {
+        "value": "xeon",
+        "count": 1
+      },
+      {
+        "value": "Ab12345678",
+        "count": 1
+      },
+      {
+        "value": "NAS",
+        "count": 1
+      },
+      {
+        "value": "WALLET",
+        "count": 1
+      },
+      {
+        "value": "!QAZ2wsx",
+        "count": 1
+      },
+      {
+        "value": "STUDIO",
         "count": 1
       }
     ]
@@ -2370,7 +2882,7 @@
   "commands": [
     {
       "command": "system",
-      "count": 228,
+      "count": 456,
       "families": [
         "Other shell activity"
       ],
@@ -2381,7 +2893,7 @@
     },
     {
       "command": "shell",
-      "count": 228,
+      "count": 456,
       "families": [
         "Other shell activity"
       ],
@@ -2392,7 +2904,7 @@
     },
     {
       "command": "sh",
-      "count": 228,
+      "count": 456,
       "families": [
         "Shell execution"
       ],
@@ -2753,29 +3265,29 @@
         "status": "correlated",
         "providers": [
           {
-            "name": "MalwareBazaar",
-            "status": "not-found",
-            "label": null,
-            "retrieved_at": "2026-09-03T01:01:47Z",
-            "report_url": null,
-            "tags": [],
-            "malicious": null,
-            "suspicious": null,
             "harmless": null,
+            "label": null,
+            "malicious": null,
+            "name": "MalwareBazaar",
+            "report_url": null,
+            "retrieved_at": "2026-09-03T01:01:47Z",
+            "status": "not-found",
+            "suspicious": null,
+            "tags": [],
             "undetected": null
           },
           {
-            "name": "VirusTotal",
-            "status": "correlated",
+            "harmless": 0,
             "label": null,
-            "retrieved_at": "2026-09-03T01:01:49Z",
+            "malicious": 0,
+            "name": "VirusTotal",
             "report_url": "https://www.virustotal.com/gui/file/a9b1c85a7bd78dd1112ecc75c9070ea8c53078831a17aa09ebeb287fe6e21b72",
+            "retrieved_at": "2026-09-03T01:01:49Z",
+            "status": "correlated",
+            "suspicious": 0,
             "tags": [
               "text"
             ],
-            "malicious": 0,
-            "suspicious": 0,
-            "harmless": 0,
             "undetected": 57
           }
         ]
@@ -2794,29 +3306,29 @@
         "status": "correlated",
         "providers": [
           {
-            "name": "MalwareBazaar",
-            "status": "not-found",
-            "label": null,
-            "retrieved_at": "2026-09-03T01:01:47Z",
-            "report_url": null,
-            "tags": [],
-            "malicious": null,
-            "suspicious": null,
             "harmless": null,
+            "label": null,
+            "malicious": null,
+            "name": "MalwareBazaar",
+            "report_url": null,
+            "retrieved_at": "2026-09-03T01:01:47Z",
+            "status": "not-found",
+            "suspicious": null,
+            "tags": [],
             "undetected": null
           },
           {
-            "name": "VirusTotal",
-            "status": "correlated",
+            "harmless": 0,
             "label": null,
-            "retrieved_at": "2026-09-03T01:02:05Z",
+            "malicious": 0,
+            "name": "VirusTotal",
             "report_url": "https://www.virustotal.com/gui/file/1193dde1c831808bf6f2db6f5b850b846b8a7f870873ec3b8a347f21cc5d96e3",
+            "retrieved_at": "2026-09-03T01:02:05Z",
+            "status": "correlated",
+            "suspicious": 0,
             "tags": [
               "text"
             ],
-            "malicious": 0,
-            "suspicious": 0,
-            "harmless": 0,
             "undetected": 58
           }
         ]
@@ -2828,21 +3340,21 @@
       "id": "T1059.004",
       "name": "Unix Shell",
       "tactic": "Execution",
-      "count": 705,
+      "count": 1389,
       "evidence": [
         {
           "value": "system",
-          "count": 228,
+          "count": 456,
           "truncated": false
         },
         {
           "value": "shell",
-          "count": 228,
+          "count": 456,
           "truncated": false
         },
         {
           "value": "sh",
-          "count": 228,
+          "count": 456,
           "truncated": false
         },
         {
@@ -2943,135 +3455,135 @@
       "id": "T1110.001",
       "name": "Password Guessing",
       "tactic": "Credential Access",
-      "count": 457,
+      "count": 921,
       "evidence": [
         {
           "value": "enable\\x00 / linuxshell\\x00",
-          "count": 226,
+          "count": 454,
           "truncated": false
         },
         {
           "value": "root / vizxv",
-          "count": 17,
+          "count": 37,
           "truncated": false
         },
         {
           "value": "root / xc3511",
-          "count": 16,
-          "truncated": false
-        },
-        {
-          "value": "root / 123456",
-          "count": 14,
-          "truncated": false
-        },
-        {
-          "value": "root / default",
-          "count": 13,
-          "truncated": false
-        },
-        {
-          "value": "root / xmhdipc",
-          "count": 12,
+          "count": 30,
           "truncated": false
         },
         {
           "value": "root / admin",
-          "count": 12,
-          "truncated": false
-        },
-        {
-          "value": "root / 54321",
-          "count": 12,
-          "truncated": false
-        },
-        {
-          "value": "root / juantech",
-          "count": 11,
-          "truncated": false
-        },
-        {
-          "value": "admin / smcadmin",
-          "count": 10,
+          "count": 27,
           "truncated": false
         },
         {
           "value": "root / root",
-          "count": 10,
+          "count": 26,
+          "truncated": false
+        },
+        {
+          "value": "root / 54321",
+          "count": 25,
+          "truncated": false
+        },
+        {
+          "value": "root / juantech",
+          "count": 24,
+          "truncated": false
+        },
+        {
+          "value": "root / xmhdipc",
+          "count": 23,
+          "truncated": false
+        },
+        {
+          "value": "root / default",
+          "count": 22,
+          "truncated": false
+        },
+        {
+          "value": "root / 123456",
+          "count": 21,
           "truncated": false
         },
         {
           "value": "root / 888888",
-          "count": 10,
-          "truncated": false
-        },
-        {
-          "value": "admin / password",
-          "count": 8,
-          "truncated": false
-        },
-        {
-          "value": "support / support",
-          "count": 7,
+          "count": 19,
           "truncated": false
         },
         {
           "value": "admin / admin",
-          "count": 7,
+          "count": 18,
           "truncated": false
         },
         {
-          "value": "admin / admin1234",
-          "count": 6,
-          "truncated": false
-        },
-        {
-          "value": "root / 12345",
-          "count": 6,
-          "truncated": false
-        },
-        {
-          "value": "root / 7ujMko0vizxv",
-          "count": 5,
-          "truncated": false
-        },
-        {
-          "value": "root / pass",
-          "count": 5,
-          "truncated": false
-        },
-        {
-          "value": "root / 1111",
-          "count": 4,
-          "truncated": false
-        },
-        {
-          "value": "admin / (empty)",
-          "count": 4,
+          "value": "support / support",
+          "count": 15,
           "truncated": false
         },
         {
           "value": "root / anko",
-          "count": 4,
+          "count": 14,
           "truncated": false
         },
         {
-          "value": "root / (empty)",
-          "count": 4,
+          "value": "admin / smcadmin",
+          "count": 13,
           "truncated": false
         },
         {
-          "value": "root / 666666",
-          "count": 4,
+          "value": "admin / password",
+          "count": 13,
+          "truncated": false
+        },
+        {
+          "value": "root / 12345",
+          "count": 13,
           "truncated": false
         },
         {
           "value": "root / password",
-          "count": 4,
+          "count": 13,
+          "truncated": false
+        },
+        {
+          "value": "root / pass",
+          "count": 9,
+          "truncated": false
+        },
+        {
+          "value": "root / (empty)",
+          "count": 9,
+          "truncated": false
+        },
+        {
+          "value": "root / hi3518",
+          "count": 8,
+          "truncated": false
+        },
+        {
+          "value": "root / 1111",
+          "count": 8,
+          "truncated": false
+        },
+        {
+          "value": "admin / admin1234",
+          "count": 8,
+          "truncated": false
+        },
+        {
+          "value": "admin / (empty)",
+          "count": 8,
+          "truncated": false
+        },
+        {
+          "value": "root / 7ujMko0vizxv",
+          "count": 6,
           "truncated": false
         }
       ],
-      "evidence_observed": 41,
+      "evidence_observed": 54,
       "evidence_published": 25
     },
     {
@@ -3232,7 +3744,97 @@
   ],
   "recent": [
     {
-      "time": "2026-09-03T01:01:43Z",
+      "time": "2026-09-03T01:58:23Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Credential rejected",
+      "detail": "root / STUDIO"
+    },
+    {
+      "time": "2026-09-03T01:58:20Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:56:27Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / !QAZ2wsx"
+    },
+    {
+      "time": "2026-09-03T01:56:17Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:56:04Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Credential rejected",
+      "detail": "root / WALLET"
+    },
+    {
+      "time": "2026-09-03T01:55:53Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:54:28Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "80.94.92.55",
+      "country_code": "RO",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:53:45Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "64.62.156.152",
+      "country_code": "US",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:53:28Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Credential rejected",
+      "detail": "root / NAS"
+    },
+    {
+      "time": "2026-09-03T01:53:25Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:52:54Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3241,7 +3843,7 @@
       "detail": "sh"
     },
     {
-      "time": "2026-09-03T01:01:42Z",
+      "time": "2026-09-03T01:52:54Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3250,7 +3852,7 @@
       "detail": "shell"
     },
     {
-      "time": "2026-09-03T01:01:42Z",
+      "time": "2026-09-03T01:52:54Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3259,7 +3861,7 @@
       "detail": "system"
     },
     {
-      "time": "2026-09-03T01:01:42Z",
+      "time": "2026-09-03T01:52:53Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3268,16 +3870,16 @@
       "detail": "enable\\x00 / linuxshell\\x00"
     },
     {
-      "time": "2026-09-03T01:01:41Z",
+      "time": "2026-09-03T01:52:52Z",
       "severity": "medium",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
       "country_code": "US",
       "event": "Credential rejected",
-      "detail": "root / xmhdipc"
+      "detail": "root / 54321"
     },
     {
-      "time": "2026-09-03T01:01:40Z",
+      "time": "2026-09-03T01:52:51Z",
       "severity": "info",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3286,7 +3888,7 @@
       "detail": ""
     },
     {
-      "time": "2026-09-03T01:01:36Z",
+      "time": "2026-09-03T01:52:19Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3295,7 +3897,7 @@
       "detail": "sh"
     },
     {
-      "time": "2026-09-03T01:01:36Z",
+      "time": "2026-09-03T01:52:18Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3304,7 +3906,7 @@
       "detail": "shell"
     },
     {
-      "time": "2026-09-03T01:01:36Z",
+      "time": "2026-09-03T01:52:18Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3313,7 +3915,7 @@
       "detail": "system"
     },
     {
-      "time": "2026-09-03T01:01:35Z",
+      "time": "2026-09-03T01:52:18Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3322,16 +3924,16 @@
       "detail": "enable\\x00 / linuxshell\\x00"
     },
     {
-      "time": "2026-09-03T01:01:34Z",
+      "time": "2026-09-03T01:52:17Z",
       "severity": "medium",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
       "country_code": "US",
       "event": "Credential rejected",
-      "detail": "root / xc3511"
+      "detail": "root / admin"
     },
     {
-      "time": "2026-09-03T01:01:33Z",
+      "time": "2026-09-03T01:52:15Z",
       "severity": "info",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3340,7 +3942,7 @@
       "detail": ""
     },
     {
-      "time": "2026-09-03T01:01:27Z",
+      "time": "2026-09-03T01:51:44Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3349,7 +3951,7 @@
       "detail": "sh"
     },
     {
-      "time": "2026-09-03T01:01:26Z",
+      "time": "2026-09-03T01:51:44Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3358,7 +3960,7 @@
       "detail": "shell"
     },
     {
-      "time": "2026-09-03T01:01:26Z",
+      "time": "2026-09-03T01:51:44Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3367,7 +3969,7 @@
       "detail": "system"
     },
     {
-      "time": "2026-09-03T01:01:26Z",
+      "time": "2026-09-03T01:51:43Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3376,52 +3978,16 @@
       "detail": "enable\\x00 / linuxshell\\x00"
     },
     {
-      "time": "2026-09-03T01:01:25Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "sh"
-    },
-    {
-      "time": "2026-09-03T01:01:25Z",
+      "time": "2026-09-03T01:51:42Z",
       "severity": "medium",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
       "country_code": "US",
       "event": "Credential rejected",
-      "detail": "guest / 12345"
+      "detail": "root / 1234"
     },
     {
-      "time": "2026-09-03T01:01:24Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "shell"
-    },
-    {
-      "time": "2026-09-03T01:01:24Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "system"
-    },
-    {
-      "time": "2026-09-03T01:01:24Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Decoy access granted",
-      "detail": "enable\\x00 / linuxshell\\x00"
-    },
-    {
-      "time": "2026-09-03T01:01:23Z",
+      "time": "2026-09-03T01:51:40Z",
       "severity": "info",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3430,7 +3996,43 @@
       "detail": ""
     },
     {
-      "time": "2026-09-03T01:01:23Z",
+      "time": "2026-09-03T01:51:38Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Credential rejected",
+      "detail": "root / Ab12345678"
+    },
+    {
+      "time": "2026-09-03T01:51:28Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "110.173.190.221",
+      "country_code": "IN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:51:21Z",
+      "severity": "medium",
+      "protocol": "SSH",
+      "ip": "116.110.211.230",
+      "country_code": "VN",
+      "event": "Credential rejected",
+      "detail": "admin / 12345"
+    },
+    {
+      "time": "2026-09-03T01:51:19Z",
+      "severity": "info",
+      "protocol": "SSH",
+      "ip": "116.110.211.230",
+      "country_code": "VN",
+      "event": "Connection opened",
+      "detail": ""
+    },
+    {
+      "time": "2026-09-03T01:51:08Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3439,16 +4041,7 @@
       "detail": "sh"
     },
     {
-      "time": "2026-09-03T01:01:22Z",
-      "severity": "medium",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Credential rejected",
-      "detail": "admin / password"
-    },
-    {
-      "time": "2026-09-03T01:01:22Z",
+      "time": "2026-09-03T01:51:08Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3457,7 +4050,7 @@
       "detail": "shell"
     },
     {
-      "time": "2026-09-03T01:01:22Z",
+      "time": "2026-09-03T01:51:08Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3466,7 +4059,7 @@
       "detail": "system"
     },
     {
-      "time": "2026-09-03T01:01:22Z",
+      "time": "2026-09-03T01:51:07Z",
       "severity": "high",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3475,34 +4068,16 @@
       "detail": "enable\\x00 / linuxshell\\x00"
     },
     {
-      "time": "2026-09-03T01:01:21Z",
-      "severity": "info",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T01:01:20Z",
+      "time": "2026-09-03T01:51:06Z",
       "severity": "medium",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
       "country_code": "US",
       "event": "Credential rejected",
-      "detail": "support / support"
+      "detail": "root / juantech"
     },
     {
-      "time": "2026-09-03T01:01:19Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "sh"
-    },
-    {
-      "time": "2026-09-03T01:01:19Z",
+      "time": "2026-09-03T01:51:05Z",
       "severity": "info",
       "protocol": "TELNET",
       "ip": "72.167.43.61",
@@ -3511,101 +4086,38 @@
       "detail": ""
     },
     {
-      "time": "2026-09-03T01:01:19Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "shell"
-    },
-    {
-      "time": "2026-09-03T01:01:19Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "system"
-    },
-    {
-      "time": "2026-09-03T01:01:18Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Decoy access granted",
-      "detail": "enable\\x00 / linuxshell\\x00"
-    },
-    {
-      "time": "2026-09-03T01:01:17Z",
+      "time": "2026-09-03T01:50:58Z",
       "severity": "medium",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
       "event": "Credential rejected",
-      "detail": "root / xmhdipc"
+      "detail": "root / xeon"
     },
     {
-      "time": "2026-09-03T01:01:16Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "sh"
-    },
-    {
-      "time": "2026-09-03T01:01:16Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "shell"
-    },
-    {
-      "time": "2026-09-03T01:01:16Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Command executed",
-      "detail": "system"
-    },
-    {
-      "time": "2026-09-03T01:01:16Z",
+      "time": "2026-09-03T01:50:56Z",
       "severity": "info",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
+      "protocol": "SSH",
+      "ip": "202.165.25.8",
+      "country_code": "MY",
       "event": "Connection opened",
       "detail": ""
-    },
-    {
-      "time": "2026-09-03T01:01:15Z",
-      "severity": "high",
-      "protocol": "TELNET",
-      "ip": "72.167.43.61",
-      "country_code": "US",
-      "event": "Decoy access granted",
-      "detail": "enable\\x00 / linuxshell\\x00"
     }
   ],
   "coverage": {
     "sources": {
-      "observed": 14,
-      "published": 14,
+      "observed": 26,
+      "published": 26,
       "truncated": false
     },
     "usernames": {
-      "observed": 69,
-      "published": 69,
+      "observed": 79,
+      "published": 79,
       "truncated": false
     },
     "passwords": {
-      "observed": 142,
-      "published": 142,
+      "observed": 197,
+      "published": 197,
       "truncated": false
     },
     "commands": {
@@ -3620,14 +4132,14 @@
     }
   },
   "data_quality": {
-    "events_published": 3422,
+    "events_published": 6619,
     "invalid_lines": 0,
     "operator_events_excluded": 0,
     "non_public_events_excluded": 0,
     "content_redactions": 3,
-    "geo_lookups": 7,
+    "geo_lookups": 10,
     "geo_failures": 0,
-    "enrichment_lookups": 4,
+    "enrichment_lookups": 0,
     "enrichment_failures": 0,
     "privacy": "Operator and non-public source IPs excluded before aggregation; sensitive patterns redacted"
   },

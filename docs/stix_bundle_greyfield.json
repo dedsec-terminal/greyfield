@@ -1,0 +1,133 @@
+{
+  "type": "bundle",
+  "id": "bundle--5b091138-b3ba-49c8-b8f4-f4281abc585a",
+  "objects": [
+    {
+      "type": "identity",
+      "spec_version": "2.1",
+      "id": "identity--fba2b756-7560-43a6-b255-c1c5bdff5997",
+      "created": "2026-10-14T05:49:46.000Z",
+      "modified": "2026-10-14T05:49:46.000Z",
+      "name": "Swaraj Singh (Greyfield Honeypot Observatory)",
+      "description": "Defensive cloud honeypot and threat telemetry observatory on Oracle Cloud Infrastructure.",
+      "identity_class": "individual",
+      "contact_information": "swarajsingh211@gmail.com | https://github.com/dedsec-terminal/greyfield"
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--8e1d0a63-2d97-4d2c-9418-51ad132ae00a",
+      "created": "2026-10-14T05:49:46.000Z",
+      "modified": "2026-10-14T05:49:46.000Z",
+      "name": "Mirai/Gafgyt Stage-1 Payload Dropper URL",
+      "description": "HTTP dropper URL distributing architecture-specific ELF botnet binaries.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[url:value = 'http://185.93.89.72/wget']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-14T05:49:46.000Z",
+      "created_by_ref": "identity--fba2b756-7560-43a6-b255-c1c5bdff5997"
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--51ab51bd-d26a-4f7c-ad61-66b57435d140",
+      "created": "2026-10-14T05:49:46.000Z",
+      "modified": "2026-10-14T05:49:46.000Z",
+      "name": "trojan.shell/i7i1kt Dropper Script",
+      "description": "Multi-stage shell script dropper correlated on MalwareBazaar and VirusTotal.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[file:hashes.'SHA-256' = 'a6296a79f44e21b76604d2d2bbf795d2cf380f70e39d45fbf166707ff3b4a6a4']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-14T05:49:46.000Z",
+      "created_by_ref": "identity--fba2b756-7560-43a6-b255-c1c5bdff5997"
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--2eb3627a-4f99-4fc9-97ef-7185b646a409",
+      "created": "2026-10-14T05:49:46.000Z",
+      "modified": "2026-10-14T05:49:46.000Z",
+      "name": "Hostile Dropper Ingress Host",
+      "description": "Remote HTTP server hosting malicious wget payload droppers.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '185.93.89.72']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-14T05:49:46.000Z",
+      "created_by_ref": "identity--fba2b756-7560-43a6-b255-c1c5bdff5997"
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--2002ad0d-4079-4715-873f-478fee73737b",
+      "created": "2026-10-14T05:49:46.000Z",
+      "modified": "2026-10-14T05:49:46.000Z",
+      "name": "High-Volume SSH Brute-Force Botnet Node",
+      "description": "Observed executing 785 automated SSH brute-force sessions against port 22.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '45.153.34.181']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-14T05:49:46.000Z",
+      "created_by_ref": "identity--fba2b756-7560-43a6-b255-c1c5bdff5997"
+    },
+    {
+      "type": "indicator",
+      "spec_version": "2.1",
+      "id": "indicator--b0865dce-29d4-43ce-93ae-422b5f8d8f77",
+      "created": "2026-10-14T05:49:46.000Z",
+      "modified": "2026-10-14T05:49:46.000Z",
+      "name": "Distributed Credential Guessing Node",
+      "description": "Observed executing 187 automated credential spray sessions.",
+      "indicator_types": [
+        "malicious-activity"
+      ],
+      "pattern": "[ipv4-addr:value = '110.173.190.221']",
+      "pattern_type": "stix",
+      "valid_from": "2026-10-14T05:49:46.000Z",
+      "created_by_ref": "identity--fba2b756-7560-43a6-b255-c1c5bdff5997"
+    },
+    {
+      "type": "report",
+      "spec_version": "2.1",
+      "id": "report--65a80857-e6c6-49e7-9a51-85bdeac9f987",
+      "created": "2026-10-14T05:49:46.000Z",
+      "modified": "2026-10-14T05:49:46.000Z",
+      "name": "Threat Intel Report: Deconstructing 1,700+ Automated SSH Brute-Force & Lateral Movement Sessions on Cloud Endpoints",
+      "description": "Empirical adversary telemetry investigation analyzing botnet handshakes, credential spray attacks, and ingress dropper payloads captured on Oracle Cloud Infrastructure.",
+      "report_types": [
+        "threat-report"
+      ],
+      "published": "2026-10-14T05:49:46.000Z",
+      "created_by_ref": "identity--fba2b756-7560-43a6-b255-c1c5bdff5997",
+      "object_refs": [
+        "identity--fba2b756-7560-43a6-b255-c1c5bdff5997",
+        "indicator--8e1d0a63-2d97-4d2c-9418-51ad132ae00a",
+        "indicator--51ab51bd-d26a-4f7c-ad61-66b57435d140",
+        "indicator--2eb3627a-4f99-4fc9-97ef-7185b646a409",
+        "indicator--2002ad0d-4079-4715-873f-478fee73737b",
+        "indicator--b0865dce-29d4-43ce-93ae-422b5f8d8f77"
+      ],
+      "external_references": [
+        {
+          "source_name": "Greyfield GitHub Repository",
+          "url": "https://github.com/dedsec-terminal/greyfield/blob/master/docs/THREAT_INTEL_REPORT_1700_SESSIONS.md"
+        },
+        {
+          "source_name": "Greyfield Public Threat Observatory",
+          "url": "https://dedsec-terminal.github.io/greyfield/"
+        },
+        {
+          "source_name": "Public Research Gist",
+          "url": "https://gist.github.com/dedsec-terminal/9205481c24005aa35a60a9c64a2f9b31"
+        }
+      ]
+    }
+  ]
+}

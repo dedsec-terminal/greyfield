@@ -1,0 +1,15 @@
+indicator_type,indicator_value,threat_actor_or_family,mitre_technique,description,first_seen
+ipv4,185.93.89.72,Mirai/Gafgyt Dropper Host,T1105,Stage-1 HTTP malware binary payload dropper,2026-09-02T10:16:38Z
+url,http://185.93.89.72/wget,Mirai/Gafgyt Dropper URL,T1105,Stage-1 shell script payload ingress URL,2026-09-02T10:16:38Z
+sha256,a6296a79f44e21b76604d2d2bbf795d2cf380f70e39d45fbf166707ff3b4a6a4,trojan.shell/i7i1kt,T1105,VirusTotal / MalwareBazaar correlated dropper script,2026-09-02T10:16:38Z
+sha256,4af5a5c98ad132095c6fbe7b02c242153a190a01cc321e50a916a0ca46fbaa62,Malicious Ingress Script,T1105,VirusTotal correlated shell payload,2026-09-02T10:08:23Z
+ipv4,45.153.34.181,Automated SSH Brute-Force Bot,T1110.001,High-volume automated credential spray (785 sessions),2026-08-30T12:00:00Z
+ipv4,110.173.190.221,Automated SSH Brute-Force Bot,T1110.001,Credential spray botnet node (187 sessions),2026-08-31T08:15:00Z
+ipv4,49.248.197.50,Automated SSH Brute-Force Bot,T1110.001,Distributed credential guessing (118 sessions),2026-09-01T04:22:00Z
+ipv4,116.74.164.106,Automated SSH Brute-Force Bot,T1110.001,Distributed credential guessing (113 sessions),2026-09-01T14:40:00Z
+ipv4,104.238.110.208,Automated SSH Brute-Force Bot,T1110.001,Distributed credential guessing (82 sessions),2026-09-01T18:10:00Z
+ipv4,2.57.122.150,Automated SSH Brute-Force Bot,T1110.001,Distributed credential guessing (64 sessions),2026-09-02T01:30:00Z
+ipv4,202.165.25.8,Automated Telnet/SSH Scanner,T1110.001,Port 22/23 reconnaissance and brute-force (41 sessions),2026-09-02T05:45:00Z
+ipv4,2.57.122.238,Automated SSH Brute-Force Bot,T1110.001,Distributed credential guessing (37 sessions),2026-09-02T09:12:00Z
+ipv4,92.118.39.50,Automated SSH Scanner,T1110.001,Reconnaissance and brute-force scanner (28 sessions),2026-09-02T11:20:00Z
+string_signature,echo -e "\x47\x41\x59\x46\x47\x54",Gafgyt/Qbot Heartbeat,T1059.004,Hex-encoded GAYFGT terminal response probe,2026-09-02T00:00:00Z

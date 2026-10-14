@@ -5,7 +5,8 @@ Greyfield is a defensive cloud honeypot and public threat observatory. It uses
 activity on an isolated Oracle Cloud Infrastructure instance, then publishes a
 sanitized, evidence-backed view of what reached the decoy.
 
-**[Open the live Internet Threat Observatory →](https://dedsec-terminal.github.io/greyfield/)**
+**[Open the live Internet Threat Observatory →](https://dedsec-terminal.github.io/greyfield/)**  
+📄 **[Read Threat Intelligence Report: Deconstructing 1,700+ Automated SSH Brute-Force & Lateral Movement Sessions →](docs/THREAT_INTEL_REPORT_1700_SESSIONS.md)**
 
 **Public research sensor:** `137.23.33.116` — SSH on `22/tcp` and Telnet on
 `23/tcp`. These are isolated Cowrie deception services; they do not provide

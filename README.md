@@ -18,6 +18,8 @@ techniques supported by retained evidence. It never publishes raw Cowrie logs,
 session identifiers, TTY recordings, captured files, operator addresses,
 administrator access details, or cloud secrets.
 
+![Greyfield Internet Threat Observatory live globe and telemetry snapshot](docs/screenshots/observatory.webp)
+
 ## What this project demonstrates
 
 - Cloud honeypot deployment with strict separation between bait services and
